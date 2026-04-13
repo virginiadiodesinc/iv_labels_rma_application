@@ -1,0 +1,18 @@
+block_info html ids
+{ 
+	"block-engraving-input": "",
+	"block-revision-input": "",
+	"block-serial-number-input": "", 
+	"inspection-date-input": "",
+	"inspection-initials-input": "",
+	"pb1-build-name-input": "",
+	"pb1-date-input": "",
+	"pb1-initials-input": "",
+	"pb2-bond-wire-pads-count-input": "",
+	"pb2-build-name-input": "",
+	"pb2-components-count-input": "",
+	"pb2-date-input": "",
+	"pb2-initials-input": "",
+	"pb2-inspector-initials-input": "",
+	"pb2-pass-fail-input": "" 
+}

@@ -1,0 +1,31 @@
+<tr class="note-row">
+	<td>
+		<label>
+			Note Type:
+			<select name="note_type">
+				<option value="GENERIC">General Note</option>
+				<option value="PCB DEVIATIONS">PCB Edits</option>
+				<option value="CURRENT_TEST">Current Test</option>
+				<option value="REWORK SUMMARY">Rework Summary</option>
+				<option value="INDIUM">Indium</option>
+				<option value="TEMPERATURE">Temperature</option>
+		</label>
+	</td>
+	<td>
+		<label>
+			Note:
+			<input type="text" 
+					name="note"
+					size="50"
+					value="{{note.text if note and note.text else ''}}"
+					>
+		</label>
+	</td>
+	<td>
+		<button
+			type="button"
+			onclick="this.closest('.note-row').remove()">
+			X
+		</button>
+	</td>
+</tr>

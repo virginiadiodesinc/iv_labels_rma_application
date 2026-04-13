@@ -1,0 +1,11 @@
+{% include 'partials/block-forms/block-id.html' %}
+{% include 'partials/block-forms/inspection.html' %}
+{% include 'partials/block-forms/pb1.html' %}
+{% include 'partials/block-forms/pb2.html' %}
+
+<div>
+	<button hx-post="/save_block_file" 
+			hx-swap="none"
+			hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info">
+			Save Block File</button>
+</div>

@@ -1,0 +1,24 @@
+<div class="lot-input-container">
+	<label>
+		Lot:
+		<select 
+		name="lot-select"
+		hx-post="/check_custom_lot/"
+		hx-trigger="change"
+		hx-target="next .custom-lot-input-container"
+		hx-swap="innerHTML"
+		hx-vals='js:{ "lot-select": this.value }'>
+			<option value="Unknown">Unknown</option>
+			<option value="N/A">N/A</option>
+			{% for lot in lot_list %}
+				<option value="{{lot}}" {% if part and part['part_lot'] == lot %}selected{% endif %}>
+					{{lot}}
+				</option>
+			{% endfor %}
+			<option value="Other">Other</option>
+		</select>	
+	</label>
+	<div class="custom-lot-input-container">
+		{% include "partials/build-page/custom-lot-input.html" %}
+	</div>
+</div>

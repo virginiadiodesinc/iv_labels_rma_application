@@ -1,0 +1,23 @@
+<tr class="bom-part-row"
+	data-part-name="{{bom_part["part_name"]}}"
+	data-part-quantity="{{bom_part["quantity"]}}"
+	data-part-type="{{bom_part["category"]}}">
+	<td>{{bom_part["part_name"]}}</td>
+	<td>
+		<input type="checkbox"
+		name="bom-part-check"
+		value="{{bom_index}}">
+
+		<input type="hidden"
+			name="bom_part_name_{{ bom_index }}"
+			value="{{ bom_part['part_name'] }}">
+
+		<input type="hidden"
+		name="bom_part_quantity_{{ bom_index }}"
+		value="{{ bom_part['part_quantity'] }}">
+
+		<input type="hidden"
+			name="bom_part_type_{{ bom_index }}"
+			value="{{ bom_part['part_type'] }}">
+	</td>
+</tr>

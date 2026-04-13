@@ -1,0 +1,430 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DieCutLabel Version="8.0" Units="twips" MediaType="Default">
+	<PaperOrientation>Landscape</PaperOrientation>
+	<Id>LargeShipping</Id>
+	<IsOutlined>false</IsOutlined>
+	<PaperName>30256 Shipping</PaperName>
+	<DrawCommands>
+		<RoundRectangle X="0" Y="0" Width="3331" Height="5715" Rx="270" Ry="270" />
+	</DrawCommands>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_NAME_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">BUILD NAME</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="540" Y="187.2" Width="1008" Height="180" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_NAME_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">_____________________________________</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="1512" Y="187.2" Width="2880" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_NAME_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">FAKE BUILD NAME GOES HERE</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="1584" Y="187.2" Width="2568" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>ROW_TEMPLATE_PART_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">PART</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="547.2" Y="374.4" Width="432" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>ROW_TEMPLATE_PART_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">_____________________________________</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="1008" Y="374.4" Width="2496" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>ROW_TEMPLATE_PART_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Middle</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">G10APWR12X3IS43.7FDGXXX</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="1080" Y="374.4" Width="2376" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>ROW_TEMPLATE_LOT_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">LOT</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="3576" Y="374.4" Width="360" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>ROW_TEMPLATE_LOT_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">_____________</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="3885" Y="374.4" Width="864" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>ROW_TEMPLATE_LOT_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Middle</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">20250101</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="3942" Y="374.4" Width="864" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>NOTE_TEMPLATE_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">NOTE</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="547.2" Y="547.2" Width="432" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>NOTE_TEMPLATE_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">_______________________________________________</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="978" Y="547.2" Width="4284" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>NOTE_TEMPLATE_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Middle</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">INSERT FAKE NOTE WITH INFO RIGHT HERE</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="1080" Y="547.2" Width="4032" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BLOCK_SERIAL_NUMBER_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">SN</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="4395" Y="187.3" Width="216" Height="180" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BLOCK_SERIAL_NUMBER_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">_______</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="4596" Y="187.2" Width="684" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BLOCK_SERIAL_NUMBER_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">3-001B</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="4668" Y="187.2" Width="623.999999999997" Height="187.2" />
+	</ObjectInfo>
+</DieCutLabel>

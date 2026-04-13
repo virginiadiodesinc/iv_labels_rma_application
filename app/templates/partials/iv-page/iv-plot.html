@@ -1,0 +1,29 @@
+<div id="iv-plot-container" 
+	class="iv-plot-container"
+	hx-get="/get_empty_plot"
+	hx-trigger="load"
+	hx-swap="innerHTML"
+	hx-target="#iv-plot">
+	<table id="iv-plot-table">
+		<th>
+			<td>Diode IV Curve (A,V)</td>
+		</th>
+		<tr>
+			<td>{{iv_curve.polarity if iv_curve and iv_curve.polarity else ""}}</td>
+			<td> Polarity</td>
+			<td>{{iv_curve.points_per_decade if iv_curve and iv_curve.points_per_decade else ""}}</td>
+			<td>Points per Decade</td>
+		</tr>
+		<tr>
+			<td>
+				<select>
+					<option value="linear">Linear</option>
+					<option value="log">Log</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			{% include "partials/iv-page/iv-plot-figure.html" %}
+		</tr>
+	</table>
+</div>

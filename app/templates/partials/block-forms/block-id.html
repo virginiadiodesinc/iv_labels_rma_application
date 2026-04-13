@@ -1,0 +1,60 @@
+<form 	
+	id="block-info" 
+	hx-get="/get_jb2_bom_from_build_name/" 
+	hx-target="#build-container"
+	>
+	<table>
+		<tr>
+			<th>BLOCK IDENTIFIERS</th>
+		</tr>
+		<tr>
+			<td>
+				<label for="block-engraving-input">BLOCK ENGRAVING:</label>
+				<input 
+					type="text" 
+					id="block-engraving-input" 
+					name="block-engraving-input"
+					oninput="this.value = this.value.toUpperCase();"
+					size="25"
+					value="{{block.block_engraving if block and block.block_engraving else ''}}"
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="block-serial-number-input">BLOCK SERIAL NUMBER:</label>
+				<input
+					type="text"
+					id="block-serial-number-input" 
+					name="block-serial-number-input"
+					size="5"
+					oninput="this.value = this.value.toUpperCase();"
+					value="{{block.block_serial_number if block and block.block_serial_number else ''}}"
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="block-revision-input">BLOCK REVISION:</label>
+				<input 
+					type="text" 
+					id="block-revision-input" 
+					name="block-revision-input"
+					oninput="this.value = this.value.toUpperCase();"
+					maxlength="2"
+					size="5"
+					value="{{block.block_revision if block and block.block_revision else ''}}"
+				>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<button
+	hx-post="/populate_block_info"
+	hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info"
+	hx-target="#populate-section"
+	class="not-implemented-yet">
+	Populate Block/Build Information
+</button>
+<div id="populate-section"></div>

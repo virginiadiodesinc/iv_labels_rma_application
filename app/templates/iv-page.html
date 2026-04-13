@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+{% block content %}
+<div id="iv-page-container" class="iv-page-container">
+
+	{% include "partials/iv-page/iv-file-upload.html" %}
+
+	{% include "partials/iv-page/iv-plot.html" %}
+
+	<div id="iv-curve-information" class="iv-curve-information">
+		{% include "partials/iv-page/iv-info.html" %}
+	</div>
+	
+	<div id="iv-gui-controls"
+		hx-post="/default_keithley_settings/"
+		hx-trigger="load"
+		hx-swap="innerHTML">
+	</div>
+	
+</div>	
+{% endblock %}

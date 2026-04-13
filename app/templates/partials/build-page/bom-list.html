@@ -1,0 +1,50 @@
+<form id="bom-list-form" name="bom-list-form">
+	<details open>
+		<summary></summary>
+		<table id="bom-list">
+			<tr>
+				<th id="bom-build-name">{{build_name}}</th>
+			</tr>
+			{% for bom_part in bom_parts %}
+				{% set bom_index = loop.index0 %}
+				{% include "partials/build-page/bom-part-row.html" %}
+			{% endfor %}
+		</table>
+	</details>
+		{% for sub_part in sub_parts %}
+		<details open>
+		<summary></summary>
+			<table class="bom-sub-list">
+				<tr>
+					<th id="bom_sub-build-name">{{sub_part.name}}</th>
+				</tr>
+				{% for bom_part in sub_part.sub_parts %}
+					{% set bom_index = loop.index0 + sub_part.starting_index %}
+					{% include "partials/build-page/bom-part-row.html" %}
+				{% endfor %}
+			</table>
+		{% endfor %}
+	</details>
+	
+</form>
+
+<button 
+	id="bom-lookup-button"
+	hx-get="/get_jb2_bom_from_build_name/"
+	hx-include="#component-name"
+	hx-target="#bom-list-form"
+	hx-swap-oob="true"
+>
+	Search for BOM
+</button>
+
+<button
+	id="add-bom-parts-button"
+	name="add-bom-parts-button"
+	hx-swap-oob="true"
+	hx-swap="beforeend"
+	hx-post="/add_part_rows_from_bom_list/"
+	hx-include="#bom-list-form"
+	hx-target="#actual-bom-container">
+	Add BOM part(s)
+</button>

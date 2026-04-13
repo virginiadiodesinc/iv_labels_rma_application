@@ -1,0 +1,61 @@
+<form id="full-build-form" name="full-build-form">
+	<table id="full-build-table-header">
+		<tr>
+			<th>FULL BUILD INFO</th>
+		</tr>
+	</table>
+	<table id="full-build-table-body">
+		{% include "partials/block-forms/full-build-info.html" %}
+	</table>
+	<table id="actual-bom-container">
+			{% for item in items %}
+				{% include "partials/build-page/part-row.html" %}
+			{% endfor %}
+			{% for note in notes %}
+				{% include "partials/build-page/note-row.html" %}
+			{% endfor %}
+	</table>
+</form>
+
+<button
+	id="add-empty-row-button"
+	name="add-empty-row-button"
+	hx-swap-oob="true"
+	hx-get="/add_empty_part_row/"
+	hx-target="#actual-bom-container"
+	hx-swap="beforeend"
+	>
+	Add Custom Part
+</button>
+
+<button
+	id="add-empty-note-button"
+	name="add-empty-note-button"
+	hx-swap-oob="true"
+	hx-get="/add_empty_note_row/"
+	hx-target="#actual-bom-container"
+	hx-swap="beforeend"
+	>
+	Add Note
+</button>
+
+<button
+	id="print-build-button"
+	name="print-build-button"
+	hx-swap-oob="true"
+	hx-post="/print/full_build/"
+	hx-include="#full-build-form, #block-info"
+	hx-swap="none"
+	>
+	Print Build
+</button>
+
+<button
+	id="save-build-button"
+	name="save-build-button"
+	hx-post="/save_build_file/"
+	hx-include="#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info, #block-id"
+	hx-swap="none"
+	>
+	Save Build File
+</button>

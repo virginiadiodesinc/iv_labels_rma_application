@@ -1,0 +1,96 @@
+<form class="pb2-info" id="pb2-info" name="pb2-info">
+	<table>
+		<tr>
+			<th>PB2 INFO</th>
+		</tr>
+		<tr>
+			<td>BUILD NAME</td>
+			<td>
+				<input 
+					size="15" 
+					id="pb2-build-name-input"
+					name="pb2-build-name-input"
+					oninput="this.value = this.value.toUpperCase();"
+					value="{{block.pb2_build_name if block and block.pb2_build_name else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>DATE</td>
+			<td>
+				<input 
+					size="10" 
+					id="pb2-date-input" 
+					name="pb2-date-input"
+					value="{{block.pb2_date if block and block.pb2_date else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>PREBUILD INITIALS</td>
+			<td>
+				<input 
+					size="5" 
+					id="pb2-initials-input" 
+					name="pb2-initials-input"
+					oninput="this.value = this.value.toUpperCase();"
+					value="{{block.pb2_initials if block and block.pb2_initials else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>PASS/FAIL</td>
+			<td>
+				<input 
+					size="5" 
+					id="pb2-pass-fail-input" 
+					name="pb2-pass-fail-input"
+					oninput="this.value = this.value.toUpperCase();"
+					value="{{block.pb2_pass_fail if block and block.pb2_pass_fail else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>BOND WIRE PADS</td>
+			<td>
+				<input 
+					size="5" 
+					id="pb2-bond-pads-count-input" 
+					name="pb2-bond-pads-count-input"
+					value="{{block.pb2_bond_pads_count if block and block.pb2_bond_pads_count else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>COMPONENTS</td>
+			<td>
+				<input 
+					size="5" 
+					id="pb2-components-count-input" 
+					name="pb2-components-count-input"
+					value="{{block.pb2_components_count if block and block.pb2_components_count else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>INSPECTOR</td>
+			<td>
+				<input 
+					size="5" 
+					id="pb2-inspector-initials-input" 
+					name="pb2-inspector-initials-input"
+					oninput="this.value = this.value.toUpperCase();"
+					value="{{block.pb2_inspection_initials if block and block.pb2_inspection_initials else ''}}">
+			</td>
+		</tr>
+	</table>
+</form>
+
+<button
+	class="not-implemented-yet">
+	Save PB2 Info
+</button>
+
+<button
+	id="print-pb2-button"
+	name="print-pb2-button"
+	hx-post="/print/pb2_label/"
+	hx-include="#pb2-info, #block-info"
+	hx-swap="none"
+	>
+	Print PB2 Info
+</button>

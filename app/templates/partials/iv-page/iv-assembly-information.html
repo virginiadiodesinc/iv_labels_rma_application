@@ -1,0 +1,56 @@
+<form id="iv-assembly-information-form">
+	<label> Block Engraving
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-block-engraving"
+				value="{{iv_data.block_name if iv_data and iv_data.block_name else ''}}">
+	</label>
+	<label> Block Serial Number
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-block-sn"
+				value="{{iv_data.block_sn if iv_data and iv_data.block_sn else ''}}">
+	</label>
+	<label> Build Name
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-build-name"
+				value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}">
+	</label>
+	<label> Revision Letter
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-block-revision"
+				value="{{iv_data.block_revision if iv_data and iv_data.block_revision else ''}}">
+	</label>
+	<label> Diode
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-diode"
+				value="{{iv_data.diode if iv_data and iv_data.diode else ''}}">
+	</label>
+	<label> Circuit
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-circuit"
+				value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}">
+	</label>
+	<label> Assembly #
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-assembly-number"
+				value="{{iv_data.assembly_number if iv_data and iv_data.assembly_number else ''}}">
+	</label>
+	<label> Additional Info
+		<input type="text"
+				name="iv-additional-info"
+				value="{{iv_data.additional_info if iv_data and iv_data.additional_info else ''}}">
+	</label>
+	<label class="not-implemented-yet"> Subassembly Tag
+		<input type="text"
+				oninput="this.value = this.value.toUpperCase();"
+				name="iv-subassembly-tag"
+				class="not-implemented-yet">
+	</label>
+	<input type="hidden" name="iv-build-sn" value="{{iv_data.build_sn if iv_data and iv_data.build_sn else ''}}">
+</form>

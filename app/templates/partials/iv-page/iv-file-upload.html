@@ -1,0 +1,17 @@
+<form id="iv-file-upload-form">
+	<button
+		hx-post="/upload_iv_file/"
+		hx-target="#iv-file-upload-form"
+		hx-swap="innerHTML">
+		Upload IV File
+	</button>
+	<text name="iv-file-upload-text" id="iv-file-upload-text">{{file_path if file_path else 'No file selected'}}</text>
+	<input type="hidden" name="iv-file-path" id="iv-file-path" value="{{file_path if file_path else ''}}">
+	<button 
+		type="submit"
+		hx-post="/populate_info_from_iv_file/"
+		hx-swap="none"
+		{% if not file_path or file_path == '' %}disabled{% endif %}>
+		Populate IV Data
+	</button>
+</form>

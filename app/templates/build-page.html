@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="build-page-container" class="build-page-container">
+	<div class="block-info-container">
+		{% include "partials/block-forms/block-file-upload.html" %}
+		{% include "partials/block-forms/build-file-upload.html" %}
+		<div id="block-forms-container" name="block-forms-container" class="block-forms-container">
+			{% include "partials/block-forms/block-forms-container.html" %}
+		</div>
+	</div>
+	<div class="bom-container" id="bom-container">
+		{% include "partials/search/bom-search-form.html" %}
+		{% include "partials/build-page/bom-list.html" %}
+	</div>
+	<div class="full-build-container" id="full-build-container">
+		{% include "partials/block-forms/full-build.html" %}
+	</div>	
+</div>	
+{% endblock %}

@@ -1,0 +1,44 @@
+<form class="inspection-info" id="inspection-info" name="inspection-info">
+	<table>
+		<tr>
+			<th>INSPECTION INFO</th>
+		</tr>
+		<tr>
+			<td>DATE</td>
+			<td>
+				<input 
+					size="10" 
+					id="inspection-date-input" 
+					name="inspection-date-input"
+					value="{{block.inspection_date if block and block.inspection_date else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>INSPECTION INITIALS</td>
+			<td>
+				<input 
+					size="5" 
+					id="inspection-initials-input" 
+					name="inspection-initials-input"
+					oninput="this.value = this.value.toUpperCase();"
+					value="{{block.inspection_initials if block and block.inspection_initials else ''}}"
+					>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<button 
+	class="not-implemented-yet">
+	Save Inspection Info
+</button>
+
+<button
+	id="print-inspection-button"
+	name="print-inspection-button"
+	hx-post="/print/inspection_label/"
+	hx-include="#inspection-info, #block-info"
+	hx-swap="none"
+	>
+	Print Inspection Info
+</button>

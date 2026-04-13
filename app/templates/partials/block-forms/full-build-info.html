@@ -1,0 +1,34 @@
+<tr>
+	<td>
+		<label for="full-build-name-input">BUILD NAME:</label>
+		<input 
+			type="text" 
+			id="full-build-name-input" 
+			name="full-build-name-input" 
+			size="15"
+			oninput="this.value = this.value.toUpperCase();"
+			value="{{block.full_build_name if block and block.full_build_name else ''}}"
+		>
+	</td>
+	<td>
+		<label for="full-build-initials-input">BUILD INITIALS:</label>
+		<input 
+			type="text" 
+			id="full-build-initials-input" 
+			name="full-build-initials-input" 
+			size="10"
+			oninput="this.value = this.value.toUpperCase();"
+			value="{{block.full_build_initials if block and block.full_build_initials else ''}}"
+		>
+	</td>
+	<td>
+		<label for="full-build-date-input">BUILD DATE:</label>
+		<input 
+			type="text" 
+			id="full-build-date-input" 
+			name="full-build-date-input" 
+			size="10"
+			value="{{block.full_build_date if block and block.full_build_date else ''}}"
+		>
+	</td>
+</tr>

@@ -1,0 +1,165 @@
+<div id="iv-gui-controls" hx-trigger="load" hx-swap="innerHTML">
+	<div>
+		<button id="open-iv-button">Open IV File from DB</button>
+	</div>
+
+	<details open id="iv-assembly-information">
+		<summary>Part Information</summary>
+		{% include "partials/iv-page/iv-assembly-information.html" %}
+	</details>
+
+	<details open>
+		<summary>IV Basic Controls</summary>
+		<form id="iv-basic-controls-form">
+			<label> Compliance Voltage (V)
+				<input type="number" 
+						step="0.1"
+						value="{{ current_settings.compliance_voltage if current_settings and current_settings.compliance_voltage}}"
+						name="compliance-voltage">
+			</label>
+			<label> Maximum Current (uA)
+				<input type="number"
+						value="{{ current_settings.maximum_current.replace('E-3', '') if current_settings and current_settings.maximum_current}}"
+						min="1"
+						max="5"
+						name="maximum-current">
+			</label>
+			<label> Polarity
+				<select name="polarity">
+					<option value="+" 
+					{% if current_settings and current_settings.polarity == '+' %}
+						selected
+					{% endif %}>+</option>
+					<option value="-" 
+					{% if current_settings and current_settings.polarity == '-' %}
+						selected
+					{% endif %}>-</option>
+				</select>
+			</label>
+			<label> Reverse Breakdown Test
+				<input type="checkbox" name="reverse-breakdown-test">
+			</label>
+			<label> Reverse Current (uA)
+				<input type="number" 
+						step="0.1"
+						value="{{ current_settings.reverse_current if current_settings and current_settings.reverse_current}}"
+						name="reverse-current">
+			</label>
+			<label> Reverse Compliance (V)
+				<input type="number" 
+						step="0.1"
+						value="{{ current_settings.reverse_compliance if current_settings and current_settings.reverse_compliance}}"
+						name="reverse-compliance">
+			</label>
+		</form>
+	</details>
+
+	<details>
+		<summary>IV Advanced Controls</summary>
+		<form id="iv-advanced-controls-form">
+			<label> Default Delay
+				<input type="checkbox"
+						id="default-delay"
+						checked = {{ True if current_settings and current_settings.default_delay == 'on'}}
+						name="default-delay">
+			</label>
+			<label> Sweep Delay (mse)
+				<input type="number"
+						value="{{ current_settings.sweep_delay if current_settings and current_settings.sweep_delay}}"
+						name="sweep-delay">
+			</label>
+			<label> GPIB Address
+				<input type="number" 
+						value="16"
+						name="gpib-address">
+			</label>
+			<label> Points/Decade
+				<select name="points-per-decade">
+					<option value="5" 
+					{% if current_settings and current_settings.points_per_decade == '5' %}
+						selected
+					{% endif %}>5</option>
+					<option value="10" 
+					{% if current_settings and current_settings.points_per_decade == '10' %}
+						selected
+					{% endif %}>10</option>
+					<option value="25" 
+					{% if current_settings and current_settings.points_per_decade == '25' %}
+						selected
+					{% endif %}>25</option>
+					<option value="50" 
+					{% if current_settings and current_settings.points_per_decade == '50' %}
+						selected
+					{% endif %}>50</option>
+				</select>
+			</label>
+			<label> Filter Readings
+				<select name="filter-readings">
+					<option value="off" 
+					{% if current_settings and current_settings.filter_readings == 'off' %}
+						selected
+					{% endif %}>Off</option>
+					<option value="2" 
+					{% if current_settings and current_settings.filter_readings == '2' %}
+						selected
+					{% endif %}>2</option>
+					<option value="4" 
+					{% if current_settings and current_settings.filter_readings == '4' %}
+						selected
+					{% endif %}>4</option>
+					<option value="8" 
+					{% if current_settings and current_settings.filter_readings == '8' %}
+						selected
+					{% endif %}>8</option>
+					<option value="16" 
+					{% if current_settings and current_settings.filter_readings == '16' %}
+						selected
+					{% endif %}>16</option>
+					<option value="32" 
+					{% if current_settings and current_settings.filter_readings == '32' %}
+						selected
+					{% endif %}>32</option>
+				</select>
+			</label>
+			<label>Time
+				<select name="integration-time">
+					<option value="60hz" 
+					{% if current_settings and current_settings.integration_time == '60hz' %}
+						selected
+					{% endif %}>60 Hz</option>
+					<option value="medium" 
+					{% if current_settings and current_settings.integration_time == 'medium' %}
+						selected
+					{% endif %}>Medium</option>
+					<option value="fast" 
+					{% if current_settings and current_settings.integration_time == 'fast' %}
+						selected
+					{% endif %}>Fast</option>
+				</select>
+			</label>
+		</form>
+	</details>
+
+	<div>
+		<button id="run-iv-button"
+				hx-post="/take_iv/"
+				hx-target="#iv-plot"
+				hx-swap="innerHTML"
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form">
+				Run IV
+		</button>
+		<button id="update-settings-button"
+				hx-post="/update_keithley_settings/"
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
+				hx-swap="none">
+				Update Settings
+		</button>
+		<button id="run-iv-with-heat-test-button">Run IV with Heat Test</button>
+		<button id="save-iv-button"
+				hx-post="/save_iv_file/"
+				hx-include="#iv-info, #iv-curve-points, #iv-assembly-information"
+				hx-swap="none">
+				Save IV File
+		</button>
+	</div>
+</div>

@@ -1,0 +1,70 @@
+<tr class="part-row">
+	<td>
+		<label>
+			Part Type:
+			<select name="part_type">
+				<option value="N/A" {% if part and part['part_type'] == "N/A" %}
+						selected
+					{% endif %}>N/A</option>
+				<option value="MISC" {% if part and part['part_type'] == "MISC" %}
+						selected
+					{% endif %}>MISC</option>
+				<option value="DIODE" {% if part and part['part_type'] == "DIODE" %}
+						selected
+					{% endif %}>DIODE</option>
+				<option value="PCB" {% if part and part['part_type'] == "PCB" %}
+						selected
+					{% endif %}>PCB</option>
+				<option value="CONNECTOR" {% if part and part['part_type'] == "CONNECTOR" %}
+						selected
+					{% endif %}>CONNECTOR</option>
+				<option value="CIRCUIT" {% if part and part['part_type'] == "CIRCUIT" %}
+						selected
+					{% endif %}>CIRCUIT</option>
+				<option value="MMIC" {% if part and part['part_type'] == "MMIC" %}
+						selected
+					{% endif %}>MMIC</option>
+				<option value="FILTER" {% if part and part['part_type'] == "FILTER" %}
+						selected
+					{% endif %}>FILTER</option>
+			</select>
+		</label>
+	</td>
+	<td>
+		<label>
+			Part Name:
+			<input type="text" 
+					name="part" 
+					value="{{part['part_name'] if part else ''}}" 
+					size="30"
+					hx-get="/search_part_lots/"
+					hx-trigger="revealed, keyup changed delay:300ms"
+					hx-target="next .lot-container"
+					hx-include="this"
+					oninput="this.value = this.value.toUpperCase();">
+		</label>
+	</td>
+	<td class="lot-container">
+		{% if part %}
+			{% include "partials/build-page/lot-input.html" %}
+		{% endif %}
+	</td>
+
+	<td>
+		<label>
+			Qty:
+			<input class="quantity"
+					type="number" 
+					name="quantity" 
+					value="{{part['part_quantity'] if part else ''}}">
+		</label>
+	</td>
+	
+	<td>
+		<button
+			type="button"
+			onclick="this.closest('.part-row').remove()">
+			X
+		</button>
+	</td>
+</tr>

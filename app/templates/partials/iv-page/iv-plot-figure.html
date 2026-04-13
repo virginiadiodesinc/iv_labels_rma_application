@@ -1,0 +1,11 @@
+<td id="iv-plot">
+	<form id="iv-curve-points">
+		<input type="hidden" name="iv-source-values" value="{{iv_curve['iv_source_values'] if iv_curve and iv_curve['iv_source_values'] else ''}}">
+		<input type="hidden" name="iv-measurement-values" value="{{iv_curve['iv_measurement_values'] if iv_curve and iv_curve['iv_measurement_values'] else ''}}">
+		<input type="hidden" name="iv-voltage-up" value="{{iv_curve['iv_voltage_up'] if iv_curve and iv_curve['iv_voltage_up'] else ''}}">
+		<input type="hidden" name="iv-voltage-down" value="{{iv_curve['iv_voltage_down'] if iv_curve and iv_curve['iv_voltage_down'] else ''}}">
+	</form>
+	<div id="iv-figure" class="iv-figure">
+		{{iv_curve["figure"] | safe if iv_curve and iv_curve["figure"] else "Loading plot..."}}
+	</div>
+</td>
