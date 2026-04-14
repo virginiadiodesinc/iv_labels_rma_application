@@ -2,6 +2,7 @@
 
 *{
 	font-family: 'Roboto', sans-serif;
+	font-size: small;
 }
 
 .not-implemented-yet {
@@ -29,7 +30,7 @@
 	background-color: #0099ff;
 	display: flex;
 	justify-content: space-around;
-	align-items: stretch;
+	align-items: center;
 }
 
 .navbar li a {
@@ -40,8 +41,8 @@
 	justify-content: center;
 }
 
-.navbar li:hover {
-	background-color: #0000cc;
+.navbar li a:hover {
+	color: gold;
 }
 
 .footer {
@@ -56,10 +57,92 @@
 }
 
 .content {
+	padding-top: 1%;
 	flex: 1;
 	order: 2;
 }
 
 .build-page-container {
+	display: grid;
+	grid-template-columns: repeat(9, 1fr);
+	grid-template-rows: 5% 95%;
+}
 
+.block-info-container {
+	grid-column-start: 1;
+	grid-column-end: 4;
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
+.bom-container {
+	grid-column-start: 4;
+	grid-column-end: 7;
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
+.full-build-container {
+	grid-column-start: 7;
+	grid-column-end: 10;
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
+.block-file-upload-form {
+	grid-row-start: 1;
+	grid-row-end: 2;
+	grid-column-start: 1;
+	grid-column-end: 4;
+}
+
+.build-file-upload-form {
+	grid-row-start: 1;
+	grid-row-end: 2;
+	grid-column-start: 7;
+	grid-column-end: 10;
+}
+
+.iv-page-container {
+	display: grid;
+	grid-template-rows: auto auto auto;
+}
+
+.iv-gui-controls {
+	grid-row-start: 1;
+	grid-row-end: 2;
+}
+
+.iv-curve-information {
+	grid-row-start: 2;
+	grid-row-end: 3;
+
+}
+
+.iv-info {
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.iv-curve-information table {
+	border: thin solid black;
+}
+
+.iv-plot-container {
+	display: grid;
+	text-align: center;
+}
+
+.iv-plot-header-container {
+	display: flex;
+	justify-content: space-around;
+}
+
+.iv-figure {
+	width: 75%;
+	height: 75%;
+	margin: auto;
+	align-self: center;
 }
