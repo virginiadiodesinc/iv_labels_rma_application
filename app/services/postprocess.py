@@ -148,7 +148,7 @@ class IV_curve():
         self.dv4 = self.dfIpts.loc[5] - self.dfIpts.loc[6] #dV4 for I from Imax/10 to Imax
         self.dv5 = self.dfIpts.loc[6] - self.dfIpts.loc[7] #dV5 for I from Imax/100 to Imax/10
 
-        self.Rs_1 = (self.dv1["V"] - self.dv2["V"]) / (self.dv1["I"]) #Should this calculation be made more accurate?
+        self.Rs_1 = (self.dv1["V"] - self.dv2["V"]) / (self.dv1["I"])
         self.Rs_3pt = (self.dv4["V"] - self.dv5["V"]) / (self.dv4["I"])
         self.Rs_4pt = (self.dv1["V"] - self.dv3["V"]) / (self.dv1["I"])
 

@@ -10,6 +10,7 @@ import pandas as pd
 from app.services.keithley_236_functions import SMU_K236
 from app.services.write_MicroA_files import write_block_file, write_IV_file, write_build_file
 from app.services import postprocess as pp
+from app.services.process_feedback import process_and_save
 from datetime import datetime
 import webview
 
@@ -22,6 +23,10 @@ build_file_directory = os.path.abspath('K:/build')
 @bp.get("/")
 def index():
 	return render_template("base.html")
+
+@bp.get("/feedback")
+def get_feedback_page():
+	return render_template("feedback-page.html")
 
 @bp.get("/build")
 def get_build_page():
@@ -74,6 +79,15 @@ def search_part_lots():
 	part = request.args.get("part")
 	lot_list = jb2.get_Lots(part)
 	return render_template("partials/build-page/lot-input.html", lot_list=lot_list)
+
+@bp.post("/submit")
+def submit():
+	initials = request.form.get("User Initials")
+	feedback = request.form.get("User Feedback")
+
+	process_and_save(initials, feedback) #Still need to write this function in process_feedback.py
+
+	return "<p>Feedback saved successfully!</p>"
 
 @bp.post("/add_part_rows_from_bom_list/")
 def add_part_rows_from_bom():

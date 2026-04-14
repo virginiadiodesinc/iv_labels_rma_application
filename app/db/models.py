@@ -82,3 +82,10 @@ class Notes(Base):
 	build_id = Column(Integer, foreign_key="build_info.block_engraving,build_info.block_serial_number,build_info.block_revision", nullable=False)
 	note_id = Column(Integer, primary_key=True, autoincrement=True)
 	type = Column(Enum(Note_Type), nullable=False)
+
+class User_Feedback(Base):
+	__tablename__ = "user_feedback"
+	entry_id = Column(Integer, primary_key=True, autoincrement=True)
+	user_initials = Column(String, nullable=False)
+	user_feedback = Column(String, nullable=False)
+	entry_date = Column(Date, nullable=False)

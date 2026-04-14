@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body>
+    <h2>Diode IV and Labels Feedback Form</h2>
+
+    <form hx-post="/submit" hx-target="#response" hx-swap="innerHTML">
+        User Initials<input type="text" name="User Initials"><br>
+        Feedback<input type="text" name="User Feedback"><br>
+
+        <button type="submit">Submit</button>
+    </form>
+    <div id="response"></div>
+</body>
+{% endblock %}
