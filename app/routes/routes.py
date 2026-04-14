@@ -605,6 +605,7 @@ def populate_info_from_iv_file():
 
 @bp.post("/upload_iv_file/")
 def upload_iv_file():
+	global iv_file_directory
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.OPEN,
 		allow_multiple=False,
@@ -613,6 +614,8 @@ def upload_iv_file():
 		)
 	if not path:
 		path = [""]
+	else:
+		iv_file_directory = os.path.dirname(path[0])
 
 	return render_template("partials/iv-page/iv-file-upload.html", file_path=path[0])
 
