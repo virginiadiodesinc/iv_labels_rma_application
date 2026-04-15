@@ -1,5 +1,5 @@
-<tr class="note-row">
-	<td>
+<div class="note-row">
+	<div>
 		<label>
 			Note Type:
 			<select name="note_type">
@@ -10,22 +10,23 @@
 				<option value="INDIUM">Indium</option>
 				<option value="TEMPERATURE">Temperature</option>
 		</label>
-	</td>
-	<td>
+	</div>
+	<div>
 		<label>
 			Note:
 			<input type="text" 
 					name="note"
-					size="50"
+					size="25"
 					value="{{note.text if note and note.text else ''}}"
 					>
 		</label>
-	</td>
-	<td>
+	</div>
+	<div>
 		<button
 			type="button"
-			onclick="this.closest('.note-row').remove()">
+			onclick="this.closest('.note-row').remove()"
+			class="delete-row-button">
 			X
 		</button>
-	</td>
-</tr>
+	</div>
+</div>

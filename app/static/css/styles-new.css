@@ -2,7 +2,7 @@
 
 *{
 	font-family: 'Roboto', sans-serif;
-	font-size: small;
+	font-size: x-small;
 }
 
 .not-implemented-yet {
@@ -64,7 +64,7 @@
 
 .build-page-container {
 	display: grid;
-	grid-template-columns: repeat(9, 1fr);
+	grid-template-columns: repeat(13, 1fr);
 	grid-template-rows: 5% 95%;
 }
 
@@ -84,7 +84,7 @@
 
 .full-build-container {
 	grid-column-start: 7;
-	grid-column-end: 10;
+	grid-column-end: 14;
 	grid-row-start: 2;
 	grid-row-end: 3;
 }
@@ -93,15 +93,27 @@
 	grid-row-start: 1;
 	grid-row-end: 2;
 	grid-column-start: 1;
-	grid-column-end: 4;
+	grid-column-end: 7;
 }
 
 .build-file-upload-form {
 	grid-row-start: 1;
 	grid-row-end: 2;
 	grid-column-start: 7;
-	grid-column-end: 10;
+	grid-column-end: 14;
 }
+
+/* .bom-list td:nth-child(even), th:nth-child(even) {
+  background-color: gray;
+}
+
+.bom-sublist td:nth-child(even), th:nth-child(even) {
+  background-color: gray;
+}
+
+.actual-bom-list td:nth-child(even), th:nth-child(even) {
+  background-color: gray;
+} */
 
 .iv-page-container {
 	display: grid;
@@ -133,6 +145,8 @@
 .iv-plot-container {
 	display: grid;
 	text-align: center;
+	grid-row-start: 3;
+	grid-row-end: 4;
 }
 
 .iv-plot-header-container {
@@ -145,4 +159,58 @@
 	height: 75%;
 	margin: auto;
 	align-self: center;
+}
+
+.combined-page {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+
+.combined-page .build-page-container {
+	grid-column-start: 1;
+	grid-column-end: 2;
+}
+
+.combined-page .iv-page-container {
+	grid-column-start: 2;
+	grid-column-end: 3;
+}
+
+.block-forms-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.actual-bom-list {
+	max-width: 100%;
+	display: block;
+	overflow-x: auto;
+}
+
+.actual-bom-list {
+	width: 100%;
+}
+
+.actual-bom-list td {
+	vertical-align: top;
+}
+
+.actual-bom-list input {
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.part-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.note-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.delete-row-button {
+	align-self: flex-end;
+	order: 5;
 }

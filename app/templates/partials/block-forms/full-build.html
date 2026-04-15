@@ -7,7 +7,7 @@
 	<table id="full-build-table-body">
 		{% include "partials/block-forms/full-build-info.html" %}
 	</table>
-	<table id="actual-bom-container">
+	<table id="actual-bom-container" class="actual-bom-list">
 			{% for item in items %}
 				{% include "partials/build-page/part-row.html" %}
 			{% endfor %}

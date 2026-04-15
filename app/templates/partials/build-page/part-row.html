@@ -1,8 +1,9 @@
-<tr class="part-row">
-	<td>
+<div class="part-row">
+	<div>
 		<label>
 			Part Type:
-			<select name="part_type">
+			<select 
+					name="part_type">
 				<option value="N/A" {% if part and part['part_type'] == "N/A" %}
 						selected
 					{% endif %}>N/A</option>
@@ -29,42 +30,44 @@
 					{% endif %}>FILTER</option>
 			</select>
 		</label>
-	</td>
-	<td>
+	</div>
+	<div>
 		<label>
 			Part Name:
 			<input type="text" 
 					name="part" 
 					value="{{part['part_name'] if part else ''}}" 
-					size="30"
+					size="25"
 					hx-get="/search_part_lots/"
 					hx-trigger="revealed, keyup changed delay:300ms"
 					hx-target="next .lot-container"
 					hx-include="this"
 					oninput="this.value = this.value.toUpperCase();">
 		</label>
-	</td>
-	<td class="lot-container">
+	</div>
+	<div class="lot-container">
 		{% if part %}
 			{% include "partials/build-page/lot-input.html" %}
 		{% endif %}
-	</td>
+	</div>
 
-	<td>
+	<div>
 		<label>
 			Qty:
 			<input class="quantity"
 					type="number" 
 					name="quantity" 
-					value="{{part['part_quantity'] if part else ''}}">
+					value="{{part['part_quantity'] if part else '1'}}"
+					size="3">
 		</label>
-	</td>
+	</div>
 	
-	<td>
+	<div>
 		<button
 			type="button"
-			onclick="this.closest('.part-row').remove()">
+			onclick="this.closest('.part-row').remove()"
+			class="delete-row-button">
 			X
 		</button>
-	</td>
-</tr>
+	</div>
+</div>
