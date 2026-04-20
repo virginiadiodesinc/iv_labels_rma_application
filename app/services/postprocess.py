@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.stats import linregress
 from scipy.constants import e,k
-import time
 
 class IV_curve():
     def __init__(self, IV_source_up, IV_measure_up, IV_measure_down, Reverse_Breakdown_source='', Reverse_Breakdown_measure='', Polarity_Sweep_source='', Polarity_Sweep_measure='',):
@@ -22,7 +20,6 @@ class IV_curve():
         -------
         None.
         """
-        start_time = time.time()
         is_list = isinstance(IV_source_up, list)
         self.IV_Iup = []
 
@@ -73,9 +70,6 @@ class IV_curve():
 
         self.V_polarity_sweep = Polarity_Sweep_source.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
         self.I_polarity_sweep = Polarity_Sweep_measure.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"IV curve initialized in {elapsed_time:.2f} seconds.")
 
     def calc_IV_parameters(self, T=293):
         """
@@ -85,10 +79,8 @@ class IV_curve():
         -------
 
         """
-        start_time = time.time()
         VT = k*T/e
 
-        rsweep = [] #To hold a dictionary of IV parameters for each trial resistance in Rst
         Rst = np.linspace(.1, 100, 10000)
 
         data = {
@@ -99,34 +91,43 @@ class IV_curve():
         }
 
         df = pd.DataFrame(data)
+
+        logI = np.log(df["I"].values)
+        Vavg = df["Vavg"].values
+        I = df["I"].values
+
+        V_diode = Vavg[None, :] - Rst[:, None] * I[None, :] #Replaces previous for loop calculating over every value
+
+        x_mean = V_diode.mean(axis=1)
+        y_mean = logI.mean()
+
+        x_centered = V_diode - x_mean[:,None]
+        y_centered = logI - y_mean
+
+        cov_xy = np.sum(x_centered * y_centered, axis=1)
+        var_x = np.sum(x_centered**2, axis=1)
+        m = cov_xy/var_x
+
+        b = y_mean - m * x_mean
+
+        y_predicted = m[:, None] * V_diode + b[:, None]
+
+        residuals = np.sum((logI - y_predicted)**2, axis=1)
+
+        ss_total = np.sum((logI - y_mean)**2)
         
-        for R in Rst:
-            V_diode = df["Vavg"] - df["I"] * R
+        R_squared_error = 1 - residuals / ss_total
 
-            (pfit, resid, _, _, _) = np.polyfit(V_diode, np.log(df["I"]), 1, full=True)
+        min_index = np.argmin(residuals)
 
-            p = np.poly1d(pfit)
+        m_best_fit = m[min_index]
+        y0_best_fit = b[min_index]
 
-            mse = np.mean((np.log(df["I"]) - p(V_diode))**2)
-
-            _, _, r_value, _, _ = linregress(V_diode, np.log(df["I"]))
-
-            rsweep.append({"Rs":R, "Residual Error":resid[0], "R_sqr":r_value**2, "Mean Square Error":mse, "Fit":pfit})
-        
-        dfr = pd.DataFrame(rsweep)
-
-        min_index = dfr["Residual Error"].idxmin()
-
-        m = dfr.loc[min_index].Fit[0]
-        y0 = dfr.loc[min_index].Fit[1]
-
-        self.Rs = dfr["Rs"].loc[min_index]
-
-        self.R_sqr = dfr["R_sqr"].loc[min_index]
-
-        self.eta = 1/(m*VT)
-
-        self.Is = np.exp(y0)
+        self.mse = (residuals / len(logI))[min_index]
+        self.Rs = Rst[min_index]
+        self.R_sqr = R_squared_error[min_index]
+        self.eta = 1/(m_best_fit*VT)
+        self.Is = np.exp(y0_best_fit)
 
         df.loc[:,"Hysteresis"] = np.abs(df["Vup"]*1000 - df["Vdown"]*1000) #in mV
 
@@ -152,39 +153,60 @@ class IV_curve():
         self.Rs_3pt = (self.dv4["V"] - self.dv5["V"]) / (self.dv4["I"])
         self.Rs_4pt = (self.dv1["V"] - self.dv3["V"]) / (self.dv1["I"])
 
-        self.var_dict = {'n (ideality)': str(self.eta), 
-                         'Is': str(self.Is),
-                         'Rs': str(self.Rs),
-                         'Rs_1': str(self.Rs_1),
-                         'Rs 3pt': str(self.Rs_3pt),
-                         'Rs_4pt': str(self.Rs_4pt),
-                         'Mean Square Error': str(dfr["Mean Square Error"].loc[min_index]),
-                         'R^2 Error': str(self.R_sqr),
-                         'Polarity': 'The plus or the minus',
-                         'Hysteresis SD (mV)': str(self.hys_STD),
-                         'Hysteresis Mean (mV)': str(self.hys_mean),
-                         'Hysteresis Max (mV)': str(self.hys_max),
-                         'Hysteresis Min (mV)': str(self.hys_min),
-                         'Reverse Current (uA)': str(float(self.I_reverse_breakdown)/1E6),
-                         'Reverse Voltage(V)': str(self.V_reverse_breakdown),
-                         'dV1': str(self.dv1["V"]),
-                         'dV2': str(self.dv2["V"]),
-                         'dV3': str(self.dv3["V"]),
-                         'dV4': str(self.dv4["V"]),
-                         'dV5': str(self.dv5["V"]),
-                         'mV @ Imax': str(self.dfIpts["V"].loc[5]),
-                         'mV @ Imax/10': str(self.dfIpts["V"].loc[6]),
-                         'mV @ Imax/100': str(self.dfIpts["V"].loc[7]),
-                         'mV @ 1mA': str(self.dfIpts["V"].loc[4]),
-                         'mV @ 100uA': str(self.dfIpts["V"].loc[3]),
-                         'mV @ 10uA': str(self.dfIpts["V"].loc[2]),
-                         'mV @ 1uA': str(self.dfIpts["V"].loc[1]),
-                         'mV @ 100nA': str(self.dfIpts["V"].loc[0]),
-                         'Points/Decade': 'pull it from the sweep settings'}
-        
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"IV parameters calculated in {elapsed_time:.2f} seconds.")
+        if f"{self.IV_Iup[-1]:E}"[0:1] not in ['1', '2', '3', '4', '5']:
+            self.source_polarity = '-'
+            current_display = f"{self.IV_Iup[-1]:E}"[1:2]
+        else:
+            self.source_polarity = '+'
+            current_display = f"{self.IV_Iup[-1]:E}"[0:1]
+
+        I_uA = []
+
+        for current in self.IV_Iup:
+            I_uA.append(f"{(current * 1E6):.6f}") #Convert current values to microamps and truncate @ 6 decimal places, preventing scientific notation
+
+        Vdown_mV = []
+
+        for voltage in self.IV_Vdown:
+            Vdown_mV.append(f"{(voltage * 1E3):.6f}") #Convert voltage values to millivolts and truncate @ 6 decimals places, preventing scientific notation
+
+        Vup_mV = []
+
+        for voltage in self.IV_Vup:
+            Vup_mV.append(f"{(voltage * 1E3):.6f}") #Convert voltage values to millivolts and truncate @ 6 decimals places, preventing scientific notation
+
+        self.var_dict = {'n (ideality)': f"{self.eta:.6f}", 
+                         'Is': f"{self.Is:.6e}",
+                         'Rs': f"{self.Rs:.6f}",
+                         'Rs_1': f"{self.Rs_1:.6f}",
+                         'Rs 3pt': f"{self.Rs_3pt:.6f}",
+                         'Rs_4pt': f"{self.Rs_4pt:.6f}",
+                         'Mean Square Error': f"{self.mse:.6e}", #previously str(dfr["Mean Square Error"].loc[min_index])
+                         'R^2 Error': f"{self.R_sqr:.6f}",
+                         'Polarity': self.source_polarity,
+                         'Hysteresis SD (mV)': f"{self.hys_STD:.6f}",
+                         'Hysteresis Mean (mV)': f"{self.hys_mean:.6f}",
+                         'Hysteresis Max (mV)': f"{self.hys_max:.6f}",
+                         'Hysteresis Min (mV)': f"{self.hys_min:.6f}",
+                         'Reverse Current (uA)': f"{float(self.I_reverse_breakdown)/1E6:.6f}",
+                         'Reverse Voltage(V)': f"{float(self.V_reverse_breakdown):.6f}",
+                         'dV1': f"{self.dv1["V"]:.6f}",
+                         'dV2': f"{self.dv2["V"]:.6f}",
+                         'dV3': f"{self.dv3["V"]:.6f}",
+                         'dV4': f"{self.dv4["V"]:.6f}",
+                         'dV5': f"{self.dv5["V"]:.6f}",
+                         'mV @ Imax': f"{self.dfIpts["V"].loc[5]:.6f}",
+                         'mV @ Imax/10': f"{self.dfIpts["V"].loc[6]:.6f}",
+                         'mV @ Imax/100': f"{self.dfIpts["V"].loc[7]:.6f}",
+                         f'mV @ {current_display}mA': f"{self.dfIpts["V"].loc[4]:.6f}",
+                         f'mV @ {current_display}00uA': f"{self.dfIpts["V"].loc[3]:.6f}",
+                         f'mV @ {current_display}0uA': f"{self.dfIpts["V"].loc[2]:.6f}",
+                         f'mV @ {current_display}uA': f"{self.dfIpts["V"].loc[1]:.6f}",
+                         f'mV @ {current_display}00nA': f"{self.dfIpts["V"].loc[0]:.6f}",
+                         'Points/Decade': self.points_per_decade,
+                         'I (uA)': I_uA,
+                         'Vup (mV)': Vup_mV,
+                         'Vdown (mV)': Vdown_mV}
 
         return self.var_dict
 
