@@ -9,6 +9,7 @@
 				<option value="REWORK SUMMARY">Rework Summary</option>
 				<option value="INDIUM">Indium</option>
 				<option value="TEMPERATURE">Temperature</option>
+			</select>
 		</label>
 	</div>
 	<div>
@@ -16,12 +17,11 @@
 			Note:
 			<input type="text" 
 					name="note"
-					size="25"
-					value="{{note.text if note and note.text else ''}}"
-					>
+					size="40"
+					value="{{note.text if note and note.text else ''}}">
 		</label>
 	</div>
-	<div>
+	<div class="delete-row-button-container">
 		<button
 			type="button"
 			onclick="this.closest('.note-row').remove()"

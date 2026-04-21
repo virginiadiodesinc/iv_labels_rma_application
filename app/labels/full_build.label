@@ -33,7 +33,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="540" Y="187.2" Width="1008" Height="180" />
+		<Bounds X="540" Y="189" Width="1008" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -89,7 +89,175 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1584" Y="187.2" Width="2568" Height="187.2" />
+		<Bounds X="1584" Y="170" Width="2568" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_INITIALS_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">BUILDER</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="547.2" Y="374.4" Width="1008" Height="180" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_INITIALS_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">_________</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="1225" Y="374.4" Width="800" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_INITIALS_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">MEEP</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="1300" Y="374.4" Width="800" Height="187.2" />
+	</ObjectInfo>
+		<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_DATE_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">DATE</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="2100" Y="374.4" Width="1008" Height="180" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_DATE_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">__________</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="2550" Y="374.4" Width="1000" Height="187.2" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>BUILD_DATE_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">01/01/0001</String>
+					<Attributes>
+						<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="2600" Y="374.4" Width="800" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -117,7 +285,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="547.2" Y="374.4" Width="432" Height="187.2" />
+		<Bounds X="547.2" Y="561.6" Width="432" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -145,7 +313,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1008" Y="374.4" Width="2496" Height="187.2" />
+		<Bounds X="1008" Y="561.6" Width="2496" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -173,7 +341,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1080" Y="374.4" Width="2376" Height="187.2" />
+		<Bounds X="1080" Y="561.6" Width="2376" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -201,7 +369,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="3576" Y="374.4" Width="360" Height="187.2" />
+		<Bounds X="3576" Y="561.6" Width="360" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -229,7 +397,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="3885" Y="374.4" Width="864" Height="187.2" />
+		<Bounds X="3885" Y="561.6" Width="864" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -257,7 +425,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="3942" Y="374.4" Width="864" Height="187.2" />
+		<Bounds X="3942" Y="561.6" Width="864" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -285,7 +453,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="547.2" Y="547.2" Width="432" Height="187.2" />
+		<Bounds X="547.2" Y="748.8" Width="432" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -313,7 +481,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="978" Y="547.2" Width="4284" Height="187.2" />
+		<Bounds X="978" Y="748.8" Width="4284" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -341,7 +509,7 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1080" Y="547.2" Width="4032" Height="187.2" />
+		<Bounds X="1080" Y="748.8" Width="4032" Height="187.2" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -425,6 +593,6 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="4668" Y="187.2" Width="623.999999999997" Height="187.2" />
+		<Bounds X="4668" Y="170" Width="623.999999999997" Height="187.2" />
 	</ObjectInfo>
 </DieCutLabel>

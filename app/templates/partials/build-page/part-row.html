@@ -37,7 +37,7 @@
 			<input type="text" 
 					name="part" 
 					value="{{part['part_name'] if part else ''}}" 
-					size="25"
+					size="30"
 					hx-get="/search_part_lots/"
 					hx-trigger="revealed, keyup changed delay:300ms"
 					hx-target="next .lot-container"
@@ -57,12 +57,11 @@
 			<input class="quantity"
 					type="number" 
 					name="quantity" 
-					value="{{part['part_quantity'] if part else '1'}}"
-					size="3">
+					value="{{part['part_quantity'] if part else '1'}}">
 		</label>
 	</div>
 	
-	<div>
+	<div class="delete-row-button-container">
 		<button
 			type="button"
 			onclick="this.closest('.part-row').remove()"

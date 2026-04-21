@@ -93,6 +93,8 @@ def populate_full_build_label_fields(label_text, form_data: dict):
 
 	label_text.SetField('BUILD_NAME_INPUT', form_data.get("full-build-name-input", ""))
 	label_text.SetField('BLOCK_SERIAL_NUMBER_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
+	label_text.SetField('BUILD_DATE_INPUT', form_data.get("full-build-date-input", ""))
+	label_text.SetField('BUILD_INITIALS_INPUT', form_data.get("full-build-initials-input", ""))
 
 	for i in range(len(part_rows)):
 		label_text.SetField(f'ROW_{i}_PART_INPUT', part_rows[i]['part'])
@@ -119,7 +121,7 @@ def prepare_full_build_label(label_path: str, form_data: dict):
 	# distance between rows is 187.2?
 	# 14.4 per .1 inch?
 	# 187.2 / 14.4 = 13
-	starting_row_y = 374.4  # Y position of the first row
+	starting_row_y = 561.6  # Y position of the first row
 	row_spacing = 187.2	# Spacing between rows
 	for i in range(part_row_count):
 		for obj_info in xml_tree.findall(".//ObjectInfo"):	

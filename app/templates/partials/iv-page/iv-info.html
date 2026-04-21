@@ -1,5 +1,5 @@
 <form id="iv-info" name="iv-info" class="iv-info">
-	<table>
+	<table class="curve-fit-parameters-table">
 		<tr>
 			<th>Diode IV Curve Fit Parameters</th>
 		</tr>
@@ -36,7 +36,7 @@
 		</tr>
 	</table>
 
-	<table>
+	<table class="hysteresis-table">
 		<tr>
 			<th>Hysteresis (mV)</th>
 		</tr>
@@ -70,7 +70,7 @@
 		</tr>
 	</table>
 
-	<table>
+	<table class="reverse-breakdown-table">
 		<tr>
 			<th>Reverse Breakdown</th>
 		</tr>
@@ -90,7 +90,7 @@
 		</tr>
 	</table>
 
-	<table>
+	<table class="series-resistance-table">
 		<tr>
 			<td>Rs 4pt</td>
 			<td>= [ΔV1 - ΔV3] / [1mA - 100uA] =</td>
@@ -117,7 +117,7 @@
 		</tr>
 	</table>
 
-	<table>
+	<table class="heat-test-table">
 		<tr>
 			<td>Pass Heat</td>
 			<td>{{iv_data.pass_heat if iv_data and iv_data.pass_heat is not none else ''}}</td>
@@ -131,7 +131,7 @@
 		</tr>
 	</table>
 
-	<table>
+	<table class="landmark-numbers-table" id="landmark-numbers-table">
 		<tr>
 			<th>Landmark Numbers</th>
 		</tr>
@@ -171,7 +171,7 @@
 			<td>{{iv_data['100nA'] if iv_data and iv_data['100nA'] is not none else ''}}</td>
 		</tr>
 	</table>
-		<table>
+		<table class ="landmark-numbers-table-2" id="landmark-numbers-table-2">
 		<tr>
 			<th>Landmark Numbers</th>
 		</tr>

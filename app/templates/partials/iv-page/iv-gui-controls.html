@@ -1,7 +1,8 @@
-<div id="iv-gui-controls" hx-trigger="load" hx-swap="innerHTML">
+<div id="iv-gui-controls" hx-trigger="load" hx-swap="innerHTML" class="iv-gui-controls">
 	<div>
 		<button id="open-iv-button" class="not-implemented-yet">Open IV File from DB</button>
 	</div>
+	{% include "partials/iv-page/iv-file-upload.html" %}
 
 	<details open id="iv-assembly-information">
 		<summary>Part Information</summary>
@@ -17,7 +18,7 @@
 						value="{{ current_settings.compliance_voltage if current_settings and current_settings.compliance_voltage}}"
 						name="compliance-voltage">
 			</label>
-			<label> Maximum Current (uA)
+			<label> Maximum Current (mA)
 				<input type="number"
 						value="{{ current_settings.maximum_current.replace('E-3', '') if current_settings and current_settings.maximum_current}}"
 						min="1"

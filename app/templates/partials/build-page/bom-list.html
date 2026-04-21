@@ -1,3 +1,24 @@
+<button 
+	id="bom-lookup-button"
+	hx-get="/get_jb2_bom_from_build_name/"
+	hx-include="#component-name"
+	hx-target="#bom-list-form"
+	hx-swap-oob="true"
+>
+	Search for BOM
+</button>
+
+<button
+	id="add-bom-parts-button"
+	name="add-bom-parts-button"
+	hx-swap-oob="true"
+	hx-swap="beforeend"
+	hx-post="/add_part_rows_from_bom_list/"
+	hx-include="#bom-list-form"
+	hx-target="#actual-bom-container">
+	Add BOM part(s)
+</button>
+
 <form id="bom-list-form" name="bom-list-form">
 	<label>Select/Deselect All
 		<input type="checkbox"
@@ -31,24 +52,3 @@
 	</details>
 	
 </form>
-
-<button 
-	id="bom-lookup-button"
-	hx-get="/get_jb2_bom_from_build_name/"
-	hx-include="#component-name"
-	hx-target="#bom-list-form"
-	hx-swap-oob="true"
->
-	Search for BOM
-</button>
-
-<button
-	id="add-bom-parts-button"
-	name="add-bom-parts-button"
-	hx-swap-oob="true"
-	hx-swap="beforeend"
-	hx-post="/add_part_rows_from_bom_list/"
-	hx-include="#bom-list-form"
-	hx-target="#actual-bom-container">
-	Add BOM part(s)
-</button>

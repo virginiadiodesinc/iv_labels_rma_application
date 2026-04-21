@@ -58,8 +58,12 @@
 
 .content {
 	padding-top: 1%;
+	padding-bottom: 1%;
+	flex-grow: 1;
 	flex: 1;
 	order: 2;
+	margin-top: 1%;
+	margin-bottom: 1%;
 }
 
 .build-page-container {
@@ -182,17 +186,10 @@
 }
 
 .actual-bom-list {
-	max-width: 100%;
-	display: block;
-	overflow-x: auto;
-}
-
-.actual-bom-list {
 	width: 100%;
-}
-
-.actual-bom-list td {
-	vertical-align: top;
+	display: flex;
+	flex-direction: column;
+	overflow-x: auto;
 }
 
 .actual-bom-list input {
@@ -200,17 +197,33 @@
 	box-sizing: border-box;
 }
 
+.actual-bom-list label {
+	display: flex;
+	flex-direction: column;
+}
+
 .part-row {
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
 }
 
 .note-row {
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
 }
 
-.delete-row-button {
-	align-self: flex-end;
+.delete-row-button-container {
+	justify-self: flex-end;
 	order: 5;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+.quantity {
+	width: 50%;
+	min-width: 50%;
+	max-width: 60%;
 }

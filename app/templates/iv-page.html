@@ -4,8 +4,6 @@
 {% block content %}
 <div id="iv-page-container" class="iv-page-container">
 
-	{% include "partials/iv-page/iv-file-upload.html" %}
-
 	{% include "partials/iv-page/iv-plot.html" %}
 
 	<div id="iv-curve-information" class="iv-curve-information">
@@ -13,6 +11,7 @@
 	</div>
 	
 	<div id="iv-gui-controls"
+		class="iv-gui-controls"
 		hx-post="/default_keithley_settings/"
 		hx-trigger="load"
 		hx-swap="innerHTML">

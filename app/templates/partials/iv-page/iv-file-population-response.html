@@ -2,30 +2,24 @@
 	{% include "partials/iv-page/iv-info.html" %}
 </div>
 
-<table id="iv-plot-table" hx-swap-oob="true">
-		<th>
-			<td>Diode IV Curve (A,V)</td>
-		</th>
-		<tr>
-			<td>{{iv_curve.polarity if iv_curve and iv_curve.polarity else ""}}</td>
-			<td> Polarity</td>
-			<td>{{iv_curve.points_per_decade if iv_curve and iv_curve.points_per_decade else ""}}</td>
-			<td>Points per Decade</td>
-		</tr>
-		<tr>
-			<td>
-				<select>
-					<option value="linear">Linear</option>
-					<option value="log">Log</option>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			{% include "partials/iv-page/iv-plot-figure.html" %}
-		</tr>
-</table>
+<div id="iv-plot-subcontainer" hx-swap-oob="true">
+	<h2 class="iv-plot-title">Diode IV Curve (A,V)</h2>
+	<div class="iv-plot-header-container">
+		<h3>Polarity {{iv_curve.polarity if iv_curve and iv_curve.polarity else ""}}</h3>
+		<h3>Points per Decade {{iv_curve.points_per_decade if iv_curve and iv_curve.points_per_decade else ""}}</h3>
+	</div>
+	<div class="iv-plot-display-controls">
+		<select>
+			<option value="linear">Linear</option>
+			<option value="log">Log</option>
+		</select>
+	</div>
 
-	<details open id="iv-assembly-information" hx-swap-oob="true">
-		<summary>Part Information</summary>
-		{% include "partials/iv-page/iv-assembly-information.html" %}
-	</details>
+	{% include "partials/iv-page/iv-plot-figure.html" %}
+	
+</div>
+
+<details open id="iv-assembly-information" hx-swap-oob="true">
+	<summary>Part Information</summary>
+	{% include "partials/iv-page/iv-assembly-information.html" %}
+</details>

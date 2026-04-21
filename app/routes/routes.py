@@ -31,6 +31,10 @@ def get_build_page():
 def get_iv_page():
 	return render_template("iv-page.html")
 
+@bp.get("/iv_and_build")
+def get_iv_and_build_page():
+	return render_template("iv-and-build-page.html")
+
 @bp.get("/search_jb2_components/")
 def search_jb2_components():
 	component_name = request.args.get("component-name")
@@ -67,7 +71,7 @@ def add_empty_part_row():
 
 @bp.get("/add_empty_note_row/")
 def add_empty_note_row():
-	return render_template("partials/build-page/note-row.html")
+	return render_template("partials/build-page/note-row.html", note=None)
 
 @bp.get("/search_part_lots/")
 def search_part_lots():
@@ -182,7 +186,7 @@ def take_iv():
 		"Voltage (mV)": voltage_avg_values
 	})
 
-	fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title="IV Curve", log_x=False, log_y=True)
+	fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
 	fig.update_traces(mode='lines+markers')
 
 	if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
@@ -206,7 +210,7 @@ def get_empty_plot():
 		"Current (uA)": []
 	})
 
-	fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title="IV Curve", log_y=True)
+	fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title=None, log_y=True)
 	fig.update_traces(mode='lines+markers')
 
 	if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
@@ -317,6 +321,10 @@ def populate_info_from_build_file():
 			note_rows.append({"text": note})
 		note_rows.append(build_dict.get("vbr", ""))
 		note_rows.append(build_dict.get("indium_info", ""))
+
+		print(build_dict)
+		print(part_rows)
+		print(note_rows)
 
 		return render_template("partials/block-forms/build-file-population-response.html", block=build_dict, parts=part_rows, notes=note_rows)
 
@@ -551,7 +559,7 @@ def populate_info_from_iv_file():
 			"Voltage (mV)": average_voltage_values
 		})
 
-		fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title="IV Curve", log_x = False, log_y=True)
+		fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title=None, log_x = False, log_y=True)
 		fig.update_traces(mode='lines+markers')
 
 		if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
