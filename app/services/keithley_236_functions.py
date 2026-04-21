@@ -430,7 +430,7 @@ class SMU_K236():
 
 		return source_values, measure_values
 
-	def update_settings(self, delay_toggle = 'on', integration_time = 'Medium', filter_count = '8', compliance_voltage = 4.0, polarity = '+', points_per_decade = '5', sweep_delay = 0, maximum_current = '1E-3'):
+	def update_settings(self, delay_toggle = 'on', integration_time = 'Medium', filter_count = '8', compliance_voltage = 4.0, polarity = '+', points_per_decade = '5', sweep_delay = 0, maximum_current = '1mA'):
 		self.set_default_delay(delay_toggle)
 		self.set_integration_time(integration_time)
 		self.set_filter(filter_count)

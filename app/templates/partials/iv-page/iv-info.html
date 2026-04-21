@@ -5,12 +5,12 @@
 		</tr>
 		<tr>
 			<td>Rs (1/2)</td>
-			<td>{{iv_data.rs if iv_data and iv_data.rs is not none else ''}}</td>
+			<td>{{iv_data.rs|float|round(2, 'floor') if iv_data and iv_data.rs is not none else ''}}</td>
 			<input type="hidden" name="rs" value="{{iv_data.rs if iv_data and iv_data.rs is not none else ''}}">
 		</tr>
 		<tr>
 			<td>n</td>
-			<td>{{iv_data.ideality if iv_data and iv_data.ideality is not none else ''}}</td>
+			<td>{{iv_data.ideality|float|round(2, 'floor') if iv_data and iv_data.ideality is not none else ''}}</td>
 			<input type="hidden" name="n" value="{{iv_data.ideality if iv_data and iv_data.ideality is not none else ''}}">
 		</tr>
 		<tr>
@@ -42,28 +42,28 @@
 		</tr>
 		<tr>
 			<td>Mean</td>
-			<td>{{iv_data.hysteresis_mean if iv_data and iv_data.hysteresis_mean is not none else ''}}</td>
+			<td>{{iv_data.hysteresis_mean|float|round(2, 'floor') if iv_data and iv_data.hysteresis_mean is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="hysteresis-mean" value="{{iv_data.hysteresis_mean if iv_data and iv_data.hysteresis_mean is not none else ''}}">
 			</td>
 		</tr>
 		<tr>
 			<td>Standard Deviation</td>
-			<td>{{iv_data.hysteresis_std if iv_data and iv_data.hysteresis_std is not none else ''}}</td>
+			<td>{{iv_data.hysteresis_std|float|round(2, 'floor') if iv_data and iv_data.hysteresis_std is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="hysteresis-std" value="{{iv_data.hysteresis_std if iv_data and iv_data.hysteresis_std is not none else ''}}">
 			</td>
 		</tr>
 		<tr>
 			<td>Maximum</td>
-			<td>{{iv_data.hysteresis_max if iv_data and iv_data.hysteresis_max is not none else ''}}</td>
+			<td>{{iv_data.hysteresis_max|float|round(2, 'floor') if iv_data and iv_data.hysteresis_max is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="hysteresis-max" value="{{iv_data.hysteresis_max if iv_data and iv_data.hysteresis_max is not none else ''}}">
 			</td>
 		</tr>
 		<tr>
 			<td>Minimum</td>
-			<td>{{iv_data.hysteresis_min if iv_data and iv_data.hysteresis_min is not none else ''}}</td>
+			<td>{{iv_data.hysteresis_min|float|round(2, 'floor') if iv_data and iv_data.hysteresis_min is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="hysteresis-min" value="{{iv_data.hysteresis_min if iv_data and iv_data.hysteresis_min is not none else ''}}">
 			</td>
@@ -76,14 +76,14 @@
 		</tr>
 		<tr>
 			<td>Set Current</td>
-			<td>{{iv_data.reverse_current if iv_data and iv_data.reverse_current is not none else ''}}</td>
+			<td>{{iv_data.reverse_current|float|round(2, 'floor') if iv_data and iv_data.reverse_current is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="reverse-current" value="{{iv_data.reverse_current if iv_data and iv_data.reverse_current is not none else ''}}">
 			</td>
 		</tr>
 		<tr>
 			<td>Reverse Voltage</td>
-			<td>{{iv_data.reverse_voltage if iv_data and iv_data.reverse_voltage is not none else ''}}</td>
+			<td>{{iv_data.reverse_voltage|float|round(2, 'floor') if iv_data and iv_data.reverse_voltage is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="reverse-voltage" value="{{iv_data.reverse_voltage if iv_data and iv_data.reverse_voltage is not none else ''}}">
 			</td>
@@ -94,7 +94,7 @@
 		<tr>
 			<td>Rs 4pt</td>
 			<td>= [ΔV1 - ΔV3] / [1mA - 100uA] =</td>
-			<td>{{iv_data.rs_4pt if iv_data and iv_data.rs_4pt is not none else ''}}</td>
+			<td>{{iv_data.rs_4pt|float|round(2, 'floor') if iv_data and iv_data.rs_4pt is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="rs-4pt" value="{{iv_data.rs_4pt if iv_data and iv_data.rs_4pt is not none else ''}}">
 			</td>
@@ -102,7 +102,7 @@
 		<tr>
 			<td>Rs</td>
 			<td>= [ΔV1 - ΔV2] / [1mA - 100uA] =</td>
-			<td>{{iv_data.rs if iv_data and iv_data.rs is not none else ''}}</td>
+			<td>{{iv_data.rs|float|round(2, 'floor') if iv_data and iv_data.rs is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="rs" value="{{iv_data.rs if iv_data and iv_data.rs is not none else ''}}">
 			</td>
@@ -110,7 +110,7 @@
 		<tr>
 			<td>Rs* 3pt</td>
 			<td>= [ΔV4 - ΔV5] / [Imax - Imax / 10] =</td>
-			<td>{{iv_data.rs_3pt if iv_data and iv_data.rs_3pt is not none else ''}}</td>
+			<td>{{iv_data.rs_3pt|float|round(2, 'floor') if iv_data and iv_data.rs_3pt is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="rs-3pt" value="{{iv_data.rs_3pt if iv_data and iv_data.rs_3pt is not none else ''}}">
 			</td>
@@ -124,7 +124,7 @@
 			<td>
 				<input type="hidden" name="pass-heat" value="{{iv_data.pass_heat if iv_data and iv_data.pass_heat is not none else ''}}">
 			</td>
-			<td>{{iv_data.temperature if iv_data and iv_data.temperature is not none else ''}} 1mS °C</td>
+			<td>{{iv_data.temperature|float|round(2, 'floor') if iv_data and iv_data.temperature is not none else ''}} 1mS °C</td>
 			<td>
 				<input type="hidden" name="temperature" value="{{iv_data.temperature if iv_data and iv_data.temperature is not none else ''}}">
 			</td>
@@ -141,34 +141,34 @@
 		</tr>
 		<tr>
 			<td>Imax</td>
-			<td>{{iv_data.i_max if iv_data and iv_data.i_max is not none else ''}}</td>
+			<td>{{iv_data.i_max|float|round(2, 'floor') if iv_data and iv_data.i_max is not none else ''}}</td>
 		</tr>
 			<td>Imax/10</td>
-			<td>{{iv_data.i_max_10 if iv_data and iv_data.i_max_10 is not none else ''}}</td>
+			<td>{{iv_data.i_max_10|float|round(2, 'floor') if iv_data and iv_data.i_max_10 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>Imax/100</td>
-			<td>{{iv_data.i_max_100 if iv_data and iv_data.i_max_100 is not none else ''}}</td>
+			<td>{{iv_data.i_max_100|float|round(2, 'floor') if iv_data and iv_data.i_max_100 is not none else ''}}</td>
 		</tr>
 		<tr>
-			<td>1 mA</td>
-			<td>{{iv_data['1mA'] if iv_data and iv_data['1mA'] is not none else ''}}</td>
+			<td>{{ iv_data.max_current ~ 'mA' if iv_data and iv_data[iv_data.max_current ~ 'mA'] is not none else '1 mA'}}</td>
+			<td>{{iv_data[iv_data.max_current ~ 'mA' ]|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ 'mA'] is not none else ''}}</td>
 		</tr>
 		<tr>
-			<td>100 uA</td>
-			<td>{{iv_data['100uA'] if iv_data and iv_data['100uA'] is not none else ''}}</td>
+			<td>{{ iv_data.max_current ~ '00uA' if iv_data and iv_data[iv_data.max_current ~ '00uA'] is not none else '100 uA' }}</td>
+			<td>{{iv_data[iv_data.max_current ~ '00uA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '00uA'] is not none else ''}}</td>
 		</tr>
 		<tr>
-			<td>10 uA</td>
-			<td>{{iv_data['10uA'] if iv_data and iv_data['10uA'] is not none else ''}}</td>
+			<td>{{ iv_data.max_current ~ '0uA' if iv_data and iv_data[iv_data.max_current ~ '0uA'] is not none else '10 uA' }}</td>
+			<td>{{iv_data[iv_data.max_current ~ '0uA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '0uA'] is not none else ''}}</td>
 		</tr>
 		<tr>
-			<td>1 uA</td>
-			<td>{{iv_data['1uA'] if iv_data and iv_data['1uA'] is not none else ''}}</td>
+			<td>{{ iv_data.max_current ~ 'uA' if iv_data and iv_data[iv_data.max_current ~ 'uA'] is not none else '1 uA'}}</td>
+			<td>{{iv_data[iv_data.max_current ~ 'uA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ 'uA'] is not none else ''}}</td>
 		</tr>
 		<tr>
-			<td>100 nA</td>
-			<td>{{iv_data['100nA'] if iv_data and iv_data['100nA'] is not none else ''}}</td>
+			<td>{{ iv_data.max_current ~ '00nA' if iv_data and iv_data[iv_data.max_current ~ '00nA'] is not none else '100 nA' }}</td>
+			<td>{{iv_data[iv_data.max_current ~ '00nA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '00nA'] is not none else ''}}</td>
 		</tr>
 	</table>
 		<table class ="landmark-numbers-table-2" id="landmark-numbers-table-2">
@@ -180,23 +180,23 @@
 		</tr>
 		<tr>
 			<td>DeltaV4 (mV)</td>
-			<td>{{iv_data.dv4 if iv_data and iv_data.dv4 is not none else ''}}</td>
+			<td>{{iv_data.dv4|float|round(2, 'floor') if iv_data and iv_data.dv4 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV5 (mV)</td>
-			<td>{{iv_data.dv5 if iv_data and iv_data.dv5 is not none else ''}}</td>
+			<td>{{iv_data.dv5|float|round(2, 'floor') if iv_data and iv_data.dv5 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV1 (mV)</td>
-			<td>{{iv_data.dv1 if iv_data and iv_data.dv1 is not none else ''}}</td>
+			<td>{{iv_data.dv1|float|round(2, 'floor') if iv_data and iv_data.dv1 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV2 (mV)</td>
-			<td>{{iv_data.dv2 if iv_data and iv_data.dv2 is not none else ''}}</td>
+			<td>{{iv_data.dv2|float|round(2, 'floor') if iv_data and iv_data.dv2 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV3 (mV)</td>
-			<td>{{iv_data.dv3 if iv_data and iv_data.dv3 is not none else ''}}</td>
+			<td>{{iv_data.dv3|float|round(2, 'floor') if iv_data and iv_data.dv3 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>Vknee=V@1uA; dV=DeltaV2</td>

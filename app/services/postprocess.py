@@ -20,6 +20,7 @@ class IV_curve():
         -------
         None.
         """
+
         is_list = isinstance(IV_source_up, list)
         self.IV_Iup = []
 
@@ -51,6 +52,14 @@ class IV_curve():
                 self.IV_Vdown.append(float(V))
             self.IV_Vdown.reverse() #Only needed for SMU output. .iv file data formatted in the correct order.
 
+        if len(self.IV_Iup) == 21:
+            self.points_per_decade = '5'
+        elif len(self.IV_Iup) == 41:
+            self.points_per_decade = '10'
+        elif len(self.IV_Iup) == 101:
+            self.points_per_decade = '25'
+        elif len(self.IV_Iup) == 201:
+            self.points_per_decade = '50'
 
         self.IV_Vavg = []
         for Vup, Vdown in zip(self.IV_Vup, self.IV_Vdown):
@@ -79,6 +88,7 @@ class IV_curve():
         -------
 
         """
+        
         VT = k*T/e
 
         Rst = np.linspace(.1, 100, 10000)
@@ -174,7 +184,7 @@ class IV_curve():
 
         for voltage in self.IV_Vup:
             Vup_mV.append(f"{(voltage * 1E3):.6f}") #Convert voltage values to millivolts and truncate @ 6 decimals places, preventing scientific notation
-
+        
         self.var_dict = {'n (ideality)': f"{self.eta:.6f}", 
                          'Is': f"{self.Is:.6e}",
                          'Rs': f"{self.Rs:.6f}",
@@ -206,7 +216,11 @@ class IV_curve():
                          'Points/Decade': self.points_per_decade,
                          'I (uA)': I_uA,
                          'Vup (mV)': Vup_mV,
-                         'Vdown (mV)': Vdown_mV}
+                         'Vdown (mV)': Vdown_mV,
+                         'Imax': current_display}
 
+        print(self.var_dict)
+        print(current_display)
+        
         return self.var_dict
 

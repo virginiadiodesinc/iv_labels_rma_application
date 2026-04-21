@@ -130,7 +130,7 @@ def take_iv():
 		"polarity": SMU_controls.get("polarity"),
 		"points_per_decade": SMU_controls.get("points-per-decade"),
 		"sweep_delay": float(SMU_controls.get("sweep-delay")) if SMU_controls.get("sweep-delay") else 0,
-		"maximum_current": SMU_controls.get("maximum-current") + "E-3"
+		"maximum_current": SMU_controls.get("maximum-current") + "mA"
 	}
 	SMU.update_settings(**translated_settings)
 
@@ -143,6 +143,9 @@ def take_iv():
 
 	process = pp.IV_curve(source_values, voltage_up_values, voltage_down_values, reverse_source, reverse_measure)
 	process_dict = process.calc_IV_parameters()
+
+	max_current = process_dict["Imax"]
+
 	iv_dict ={
 		"rs": process_dict["Rs"],
 		"ideality": process_dict["n (ideality)"],
@@ -162,16 +165,17 @@ def take_iv():
 		"i_max": process_dict['mV @ Imax'],
 		"i_max_10": process_dict['mV @ Imax/10'],
 		"i_max_100": process_dict['mV @ Imax/100'],
-		"1mA": process_dict['mV @ 1mA'],
-		"100uA": process_dict['mV @ 100uA'],
-		"10uA": process_dict['mV @ 10uA'],
-		"1uA": process_dict['mV @ 1uA'],
-		"100nA": process_dict['mV @ 100nA'],
+		f"{max_current}mA": process_dict[f'mV @ {max_current}mA'],
+		f"{max_current}00uA": process_dict[f'mV @ {max_current}00uA'],
+		f"{max_current}0uA": process_dict[f'mV @ {max_current}0uA'],
+		f"{max_current}uA": process_dict[f'mV @ {max_current}uA'],
+		f"{max_current}00nA": process_dict[f'mV @ {max_current}00nA'],
 		"dv1": process_dict["dV1"],
 		"dv2": process_dict["dV2"],
 		"dv3": process_dict["dV3"],
 		"dv4": process_dict["dV4"],
-		"dv5": process_dict["dV5"]
+		"dv5": process_dict["dV5"],
+		"max_current": max_current
 	}
 
 	source_values = source_values.split(",")
@@ -321,10 +325,6 @@ def populate_info_from_build_file():
 			note_rows.append({"text": note})
 		note_rows.append(build_dict.get("vbr", ""))
 		note_rows.append(build_dict.get("indium_info", ""))
-
-		print(build_dict)
-		print(part_rows)
-		print(note_rows)
 
 		return render_template("partials/block-forms/build-file-population-response.html", block=build_dict, parts=part_rows, notes=note_rows)
 
@@ -574,6 +574,9 @@ def populate_info_from_iv_file():
 
 		process = pp.IV_curve(iv_dict["current"], iv_dict["voltage_up"], iv_dict["voltage_down"])
 		process_dict = process.calc_IV_parameters()
+
+		max_current = process_dict["Imax"]
+
 		clean_process_dict = {
 			"rs": process_dict["Rs"],
 			"ideality": process_dict["n (ideality)"],
@@ -593,16 +596,17 @@ def populate_info_from_iv_file():
 			"i_max": process_dict['mV @ Imax'],
 			"i_max_10": process_dict['mV @ Imax/10'],
 			"i_max_100": process_dict['mV @ Imax/100'],
-			"1mA": process_dict['mV @ 1mA'],
-			"100uA": process_dict['mV @ 100uA'],
-			"10uA": process_dict['mV @ 10uA'],
-			"1uA": process_dict['mV @ 1uA'],
-			"100nA": process_dict['mV @ 100nA'],
+			f"{max_current}mA": process_dict[f'mV @ {max_current}mA'],
+			f"{max_current}00uA": process_dict[f'mV @ {max_current}00uA'],
+			f"{max_current}0uA": process_dict[f'mV @ {max_current}0uA'],
+			f"{max_current}uA": process_dict[f'mV @ {max_current}uA'],
+			f"{max_current}00nA": process_dict[f'mV @ {max_current}00nA'],
 			"dv1": process_dict["dV1"],
 			"dv2": process_dict["dV2"],
 			"dv3": process_dict["dV3"],
 			"dv4": process_dict["dV4"],
-			"dv5": process_dict["dV5"]
+			"dv5": process_dict["dV5"],
+			"max_current": max_current
 		}
 		
 		full_iv_dict = {**clean_process_dict, **iv_dict}
