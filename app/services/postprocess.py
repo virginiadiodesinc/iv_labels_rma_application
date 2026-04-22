@@ -102,8 +102,8 @@ class IV_curve():
 
         df = pd.DataFrame(data)
 
-        logI = np.log(df["I"].values)
-        Vavg = df["Vavg"].values
+        logI = np.log(np.abs(df["I"].values))
+        Vavg = np.abs(df["Vavg"].values)
         I = df["I"].values
 
         V_diode = Vavg[None, :] - Rst[:, None] * I[None, :] #Replaces previous for loop calculating over every value
@@ -218,9 +218,8 @@ class IV_curve():
                          'Vup (mV)': Vup_mV,
                          'Vdown (mV)': Vdown_mV,
                          'Imax': current_display}
-
-        print(self.var_dict)
-        print(current_display)
+        
+        print("Postprocessing finished.")
         
         return self.var_dict
 

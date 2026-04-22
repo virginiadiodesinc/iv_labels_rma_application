@@ -21,7 +21,7 @@ logging.basicConfig(
 def wait_for_server():
 	for _ in range(100):
 		try:
-			r = requests.get("http://127.0.0.1:5000/build")
+			r = requests.get("http://127.0.0.1:5000/iv_and_build")
 			if r.status_code == 200:
 				return
 		except:
@@ -41,7 +41,7 @@ def main():
 	# Disable automatic DevTools popup
 	webview.settings['OPEN_DEVTOOLS_IN_DEBUG'] = False
 
-	webview.create_window("IV/Labels/Components", "http://127.0.0.1:5000/build", maximized=True)
+	webview.create_window("IV/Labels/Components", "http://127.0.0.1:5000/iv_and_build", maximized=True)
 	webview.start(debug=True)
 
 if __name__ == "__main__":

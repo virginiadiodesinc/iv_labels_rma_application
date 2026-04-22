@@ -381,7 +381,7 @@ class SMU_K236():
 		-------
 		None.
 		"""
-		self.V_compliance_reverse = Vmax
+		self.V_compliance_reverse = str(Vmax)
 		self.L_command_reverse = 'L'+self.V_compliance_reverse+',0'
 
 	def takeReverseBreakdown(self):
@@ -430,7 +430,8 @@ class SMU_K236():
 
 		return source_values, measure_values
 
-	def update_settings(self, delay_toggle = 'on', integration_time = 'Medium', filter_count = '8', compliance_voltage = 4.0, polarity = '+', points_per_decade = '5', sweep_delay = 0, maximum_current = '1mA'):
+	def update_settings(self, delay_toggle = 'on', integration_time = 'Medium', filter_count = '8', compliance_voltage = 4.0, 
+					 polarity = '+', points_per_decade = '5', sweep_delay = 0, maximum_current = '1mA', reverse_polarity_start_current = 10.0, reverse_compliance_voltage = 100.0):
 		self.set_default_delay(delay_toggle)
 		self.set_integration_time(integration_time)
 		self.set_filter(filter_count)
@@ -439,6 +440,8 @@ class SMU_K236():
 		self.set_points_per_decade(points_per_decade)
 		self.set_user_sweep_delay(sweep_delay)
 		self.set_maximum_current(maximum_current)
+		self.set_reverse_polarity_start_current(reverse_polarity_start_current)
+		self.set_reverse_compliance_voltage(reverse_compliance_voltage)
 
 		settings_dict = {
 			"default_delay": delay_toggle,
@@ -448,6 +451,8 @@ class SMU_K236():
 			"polarity": polarity,
 			"points_per_decade": points_per_decade,
 			"sweep_delay": sweep_delay,
-			"maximum_current": maximum_current
+			"maximum_current": maximum_current,
+			"reverse_polarity_start_current": reverse_polarity_start_current,
+			"reverse_compliance_voltage": reverse_compliance_voltage
 		}
 		return settings_dict

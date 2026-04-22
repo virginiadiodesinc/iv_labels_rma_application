@@ -130,8 +130,13 @@ def take_iv():
 		"polarity": SMU_controls.get("polarity"),
 		"points_per_decade": SMU_controls.get("points-per-decade"),
 		"sweep_delay": float(SMU_controls.get("sweep-delay")) if SMU_controls.get("sweep-delay") else 0,
-		"maximum_current": SMU_controls.get("maximum-current") + "mA"
+		"maximum_current": SMU_controls.get("maximum-current") + "mA",
+		"reverse_polarity_start_current": SMU_controls.get("reverse-current"),
+		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance")
 	}
+
+	print(translated_settings)
+
 	SMU.update_settings(**translated_settings)
 
 	source_values, voltage_up_values, voltage_down_values = SMU.takeIV()
@@ -158,6 +163,7 @@ def take_iv():
 		"hysteresis_min": process_dict["Hysteresis Min (mV)"],
 		"reverse_current": process_dict["Reverse Current (uA)"],
 		"reverse_voltage": process_dict["Reverse Voltage(V)"],
+		"rs_1" : process_dict["Rs_1"],
 		"rs_4pt": process_dict["Rs_4pt"],
 		"rs_3pt": process_dict["Rs 3pt"],
 		"pass_heat": process_dict.get("pass_heat", ""),
@@ -186,8 +192,8 @@ def take_iv():
 	# source_values = [float(value) * 1e6 for value in source_values] # convert to microamps
 	# voltage_values = [float(value) * 1e-3 for value in voltage_values] # convert to millivolts
 	df = pd.DataFrame({
-		"Current (uA)": source_values,
-		"Voltage (mV)": voltage_avg_values
+		"Current (uA)": [abs(float(source_value)) for source_value in source_values],
+		"Voltage (mV)": [abs(float(voltage_avg_value)) for voltage_avg_value in voltage_avg_values]
 	})
 
 	fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
@@ -229,17 +235,21 @@ def get_empty_plot():
 
 @bp.post("/update_keithley_settings/")
 def update_keithley_settings():
-	settings = request.form
+	SMU_controls = request.form
+	
 	translated_settings = {
-		"delay_toggle": settings.get("default-delay"),
-		"integration_time": settings.get("integration-time"),
-		"filter_count": settings.get("filter-readings"),
-		"compliance_voltage": float(settings.get("compliance-voltage")),
-		"polarity": settings.get("polarity"),
-		"points_per_decade": settings.get("points-per-decade"),
-		"sweep_delay": float(settings.get("sweep-delay")),
-		"maximum_current": settings.get("maximum-current") + "E-3"
+		"delay_toggle": SMU_controls.get("default-delay"),
+		"integration_time": SMU_controls.get("integration-time"),
+		"filter_count": SMU_controls.get("filter-readings"),
+		"compliance_voltage": float(SMU_controls.get("compliance-voltage")),
+		"polarity": SMU_controls.get("polarity"),
+		"points_per_decade": SMU_controls.get("points-per-decade"),
+		"sweep_delay": float(SMU_controls.get("sweep-delay")) if SMU_controls.get("sweep-delay") else 0,
+		"maximum_current": SMU_controls.get("maximum-current") + "mA",
+		"reverse_polarity_start_current": SMU_controls.get("reverse-current"),
+		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance")
 	}
+
 	SMU = SMU_K236()
 	SMU.update_settings(**translated_settings)
 
@@ -591,6 +601,7 @@ def populate_info_from_iv_file():
 			"reverse_voltage": process_dict["Reverse Voltage(V)"],
 			"rs_4pt": process_dict["Rs_4pt"],
 			"rs_3pt": process_dict["Rs 3pt"],
+			"rs_1": process_dict["Rs_1"],
 			"pass_heat": process_dict.get("pass_heat", ""),
 			"temperature": process_dict.get("temperature", ""),
 			"i_max": process_dict['mV @ Imax'],

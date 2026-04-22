@@ -102,7 +102,7 @@
 		<tr>
 			<td>Rs</td>
 			<td>= [ΔV1 - ΔV2] / [1mA - 100uA] =</td>
-			<td>{{iv_data.rs|float|round(2, 'floor') if iv_data and iv_data.rs is not none else ''}}</td>
+			<td>{{iv_data.rs_1|float|round(2, 'floor') if iv_data and iv_data.rs is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="rs" value="{{iv_data.rs if iv_data and iv_data.rs is not none else ''}}">
 			</td>

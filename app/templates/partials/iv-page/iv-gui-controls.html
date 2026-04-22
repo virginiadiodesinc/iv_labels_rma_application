@@ -1,4 +1,4 @@
-<div id="iv-gui-controls" hx-trigger="load" hx-swap="innerHTML" class="iv-gui-controls">
+<div id="iv-gui-controls" class="iv-gui-controls">
 	<div>
 		<button id="open-iv-button" class="not-implemented-yet">Open IV File from DB</button>
 	</div>
@@ -20,7 +20,7 @@
 			</label>
 			<label> Maximum Current (mA)
 				<input type="number"
-						value="{{ current_settings.maximum_current.replace('E-3', '') if current_settings and current_settings.maximum_current}}"
+						value="{{ current_settings.maximum_current.replace('mA', '') if current_settings and current_settings.maximum_current}}"
 						min="1"
 						max="5"
 						name="maximum-current">
