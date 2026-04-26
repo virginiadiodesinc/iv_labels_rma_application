@@ -1,6 +1,7 @@
 import enum
 from numbers import Number
-from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum
+from datetime import datetime
+from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum, DateTime, CheckConstraint
 from app.db.database import Base
 
 class Build_Info(Base):
@@ -82,3 +83,13 @@ class Notes(Base):
 	build_id = Column(Integer, foreign_key="build_info.block_engraving,build_info.block_serial_number,build_info.block_revision", nullable=False)
 	note_id = Column(Integer, primary_key=True, autoincrement=True)
 	type = Column(Enum(Note_Type), nullable=False)
+
+class Feedback(Base):
+	__tablename__ = 'feedback'
+	feedback_id = Column(Integer, primary_key=True, autoincrement=True)
+	user_initials = Column(String(3), nullable=False)
+	user_feedback = Column(String, nullable=False)
+	submission_datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
+	__table_args__ = (
+        CheckConstraint("length(user_initials) = 3", name="initials_length_check"),
+    )

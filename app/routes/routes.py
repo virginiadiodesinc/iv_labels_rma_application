@@ -1,6 +1,7 @@
 import os
 
 from flask import Blueprint, render_template, request, current_app
+from app.services.process_feedback import process_and_save
 from app.db.database import db_session
 from app.db.queries import *
 from app.db import JB2_queries as jb2
@@ -232,6 +233,22 @@ def get_empty_plot():
 	iv_curve["iv_measurement_values"] = ""
 
 	return render_template("partials/iv-page/iv-plot-figure.html", iv_curve=iv_curve)
+
+@bp.get("/feedback")
+def get_feedback_page():
+	return render_template("feedback-page.html")
+
+@bp.post("/submit")
+def submit():
+	initials = request.form.get("User_Initials", "").strip()
+	feedback = request.form.get("User_Feedback", "").strip()
+
+	if not initials or not feedback: return "<p style='color:red;'>All fields are required.</p>"
+
+	if len(initials) != 3: return "<p style='color:red;'>Initials must be exactly 3 characters.</p>"
+
+	process_and_save(initials, feedback)
+	return "<p>Feedback saved successfully.</p>"
 
 @bp.post("/update_keithley_settings/")
 def update_keithley_settings():
