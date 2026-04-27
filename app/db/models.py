@@ -89,6 +89,7 @@ class Feedback(Base):
 	feedback_id = Column(Integer, primary_key=True, autoincrement=True)
 	user_initials = Column(String(3), nullable=False)
 	user_feedback = Column(String, nullable=False)
+	resolution_status = Column(String, nullable=False)
 	submission_datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
 	__table_args__ = (
         CheckConstraint("length(user_initials) = 3", name="initials_length_check"),
