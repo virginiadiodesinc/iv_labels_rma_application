@@ -135,8 +135,6 @@ def take_iv():
 		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance")
 	}
 
-	print(translated_settings)
-
 	SMU.update_settings(**translated_settings)
 
 	source_values, voltage_up_values, voltage_down_values = SMU.takeIV()
@@ -162,7 +160,7 @@ def take_iv():
 		"hysteresis_max": process_dict["Hysteresis Max (mV)"],
 		"hysteresis_min": process_dict["Hysteresis Min (mV)"],
 		"reverse_current": process_dict["Reverse Current (uA)"],
-		"reverse_voltage": process_dict["Reverse Voltage(V)"],
+		"reverse_voltage": process_dict["Reverse Voltage (V)"],
 		"rs_1" : process_dict["Rs_1"],
 		"rs_4pt": process_dict["Rs_4pt"],
 		"rs_3pt": process_dict["Rs 3pt"],
@@ -183,24 +181,35 @@ def take_iv():
 		"dv5": process_dict["dV5"],
 		"max_current": max_current
 	}
+	
+	source_values = process_dict['I (uA)']
+	source_values = [str(abs(float(value))) for value in source_values]
 
-	source_values = source_values.split(",")
-	voltage_up_values = voltage_up_values.split(",")
-	voltage_down_values = voltage_down_values.split(",")
-	voltage_avg_values = [str((float(up) + float(down)) / 2) for up, down in zip(voltage_up_values, voltage_down_values)]
+	voltage_up_values = process_dict['Vup (mV)']
+	voltage_down_values = process_dict['Vdown (mV)']
+	voltage_avg_values = [str(abs(((float(up) + float(down)) / 2) / 1000.0)) for up, down in zip(voltage_up_values, voltage_down_values)]
 
-	# source_values = [float(value) * 1e6 for value in source_values] # convert to microamps
-	# voltage_values = [float(value) * 1e-3 for value in voltage_values] # convert to millivolts
+	truncated_source_values = ["{:.2f}".format(float(value)) for value in source_values]
+	truncated_voltage_values = ["{:.2f}".format(float(value)) for value in voltage_avg_values]
+
+	# min_voltage = min([float(value) for value in voltage_avg_values])
+	# max_voltage = max([float(value) for value in voltage_avg_values])
+	# print(min_voltage - 0.1)
+	# print(max_voltage + 0.1)
+
 	df = pd.DataFrame({
-		"Current (uA)": [abs(float(source_value)) for source_value in source_values],
-		"Voltage (mV)": [abs(float(voltage_avg_value)) for voltage_avg_value in voltage_avg_values]
+		"Current (uA)": truncated_source_values,
+		"Voltage (V)": truncated_voltage_values
 	})
 
-	fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
+	fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
 	fig.update_traces(mode='lines+markers')
+	
+	# fig.update_xaxes(range=[min_voltage - 0.1, max_voltage + 0.1])
+	# fig.update_yaxes(autorange=True)
 
-	if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
-		fig.update_xaxes(range=[df["Voltage (mV)"].astype(float).min() - 25, df["Voltage (mV)"].astype(float).min() + 75])
+	# if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
+	# 	fig.update_xaxes(range=[df["Voltage (mV)"].astype(float).min() - 25, df["Voltage (mV)"].astype(float).min() + 75])
 
 	iv_curve = {} 
 	iv_curve["figure"] = fig.to_html(full_html=False)
@@ -216,15 +225,15 @@ def take_iv():
 @bp.get("/get_empty_plot")
 def get_empty_plot():
 	df = pd.DataFrame({
-		"Voltage (mV)": [],
+		"Voltage (V)": [],
 		"Current (uA)": []
 	})
 
-	fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title=None, log_y=True)
+	fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_y=True)
 	fig.update_traces(mode='lines+markers')
 
-	if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
-		fig.update_xaxes(range=[df["Voltage (mV)"].astype(float).min() - 25, df["Voltage (mV)"].astype(float).min() + 75])
+	# if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
+	# 	fig.update_xaxes(range=[df["Voltage (mV)"].astype(float).min() - 25, df["Voltage (mV)"].astype(float).min() + 75])
 
 	iv_curve = {} 
 	iv_curve["figure"] = fig.to_html(full_html=False)
@@ -468,13 +477,6 @@ def save_build_file():
 	# assembly_initials2, assembly_date2, circuit2 filter2
 	# NOTES: notes, indium, Vbr, notes1, notes2, notes3, notes4, notes5, notes6
 	file_name, content_rows = write_build_file(block_dict, build_dict, build_name)
-	print(file_name)
-	print()
-	print(block_dict)
-	print()
-	print(build_dict)
-	print()
-	print(build_name)
 
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.SAVE,
@@ -527,7 +529,7 @@ def save_iv_file():
 		"Hysteresis Max (mV)": iv_data.get("hysteresis-max", ""),
 		"Hysteresis Min (mV)": iv_data.get("hysteresis-min", ""),
 		"Reverse Current (uA)": iv_data.get("reverse-current", ""),
-		"Reverse Voltage(V)": iv_data.get("reverse-voltage", ""),
+		"Reverse Voltage (V)": iv_data.get("reverse-voltage", ""),
 	}
 
 	Vup_list = iv_data.get("iv-voltage-up", "").split(",")
@@ -561,19 +563,20 @@ def populate_info_from_iv_file():
 		source_values = [float(value) for value in iv_dict["current"]]
 		voltage_values_tuples = zip([float(value) for value in iv_dict["voltage_up"]], [float(value) for value in iv_dict["voltage_down"]])
 		average_voltage_values = [(float(up) + float(down)) / 2 for up, down in voltage_values_tuples]
+		average_voltage_values = [float(value) / 1000.0 for value in average_voltage_values]
 
 		# source_values = [float(value) * 1e6 for value in source_values] # convert to microamps
 		# voltage_values = [float(value) * 1e-3 for value in voltage_values] # convert to millivolts
 		df = pd.DataFrame({
 			"Current (uA)": source_values,
-			"Voltage (mV)": average_voltage_values
+			"Voltage (V)": average_voltage_values
 		})
 
-		fig = px.scatter(df, x="Voltage (mV)", y="Current (uA)", labels={"x": "Voltage (mV)", "y": "Current (uA)"}, title=None, log_x = False, log_y=True)
+		fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_x = False, log_y=True)
 		fig.update_traces(mode='lines+markers')
 
-		if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
-			fig.update_xaxes(range=[df["Voltage (mV)"].astype(float).min() - 25, df["Voltage (mV)"].astype(float).min() + 75])
+		# if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
+		# 	fig.update_xaxes(range=[df["Voltage (mV)"].astype(float).min() - 25, df["Voltage (mV)"].astype(float).min() + 75])
 
 		iv_curve = {} 
 		iv_curve["figure"] = fig.to_html(full_html=False)
@@ -598,7 +601,7 @@ def populate_info_from_iv_file():
 			"hysteresis_max": process_dict["Hysteresis Max (mV)"],
 			"hysteresis_min": process_dict["Hysteresis Min (mV)"],
 			"reverse_current": process_dict["Reverse Current (uA)"],
-			"reverse_voltage": process_dict["Reverse Voltage(V)"],
+			"reverse_voltage": process_dict["Reverse Voltage (V)"],
 			"rs_4pt": process_dict["Rs_4pt"],
 			"rs_3pt": process_dict["Rs 3pt"],
 			"rs_1": process_dict["Rs_1"],

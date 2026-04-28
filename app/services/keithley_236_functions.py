@@ -418,7 +418,7 @@ class SMU_K236():
 		time.sleep(.1)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(1) #Should probably be variable and depend on the the total number of points and delay time
+		time.sleep(.5) #Should probably be variable and depend on the the total number of points and delay time
 
 		self.inst.write('N0X') #Standby mode
 		time.sleep(.1)
@@ -455,4 +455,6 @@ class SMU_K236():
 			"reverse_polarity_start_current": reverse_polarity_start_current,
 			"reverse_compliance_voltage": reverse_compliance_voltage
 		}
+
+		print(settings_dict)
 		return settings_dict

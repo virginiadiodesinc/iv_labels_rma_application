@@ -43,13 +43,13 @@
 			<label> Reverse Current (uA)
 				<input type="number" 
 						step="0.1"
-						value="{{ current_settings.reverse_current if current_settings and current_settings.reverse_current}}"
+						value="{{ current_settings.reverse_polarity_start_current if current_settings and current_settings.reverse_polarity_start_current}}"
 						name="reverse-current">
 			</label>
 			<label> Reverse Compliance (V)
 				<input type="number" 
 						step="0.1"
-						value="{{ current_settings.reverse_compliance if current_settings and current_settings.reverse_compliance}}"
+						value="{{ current_settings.reverse_compliance_voltage if current_settings and current_settings.reverse_compliance_voltage}}"
 						name="reverse-compliance">
 			</label>
 		</form>

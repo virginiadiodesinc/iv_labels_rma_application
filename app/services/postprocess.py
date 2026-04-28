@@ -30,6 +30,8 @@ class IV_curve():
         else:
             for I in IV_source_up.replace(r'\r', '').replace(r'\n', '').split(','):
                 self.IV_Iup.append(float(I))
+                
+        self.IV_Iup = list(map(abs, self.IV_Iup))
 
         is_list = isinstance(IV_measure_up, list)
         self.IV_Vup = []
@@ -40,6 +42,8 @@ class IV_curve():
         else:
             for V in IV_measure_up.replace(r'\r', '').replace(r'\n', '').split(','):
                 self.IV_Vup.append(float(V))
+                
+        self.IV_Vup = list(map(abs, self.IV_Vup))
 
         is_list = isinstance(IV_measure_down, list)
         self.IV_Vdown = []
@@ -51,6 +55,8 @@ class IV_curve():
             for V in IV_measure_down.replace(r'\r', '').replace(r'\n', '').split(','):
                 self.IV_Vdown.append(float(V))
             self.IV_Vdown.reverse() #Only needed for SMU output. .iv file data formatted in the correct order.
+            
+        self.IV_Vdown = list(map(abs, self.IV_Vdown))
 
         if len(self.IV_Iup) == 21:
             self.points_per_decade = '5'
@@ -64,17 +70,20 @@ class IV_curve():
         self.IV_Vavg = []
         for Vup, Vdown in zip(self.IV_Vup, self.IV_Vdown):
             self.IV_Vavg.append((Vup + Vdown)/ 2)
+        
+        print(Reverse_Breakdown_measure)
+        print(Reverse_Breakdown_source)
 
         if Reverse_Breakdown_source == '':
             self.I_reverse_breakdown = '0.0'
         else:
-            self.I_reverse_breakdown = Reverse_Breakdown_source.replace(r'\r', '').replace(r'\n', '').split(',')[len(Reverse_Breakdown_source.replace(r'\r', '').replace(r'\n', '').split(',')) - 1] 
+            self.I_reverse_breakdown = abs(float(Reverse_Breakdown_source.replace(r'\r', '').replace(r'\n', '').split(',')[0]))
             #last value of reverse breakdown current list
 
         if Reverse_Breakdown_measure == '':
             self.V_reverse_breakdown  = '0.0'
         else:
-            self.V_reverse_breakdown = Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')[len(Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')) - 1] 
+            self.V_reverse_breakdown = abs(float(Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')[len(Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')) - 1]))
             #last value of reverse breakdown voltage list
 
         self.V_polarity_sweep = Polarity_Sweep_source.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
@@ -104,7 +113,7 @@ class IV_curve():
 
         logI = np.log(np.abs(df["I"].values))
         Vavg = np.abs(df["Vavg"].values)
-        I = df["I"].values
+        I = np.abs(df["I"].values)
 
         V_diode = Vavg[None, :] - Rst[:, None] * I[None, :] #Replaces previous for loop calculating over every value
 
@@ -145,8 +154,16 @@ class IV_curve():
         self.hys_mean = df["Hysteresis"].mean()
         self.hys_max = df["Hysteresis"].max()
         self.hys_min = df["Hysteresis"].min()
+        
+        if f"{self.IV_Iup[-1]:E}"[0:1] not in ['1', '2', '3', '4', '5']:
+            self.source_polarity = '-'
+            current_display = f"{self.IV_Iup[-1]:E}"[1:2]
+        else:
+            self.source_polarity = '+'
+            current_display = f"{self.IV_Iup[-1]:E}"[0:1]
 
-        Ipts = np.array([0.1E-6, 1E-6, 10E-6, 100E-6, 1000E-6, df["I"].max(), df["I"].max()/10, df["I"].max()/100])
+        Ipts = np.array([int(current_display) * 0.1E-6, int(current_display) * 1E-6, int(current_display) * 10E-6, 
+                         int(current_display) * 100E-6, int(current_display) * 1000E-6, df["I"].max(), df["I"].max()/10, df["I"].max()/100])
 
         self.dfIpts = pd.DataFrame()
         self.dfIpts["I"] = Ipts
@@ -162,13 +179,6 @@ class IV_curve():
         self.Rs_1 = (self.dv1["V"] - self.dv2["V"]) / (self.dv1["I"])
         self.Rs_3pt = (self.dv4["V"] - self.dv5["V"]) / (self.dv4["I"])
         self.Rs_4pt = (self.dv1["V"] - self.dv3["V"]) / (self.dv1["I"])
-
-        if f"{self.IV_Iup[-1]:E}"[0:1] not in ['1', '2', '3', '4', '5']:
-            self.source_polarity = '-'
-            current_display = f"{self.IV_Iup[-1]:E}"[1:2]
-        else:
-            self.source_polarity = '+'
-            current_display = f"{self.IV_Iup[-1]:E}"[0:1]
 
         I_uA = []
 
@@ -198,8 +208,8 @@ class IV_curve():
                          'Hysteresis Mean (mV)': f"{self.hys_mean:.6f}",
                          'Hysteresis Max (mV)': f"{self.hys_max:.6f}",
                          'Hysteresis Min (mV)': f"{self.hys_min:.6f}",
-                         'Reverse Current (uA)': f"{float(self.I_reverse_breakdown)/1E6:.6f}",
-                         'Reverse Voltage(V)': f"{float(self.V_reverse_breakdown):.6f}",
+                         'Reverse Current (uA)': f"{float(self.I_reverse_breakdown)*1E6:.6f}",
+                         'Reverse Voltage (V)': f"{float(self.V_reverse_breakdown):.6f}",
                          'dV1': f"{self.dv1['V']:.6f}",
                          'dV2': f"{self.dv2['V']:.6f}",
                          'dV3': f"{self.dv3['V']:.6f}",
@@ -218,6 +228,7 @@ class IV_curve():
                          'Vup (mV)': Vup_mV,
                          'Vdown (mV)': Vdown_mV,
                          'Imax': current_display}
+        
         
         print("Postprocessing finished.")
         

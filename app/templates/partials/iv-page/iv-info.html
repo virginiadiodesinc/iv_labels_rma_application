@@ -141,34 +141,34 @@
 		</tr>
 		<tr>
 			<td>Imax</td>
-			<td>{{iv_data.i_max|float|round(2, 'floor') if iv_data and iv_data.i_max is not none else ''}}</td>
+			<td>{{(iv_data.i_max|float * 1000)|round(2, 'floor') if iv_data and iv_data.i_max is not none else ''}}</td>
 		</tr>
 			<td>Imax/10</td>
-			<td>{{iv_data.i_max_10|float|round(2, 'floor') if iv_data and iv_data.i_max_10 is not none else ''}}</td>
+			<td>{{(iv_data.i_max_10|float * 1000)|round(2, 'floor') if iv_data and iv_data.i_max_10 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>Imax/100</td>
-			<td>{{iv_data.i_max_100|float|round(2, 'floor') if iv_data and iv_data.i_max_100 is not none else ''}}</td>
+			<td>{{(iv_data.i_max_100|float * 1000)|round(2, 'floor') if iv_data and iv_data.i_max_100 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>{{ iv_data.max_current ~ 'mA' if iv_data and iv_data[iv_data.max_current ~ 'mA'] is not none else '1 mA'}}</td>
-			<td>{{iv_data[iv_data.max_current ~ 'mA' ]|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ 'mA'] is not none else ''}}</td>
+			<td>{{(iv_data[iv_data.max_current ~ 'mA' ]|float * 1000)|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ 'mA'] is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>{{ iv_data.max_current ~ '00uA' if iv_data and iv_data[iv_data.max_current ~ '00uA'] is not none else '100 uA' }}</td>
-			<td>{{iv_data[iv_data.max_current ~ '00uA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '00uA'] is not none else ''}}</td>
+			<td>{{(iv_data[iv_data.max_current ~ '00uA']|float * 1000)|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '00uA'] is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>{{ iv_data.max_current ~ '0uA' if iv_data and iv_data[iv_data.max_current ~ '0uA'] is not none else '10 uA' }}</td>
-			<td>{{iv_data[iv_data.max_current ~ '0uA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '0uA'] is not none else ''}}</td>
+			<td>{{(iv_data[iv_data.max_current ~ '0uA']|float * 1000)|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '0uA'] is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>{{ iv_data.max_current ~ 'uA' if iv_data and iv_data[iv_data.max_current ~ 'uA'] is not none else '1 uA'}}</td>
-			<td>{{iv_data[iv_data.max_current ~ 'uA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ 'uA'] is not none else ''}}</td>
+			<td>{{(iv_data[iv_data.max_current ~ 'uA']|float * 1000)|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ 'uA'] is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>{{ iv_data.max_current ~ '00nA' if iv_data and iv_data[iv_data.max_current ~ '00nA'] is not none else '100 nA' }}</td>
-			<td>{{iv_data[iv_data.max_current ~ '00nA']|float|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '00nA'] is not none else ''}}</td>
+			<td>{{(iv_data[iv_data.max_current ~ '00nA']|float * 1000)|round(2, 'floor') if iv_data and iv_data[iv_data.max_current ~ '00nA'] is not none else ''}}</td>
 		</tr>
 	</table>
 		<table class ="landmark-numbers-table-2" id="landmark-numbers-table-2">
@@ -180,23 +180,23 @@
 		</tr>
 		<tr>
 			<td>DeltaV4 (mV)</td>
-			<td>{{iv_data.dv4|float|round(2, 'floor') if iv_data and iv_data.dv4 is not none else ''}}</td>
+			<td>{{(iv_data.dv4|float * 1000)|round(2, 'floor') if iv_data and iv_data.dv4 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV5 (mV)</td>
-			<td>{{iv_data.dv5|float|round(2, 'floor') if iv_data and iv_data.dv5 is not none else ''}}</td>
+			<td>{{(iv_data.dv5|float * 1000)|round(2, 'floor') if iv_data and iv_data.dv5 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV1 (mV)</td>
-			<td>{{iv_data.dv1|float|round(2, 'floor') if iv_data and iv_data.dv1 is not none else ''}}</td>
+			<td>{{(iv_data.dv1|float * 1000)|round(2, 'floor') if iv_data and iv_data.dv1 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV2 (mV)</td>
-			<td>{{iv_data.dv2|float|round(2, 'floor') if iv_data and iv_data.dv2 is not none else ''}}</td>
+			<td>{{(iv_data.dv2|float * 1000)|round(2, 'floor') if iv_data and iv_data.dv2 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV3 (mV)</td>
-			<td>{{iv_data.dv3|float|round(2, 'floor') if iv_data and iv_data.dv3 is not none else ''}}</td>
+			<td>{{(iv_data.dv3|float * 1000)|round(2, 'floor') if iv_data and iv_data.dv3 is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>Vknee=V@1uA; dV=DeltaV2</td>
