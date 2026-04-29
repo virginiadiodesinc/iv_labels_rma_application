@@ -124,6 +124,9 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	rows = []
 	i = 0
 
+	print("INFO", info_dict)
+	print("IV INFO", IV_dict)
+
 	rows.append(info_dict['build_name'] + ' ' +
 				info_dict['build_sn'] + ' ' +
 				info_dict['diode'] + ' ' +
@@ -146,7 +149,7 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	rows.append('Hysteresis Max (mV) = ' + IV_dict['Hysteresis Max (mV)'])
 	rows.append('Hysteresis Min (mV) = ' + IV_dict['Hysteresis Min (mV)'])
 	rows.append('Reverse Curent (uA): ' + IV_dict['Reverse Current (uA)'])
-	rows.append('Reverse Voltage (V): ' + IV_dict['Reverse Voltage(V)'])
+	rows.append('Reverse Voltage (V): ' + IV_dict['Reverse Voltage (V)'])
 	rows.append('Voltage Up (mV)    Voltage Down (mV)    Current (uA)')
 
 	for Vup, Vdown, I_source in zip(Vup_list, Vdown_list, I_source_list):

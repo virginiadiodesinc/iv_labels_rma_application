@@ -149,6 +149,11 @@ class IV_curve():
         self.Is = np.exp(y0_best_fit)
 
         df.loc[:,"Hysteresis"] = np.abs(df["Vup"]*1000 - df["Vdown"]*1000) #in mV
+        
+
+        print("V UP", df["Vup"] * 1000)
+        print("V DOWN", df["Vdown"] * 1000)
+        print("DELTA", df["Hysteresis"])
 
         self.hys_STD = df["Hysteresis"].std(ddof=0)
         self.hys_mean = df["Hysteresis"].mean()

@@ -40,6 +40,9 @@ class SMU_K236():
 		self.sign_reverse = '-' #default polarity negative
 		self.Q_command_reverse = 'Q2,'+self.sign_reverse+self.Imin_reverse+','+self.sign_reverse+'1E-3'+',0,0,0'
 
+		self.instrument_delay = 0.05
+		self.default_sweep_delay = .45
+
 	def reset(self):
 		"""
 		Resets the SMU 236 to defaults.
@@ -49,7 +52,7 @@ class SMU_K236():
 		None.
 		"""
 		self.inst.write('J0X')
-		time.sleep(.01)
+		time.sleep(self.instrument_delay)
 
 	def set_default_delay(self, toggle):
 		"""
@@ -218,51 +221,51 @@ class SMU_K236():
 		self.reset()
 
 		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write(self.W_command+':'+self.S_command+':'+self.P_command+':'+self.L_command+'X')
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write(self.Q_command+'X')
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(1) #Should probably be variable and depend on the the total number of points and delay time
+		time.sleep(self.default_sweep_delay) #Should probably be variable and depend on the the total number of points and delay time
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		source_values_up = self.inst.query("G1,2,2X") #Current values
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 		measure_values_up = self.inst.query("G4,2,2X") #Voltage values
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.Q_command = 'Q2,'+self.sign+self.Imax+','+self.sign+self.Imin+','+self.points+',0,'+self.user_sweep_delay #prepare down sweep
 
 		self.inst.write(self.Q_command+'X')
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(1) #Should probably be variable and depend on the the total number of points and delay time
+		time.sleep(self.default_sweep_delay) #Should probably be variable and depend on the the total number of points and delay time
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		#source_values_down = self.inst.query("G1,2,2X") #Current values, these are identical to source_values_up but in reverse, so this is redundant
-		#time.sleep(.1)
+		#time.sleep(self.instrument_delay)
 		measure_values_down = self.inst.query("G4,2,2X") #Voltage values
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.Q_command = 'Q2,'+self.sign+self.Imin+','+self.sign+self.Imax+','+self.points+',0,'+self.user_sweep_delay #return to up sweep
 
@@ -318,32 +321,32 @@ class SMU_K236():
 		self.reset() 
 
 		self.inst.write('F0,1X') #Sources voltage, measures current (sweep)
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		print(self.L_command_polarity)
 		self.inst.write(self.L_command_polarity+'X')
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		print(self.Q_command_polarity)
 		self.inst.write(self.Q_command_polarity+'X')
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 	
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
 		time.sleep(1)
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		source_values = self.inst.query("G1,2,2X") #Voltage values
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 		measure_values = self.inst.query("G4,2,2X") #Current values
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 		
 		return source_values, measure_values
 	
@@ -362,16 +365,16 @@ class SMU_K236():
 			self.sign_reverse = ''
 			self.Q_command_reverse = 'Q2,'+self.sign_reverse+self.Imin_reverse+','+self.sign_reverse+'1E-3'+',0,0,0'
 
-	def set_reverse_polarity_start_current(self, Imin):
+	def set_reverse_polarity_end_current(self, Imax):
 		"""
-		Set start current for reverse breakdown test current ramp. Add an upper limit for the start current?
+		Set end current for reverse breakdown test current ramp. Add an upper limit for the start current?
 
 		Returns
 		-------
 		None.
 		"""
-		self.Imin_reverse = str(Imin)+'E-6'
-		self.Q_command_reverse = 'Q2,'+self.sign_reverse+self.Imin_reverse+','+self.sign_reverse+'1E-3'+',0,0,0'
+		self.Imax_reverse = str(Imax) + 'E-6'
+		self.Q_command_reverse = 'Q2,' + self.sign_reverse + '1E-7' + ',' + self.sign_reverse + self.Imax_reverse + ',0,0,0'
 
 	def set_reverse_compliance_voltage(self, Vmax):
 		"""
@@ -398,35 +401,35 @@ class SMU_K236():
 		self.reset()
 
 		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('S1X') #Integration time medium
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		print(self.L_command_reverse)
 		self.inst.write(self.L_command_reverse+'X')
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		print(self.Q_command_reverse)
 		self.inst.write(self.Q_command_reverse+'X')
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(.5) #Should probably be variable and depend on the the total number of points and delay time
+		time.sleep(self.default_sweep_delay) #Should probably be variable and depend on the the total number of points and delay time
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		source_values = self.inst.query("G1,2,2X") #Current values
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 		measure_values = self.inst.query("G4,2,2X") #Voltage values
-		time.sleep(.1)
+		time.sleep(self.instrument_delay)
 
 		return source_values, measure_values
 
@@ -437,10 +440,11 @@ class SMU_K236():
 		self.set_filter(filter_count)
 		self.set_compliance_voltage(compliance_voltage)
 		self.set_polarity(polarity)
+		self.set_reverse_polarity()
 		self.set_points_per_decade(points_per_decade)
 		self.set_user_sweep_delay(sweep_delay)
 		self.set_maximum_current(maximum_current)
-		self.set_reverse_polarity_start_current(reverse_polarity_start_current)
+		self.set_reverse_polarity_end_current(reverse_polarity_start_current)
 		self.set_reverse_compliance_voltage(reverse_compliance_voltage)
 
 		settings_dict = {

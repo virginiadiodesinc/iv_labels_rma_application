@@ -179,7 +179,9 @@ def take_iv():
 		"dv3": process_dict["dV3"],
 		"dv4": process_dict["dV4"],
 		"dv5": process_dict["dV5"],
-		"max_current": max_current
+		"max_current": max_current,
+		"polarity": translated_settings["polarity"],
+		"points_per_decade": translated_settings["points_per_decade"]
 	}
 	
 	source_values = process_dict['I (uA)']
@@ -495,6 +497,7 @@ def save_build_file():
 @bp.post("/save_iv_file/")
 def save_iv_file():
 	iv_data = request.form
+	print("FORMS IN ROUTE", iv_data)
 
 	current_datetime = datetime.now()
 	formatted_date = current_datetime.strftime("%#m/%#d/%Y")
@@ -584,6 +587,8 @@ def populate_info_from_iv_file():
 		iv_curve["iv_measurement_values"] = ",".join(str(value) for value in average_voltage_values)
 		iv_curve["iv_voltage_up"] = ",".join(str(value) for value in iv_dict["voltage_up"])
 		iv_curve["iv_voltage_down"] = ",".join(str(value) for value in iv_dict["voltage_down"])
+		iv_curve["points_per_decade"] = iv_dict["points_per_decade"]
+		iv_curve["polarity"] = iv_dict["polarity"]
 
 		process = pp.IV_curve(iv_dict["current"], iv_dict["voltage_up"], iv_dict["voltage_down"])
 		process_dict = process.calc_IV_parameters()
