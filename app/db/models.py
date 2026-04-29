@@ -1,6 +1,7 @@
 import enum
 from numbers import Number
-from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum
+from datetime import datetime
+from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum, DateTime, CheckConstraint, ForeignKey
 from app.db.database import Base
 
 class Build_Info(Base):
@@ -31,7 +32,7 @@ class Build_Info(Base):
 
 class Build_Parts(Base):
 	__tablename__ = "build_parts"
-	build_id = Column(Integer, foreign_key="build_info.block_engraving,build_info.block_serial_number,build_info.block_revision", nullable=False)
+	build_id = Column(Integer, ForeignKey("build_info.block_engraving,build_info.block_serial_number,build_info.block_revision"), nullable=False)
 	name = Column(String, nullable=False)
 	quantity = Column(Integer, nullable=False)
 	type = Column(String, nullable=False)
@@ -46,7 +47,7 @@ class Polarity(enum.Enum):
 
 class IV_Info(Base):
 	__tablename__ = "iv_info"
-	build_id = Column(Integer, foreign_key="build_info.block_engraving,build_info.block_serial_number,build_info.block_revision", nullable=False)
+	build_id = Column(Integer, ForeignKey("build_info.block_engraving,build_info.block_serial_number,build_info.block_revision"), nullable=False)
 	subassembly_tag = Column(String)
 	iv_id = Column(Integer, primary_key=True, autoincrement=True)
 	iv_date = Column(Date, nullable=False)
@@ -65,7 +66,7 @@ class IV_Info(Base):
 
 class IV_Points(Base):
 	__tablename__ = "iv_points"
-	iv_id = Column(Integer, foreign_key="iv_info.iv_id", nullable=False)
+	iv_id = Column(Integer, ForeignKey("iv_info.iv_id"), nullable=False)
 	point_id = Column(Integer, primary_key=True, autoincrement=True)
 	voltage_up_mv = Column(Float, nullable=False)
 	voltage_down_mv = Column(Float, nullable=False)
@@ -79,6 +80,17 @@ class Note_Type(enum.Enum):
 
 class Notes(Base):
 	__tablename__ = "notes"
-	build_id = Column(Integer, foreign_key="build_info.block_engraving,build_info.block_serial_number,build_info.block_revision", nullable=False)
+	build_id = Column(Integer, ForeignKey("build_info.block_engraving,build_info.block_serial_number,build_info.block_revision"), nullable=False)
 	note_id = Column(Integer, primary_key=True, autoincrement=True)
 	type = Column(Enum(Note_Type), nullable=False)
+
+class Feedback(Base):
+	__tablename__ = 'feedback'
+	feedback_id = Column(Integer, primary_key=True, autoincrement=True)
+	user_initials = Column(String(3), nullable=False)
+	user_feedback = Column(String, nullable=False)
+	resolution_status = Column(String, nullable=False)
+	submission_datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
+	__table_args__ = (
+		CheckConstraint("length(user_initials) = 3", name="initials_length_check"),
+	)

@@ -8,6 +8,7 @@ from app.services import build_file_converter as build_converter, block_file_con
 import plotly.express as px
 import pandas as pd
 from app.services.keithley_236_functions import SMU_K236
+from app.services.process_feedback import process_and_save
 from app.services.write_MicroA_files import write_block_file, write_IV_file, write_build_file
 from app.services import postprocess as pp
 from datetime import datetime
@@ -34,6 +35,22 @@ def get_iv_page():
 @bp.get("/iv_and_build")
 def get_iv_and_build_page():
 	return render_template("iv-and-build-page.html")
+
+@bp.get("/feedback")
+def get_feedback_page():
+	return render_template("feedback-page.html")
+
+@bp.post("/submit")
+def submit():
+	initials = request.form.get("User_Initials", "").strip()
+	feedback = request.form.get("User_Feedback", "").strip()
+
+	if not initials or not feedback: return "<p style='color:red;'>All fields are required.</p>"
+
+	if len(initials) != 3: return "<p style='color:red;'>Initials must be exactly 3 characters.</p>"
+
+	process_and_save(initials, feedback)
+	return "<p>Feedback saved successfully.</p>"
 
 @bp.get("/search_jb2_components/")
 def search_jb2_components():
