@@ -698,3 +698,7 @@ def check_custom_lot():
 	selected_lot = request.form.get("lot-select")
 	
 	return render_template("partials/build-page/custom-lot-input.html", selected_lot=selected_lot)
+
+@bp.get("/clear_build_parts")
+def clear_build_parts():
+	return render_template("partials/block-forms/clear-build-parts-response.html", items=[], notes=[])

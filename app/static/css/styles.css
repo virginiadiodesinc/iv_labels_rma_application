@@ -57,13 +57,13 @@
 }
 
 .content {
-	padding-top: 1%;
-	padding-bottom: 1%;
+	padding-top: 15px;
+	padding-bottom: 15px;
 	flex-grow: 1;
 	flex: 1;
 	order: 2;
-	margin-top: 1%;
-	margin-bottom: 1%;
+	margin-top: 15px;
+	margin-bottom: 15px;
 }
 
 .build-page-container {
@@ -107,6 +107,20 @@
 	grid-column-end: 14;
 }
 
+
+.actual-bom-list > div:nth-child(even) {
+	background-color: lightblue;
+}
+
+.bom-list tr:nth-child(even)
+{
+	background-color: lightblue;
+}
+
+.bom-sub-list tr:nth-child(even)
+{
+	background-color: lightblue;
+}
 /* .bom-list td:nth-child(even), th:nth-child(even) {
   background-color: gray;
 }
@@ -229,37 +243,37 @@
 }
 
 .feedback-form {
-    width: 500px;
-    margin: 50px auto;
+	width: 500px;
+	margin: 50px auto;
 }
 
 .feedback-form-row {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 15px;
 }
 
 .feedback-form-row label {
-    font-weight: bold;
-    margin-bottom: 5px;
+	font-weight: bold;
+	margin-bottom: 5px;
 }
 
 .feedback-form-row input {
-    padding: 8px;
-    font-size: 14px;
-    width: 30px;
+	padding: 8px;
+	font-size: 14px;
+	width: 30px;
 }
 
 .feedback-form-row textarea {
-    padding: 8px;
-    font-size: 14px;
-    width: 100%;
-    height: 120px;
+	padding: 8px;
+	font-size: 14px;
+	width: 100%;
+	height: 120px;
 	resize: none;
 }
 
 .feedback-submit-btn {
-    margin-top: 10px;
-    padding: 10px;
-    cursor: pointer;
+	margin-top: 10px;
+	padding: 10px;
+	cursor: pointer;
 }

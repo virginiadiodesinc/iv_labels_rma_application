@@ -33,6 +33,16 @@
 	</button>
 
 	<button
+		id="clear-build-parts-button"
+		name="clear-build-parts-button"
+		hx-get="/clear_build_parts"
+		hx-target="#actual-bom-container"
+		hx-swap="innerHTML"
+		>
+		Clear Build List
+	</button>
+
+	<button
 		id="print-build-button"
 		name="print-build-button"
 		hx-swap-oob="true"

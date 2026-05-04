@@ -12,6 +12,8 @@ def write_block_file(block_dict):
 	rows = []
 	i = 0
 
+	print(block_dict)
+
 	rows.append(block_dict['block_engraving'] + ' ' + block_dict['PB1_name'])
 	rows.append(block_dict['block_sn'] + ' ' + '12' + ' ' + '12')
 	rows.append(block_dict['inspection_date'])
@@ -53,6 +55,9 @@ def write_build_file(block_dict, build_dict, build_name):
 	"""
 	rows = []
 	i = 0
+
+	print(block_dict)
+	print(build_dict)
 
 	rows.append(block_dict['block_engraving'] + ' ' + block_dict['PB1_name'])
 	rows.append(block_dict['block_sn'] + ' ' + '12' + ' ' + '12')
@@ -128,7 +133,7 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	print("IV INFO", IV_dict)
 
 	rows.append(info_dict['build_name'] + ' ' +
-				info_dict['build_sn'] + ' ' +
+				'B' + info_dict['build_sn'] + ' ' +
 				info_dict['diode'] + ' ' +
 				info_dict['circuit'] + ' ' +
 				'A#' + info_dict['assembly_no'] + ' ' +

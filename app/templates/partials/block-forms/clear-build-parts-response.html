@@ -1,3 +1,8 @@
-<table id="full-build-table-body" hx-swap-oob="true">
-	{% include "partials/block-forms/full-build-info.html" %}
-</table>
+<div id="actual-bom-container" class="actual-bom-list" hx-swap-oob="true">
+		{% for item in items %}
+			{% include "partials/build-page/part-row.html" %}
+		{% endfor %}
+		{% for note in notes %}
+			{% include "partials/build-page/note-row.html" %}
+		{% endfor %}
+</div>
