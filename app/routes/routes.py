@@ -234,22 +234,6 @@ def get_empty_plot():
 
 	return render_template("partials/iv-page/iv-plot-figure.html", iv_curve=iv_curve)
 
-@bp.get("/feedback")
-def get_feedback_page():
-	return render_template("feedback-page.html")
-
-@bp.post("/submit")
-def submit():
-	initials = request.form.get("User_Initials", "").strip()
-	feedback = request.form.get("User_Feedback", "").strip()
-
-	if not initials or not feedback: return "<p style='color:red;'>All fields are required.</p>"
-
-	if len(initials) != 3: return "<p style='color:red;'>Initials must be exactly 3 characters.</p>"
-
-	process_and_save(initials, feedback)
-	return "<p>Feedback saved successfully.</p>"
-
 @bp.post("/update_keithley_settings/")
 def update_keithley_settings():
 	SMU_controls = request.form
@@ -690,3 +674,26 @@ def check_custom_lot():
 	selected_lot = request.form.get("lot-select")
 	
 	return render_template("partials/build-page/custom-lot-input.html", selected_lot=selected_lot)
+
+"""
+Feedback page routes: @bp.get("/feedback"), @bp.post("/submit")
+"""
+@bp.get("/feedback")
+def get_feedback_page():
+	return render_template("feedback-page.html")
+
+@bp.post("/submit")
+def submit():
+	initials = request.form.get("User_Initials", "").strip()
+	feedback = request.form.get("User_Feedback", "").strip()
+
+	if not initials or not feedback: return "<p style='color:red;'>All fields are required.</p>"
+
+	if len(initials) != 3: return "<p style='color:red;'>Initials must be exactly 3 characters.</p>"
+
+	process_and_save(initials, feedback)
+	return "<p>Feedback saved successfully.</p>"
+
+"""
+
+"""

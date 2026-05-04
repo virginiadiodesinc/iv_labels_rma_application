@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, scoped_session
 
 from app.db.config import COMPONENT_DB_FILE
 
-# SQLite db connection
+# SQLite db connection: tells SQLalchemy to use SQLite database at this path
 engine = create_engine(f"sqlite:///{COMPONENT_DB_FILE}", echo=False)
 
 # Session maker

@@ -1,5 +1,5 @@
 from app.db.database import engine, Base
 import app.db.models
-
-Base.metadata.create_all(bind=engine)
-print("Database created.")
+def createDB():
+    Base.metadata.create_all(bind=engine) #triggers DB creation if file doesn't already exist
+    print("Database created.")
