@@ -75,10 +75,16 @@ def get_jb2_bom_from_build_name():
 		if part["part_type"] == "BLOCK":
 			parts.remove(part)
 
+	for sub_part_entry in sub_parts:
+		for sub_part in sub_part_entry["sub_parts"]:
+			if sub_part["part_type"] == "BLOCK":
+				sub_part_entry["sub_parts"].remove(sub_part)
+
 	for index, sub_part in enumerate(sub_parts):
 		sub_part["starting_index"] = len(parts)
 		if (index > 0):
 			sub_part["starting_index"] += len(sub_parts[index-1]["sub_parts"])
+
 
 	return render_template("partials/build-page/bom-list.html", build_name=build_name, bom_parts=parts, sub_parts=sub_parts)
 

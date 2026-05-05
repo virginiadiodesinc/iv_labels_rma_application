@@ -53,11 +53,26 @@
 				value="{{iv_data.additional_info if iv_data and iv_data.additional_info else ''}}"
 				>
 	</label>
-	<label class="not-implemented-yet"> Subassembly Tag
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-subassembly-tag"
-				class="not-implemented-yet">
-	</label>
+
+	<label class="not-implemented-yet">
+			Tag:
+			<select
+			name="part-tag"
+			class="part-tag">
+				<option>N/A</option>
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+				<option>A</option>
+				<option>B</option>
+				<option>A1</option>
+				<option>A2</option>
+				<option>G1</option>
+				<option>G2</option>
+				<option>G3</option>
+				<option>G4</option>
+			</select>
+		</label>
+
 	<input type="hidden" name="iv-build-sn" value="{{iv_data.build_sn if iv_data and iv_data.build_sn else ''}}">
 </form>
