@@ -70,9 +70,6 @@ class IV_curve():
         self.IV_Vavg = []
         for Vup, Vdown in zip(self.IV_Vup, self.IV_Vdown):
             self.IV_Vavg.append((Vup + Vdown)/ 2)
-        
-        print(Reverse_Breakdown_measure)
-        print(Reverse_Breakdown_source)
 
         if Reverse_Breakdown_source == '':
             self.I_reverse_breakdown = '0.0'
@@ -150,10 +147,6 @@ class IV_curve():
 
         df.loc[:,"Hysteresis"] = np.abs(df["Vup"]*1000 - df["Vdown"]*1000) #in mV
         
-
-        print("V UP", df["Vup"] * 1000)
-        print("V DOWN", df["Vdown"] * 1000)
-        print("DELTA", df["Hysteresis"])
 
         self.hys_STD = df["Hysteresis"].std(ddof=0)
         self.hys_mean = df["Hysteresis"].mean()

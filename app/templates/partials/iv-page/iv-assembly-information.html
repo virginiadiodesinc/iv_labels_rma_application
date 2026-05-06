@@ -34,11 +34,21 @@
 				value="{{iv_data.diode if iv_data and iv_data.diode else ''}}"
 				>
 	</label>
+	<label> Lot
+		<input 
+			type="text"
+			name="iv-diode-lot">
+	</label>
 	<label> Circuit
 		<input type="text"
 				oninput="this.value = this.value.toUpperCase();"
 				name="iv-circuit"
 				value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}">
+	</label>
+	<label> Lot
+		<input 
+			type="text"
+			name="iv-circuit-lot">
 	</label>
 	<label> Assembly #
 		<input type="text"
