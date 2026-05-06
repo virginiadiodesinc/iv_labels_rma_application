@@ -27,12 +27,7 @@
 			{% include "partials/iv-page/iv-info.html" %}
 		</div>
 		
-		<div id="iv-gui-controls"
-			class="iv-gui-controls"
-			hx-post="/default_keithley_settings/"
-			hx-trigger="load"
-			hx-swap="innerHTML">
-		</div>
+		{% include "partials/iv-page/iv-gui-controls.html" %}
 	
 	</div>	
 </div>

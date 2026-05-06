@@ -2,7 +2,8 @@
 	<button
 		hx-post="/upload_iv_file/"
 		hx-target="#iv-file-upload-form"
-		hx-swap="innerHTML">
+		hx-swap="innerHTML"
+		hx-disabled-elt="this">
 		Upload IV File
 	</button>
 	<text name="iv-file-upload-text" id="iv-file-upload-text">{{file_path if file_path else 'No file selected'}}</text>

@@ -1,6 +1,19 @@
 import time
 import pyvisa
 
+def get_SMU():
+	smu = SMU_K236()
+	if smu.connect():
+		return smu
+	else:
+		return Fake_SMU()
+
+class Fake_SMU():
+	def update_settings(self, **kwargs):
+		return kwargs
+	def takeIV(self):
+		raise RuntimeError("No Keithley connected")
+
 
 class SMU_K236():
 
@@ -12,10 +25,8 @@ class SMU_K236():
 		-------
 		None.
 		"""
-		rm = pyvisa.ResourceManager()
-		gpib_address = f'GPIB0::{address}::INSTR'
-
-		self.inst = rm.open_resource(gpib_address)
+		self.address = address
+		self.inst = None
 
 		self.W_command = 'W1' #default delay on
 		self.S_command = 'S1' #default integration time 'medium'
@@ -42,6 +53,17 @@ class SMU_K236():
 
 		self.instrument_delay = 0.05
 		self.default_sweep_delay = .45
+
+	def connect(self):
+		try:
+			rm = pyvisa.ResourceManager()
+			gpib_address = f'GPIB0::{self.address}::INSTR'
+			self.inst = rm.open_resource(gpib_address)
+			return True
+		except Exception as e:
+			print("Keithley connection failed")
+			self.inst
+			return False
 
 	def reset(self):
 		"""

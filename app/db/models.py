@@ -29,6 +29,10 @@ class Build_Info(Base):
 	full_build_date = Column(Date)
 	full_build_initials = Column(String)
 	full_build_name = Column(String)
+	# FILE PATHS
+	block_file_path = Column(String)
+	build_file_path = Column(String)
+
 
 class Build_Parts(Base):
 	__tablename__ = "build_parts"
@@ -63,6 +67,7 @@ class IV_Info(Base):
 	hysteresis_minimum = Column(Float, nullable=False)
 	reverse_current = Column(Float, nullable=False)
 	reverse_voltage = Column(Float, nullable=False)
+	iv_file_path = Column(String)
 
 class IV_Points(Base):
 	__tablename__ = "iv_points"

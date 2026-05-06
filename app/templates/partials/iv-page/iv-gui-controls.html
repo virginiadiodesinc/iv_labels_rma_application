@@ -141,21 +141,19 @@
 		</form>
 	</details>
 
-	<div>
+	<div id="iv-control-buttons">
 		<button id="run-iv-button"
 				hx-post="/take_iv/"
 				hx-target="#iv-plot"
 				hx-swap="innerHTML"
-				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form">
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
+				hx-disabled-elt="#iv-control-buttons button">
 				Run IV
 		</button>
-		<button id="update-settings-button"
-				hx-post="/update_keithley_settings/"
-				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
-				hx-swap="none">
-				Update Settings
+		<button 
+			id="run-iv-with-heat-test-button">
+			Run IV with Heat Test
 		</button>
-		<button id="run-iv-with-heat-test-button">Run IV with Heat Test</button>
 		<button id="save-iv-button"
 				hx-post="/save_iv_file/"
 				hx-include="#iv-info, #iv-curve-points, #iv-assembly-information"
