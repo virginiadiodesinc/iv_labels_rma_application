@@ -38,7 +38,7 @@
 		<input type="text"
 				oninput="this.value = this.value.toUpperCase();"
 				name="iv-circuit"
-				value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}"fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))>
+				value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}">
 	</label>
 	<label> Assembly #
 		<input type="text"
@@ -55,24 +55,24 @@
 	</label>
 
 	<label class="not-implemented-yet">
-			Tag:
-			<select
-			name="part-tag"
-			class="part-tag">
-				<option>N/A</option>
-				<option>1</option>
-				<option>2</option>
-				<option>3</option>
-				<option>A</option>
-				<option>B</option>
-				<option>A1</option>
-				<option>A2</option>
-				<option>G1</option>
-				<option>G2</option>
-				<option>G3</option>
-				<option>G4</option>
-			</select>
-		</label>
+		Tag:
+		<select
+		name="part-tag"
+		class="part-tag">
+			<option>N/A</option>
+			<option>1</option>
+			<option>2</option>
+			<option>3</option>
+			<option>A</option>
+			<option>B</option>
+			<option>A1</option>
+			<option>A2</option>
+			<option>G1</option>
+			<option>G2</option>
+			<option>G3</option>
+			<option>G4</option>
+		</select>
+	</label>
 
 	<input type="hidden" name="iv-build-sn" value="{{iv_data.build_sn if iv_data and iv_data.build_sn else ''}}">
 </form>
