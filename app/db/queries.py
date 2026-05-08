@@ -2,22 +2,39 @@ from sqlalchemy import select
 
 # CREATE
 def add_table_entry(db_session, model, **data):
-	entry = model(**data)
-	db_session.add(entry)
-	db_session.commit()
-	db_session.refresh(entry)
+	try:
+		entry = model(**data)
+		db_session.add(entry)
+		db_session.commit()
+		db_session.refresh(entry)
 	
-	return entry
+		return entry
+	except:
+		db_session.rollback()
+		raise
 
 # READ
 def get_table_entries(db_session, model, **filters):
 	query = select(model)
 	for attribute, value in filters.items():
+		if value in (None, ""):
+			continue
 		if hasattr(model, attribute):
 			query = query.where(getattr(model, attribute) == value)
-			
-	entries = db_session.execute(query).scalars().all()
-	return entries
+
+	print(query)
+
+	try:		
+		entries = db_session.execute(query).scalars().all()
+		print("query success")
+		return(entries)
+	
+	except Exception as e:
+		print("query failed")
+		print(type(e))
+		print(e)
+
+		raise
 
 # UPDATE
 def update_table_entry(db_session, model, entry_id, **updates):

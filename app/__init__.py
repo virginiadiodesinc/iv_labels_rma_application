@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from app.db.models import *
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -24,7 +25,16 @@ def create_app():
 	app.register_blueprint(page_loading_routes.page_bp)
 	app.register_blueprint(printing_routes.print_bp)
 
-	from .db.database import db_session
+	from app.db.database import db_session, engine, Base
+	from sqlalchemy import inspect
+
+	Base.metadata.create_all(bind=engine)
+	print("Database created.")
+
+	inspector = inspect(engine)
+
+	print("Database initialized.")
+	print("Tables:", inspector.get_table_names())
 
 	# session teardown
 	@app.teardown_appcontext

@@ -6,25 +6,25 @@ from app.db.database import Base
 
 class Build_Info(Base):
 	__tablename__ = "build_info"
+	block_id = Column(String, nullable=False, primary_key=True) #Concatenated version of block_engraving, block_serial_number, and block_revision to avoid ForeignKeyConstraint
 	# MOST BASIC BLOCK INFORMATION - COMPOSITE PRIMARY KEY: block_engraving, block_serial_number, block_revision
-	block_engraving = Column(String, nullable=False, primary_key=True)
-	block_serial_number = Column(String, nullable=False, primary_key=True)
-	block_revision = Column(String, nullable=False, primary_key=True)
+	block_engraving = Column(String, nullable=False)
+	block_serial_number = Column(String, nullable=False)
+	block_revision = Column(String, nullable=False)
 	# INSPECTION AND CLEANOUT INFORMATION
 	inspection_date = Column(Date)
-	inspector_initials = Column(String)
+	inspection_initials = Column(String)
 	cleanout_date = Column(Date)
 	cleanout_initials = Column(String)
 	# PB1 INFORMATION
+	pb1_build_name = Column(String)
 	pb1_date = Column(Date)
 	pb1_initials = Column(String)
 	# PB2 INFORMATION
+	pb2_build_name = Column(String)
 	pb2_date = Column(Date)
 	pb2_initials = Column(String)
-	pb2_inspector_initials = Column(String)
-	pb2_pass_fail = Column(Boolean)
-	pb2_bond_pads_number = Column(Integer)
-	pb2_components_number = Column(Integer)
+	pb2_inspection_initials = Column(String)
 	# FULL BUILD INFORMATION
 	full_build_date = Column(Date)
 	full_build_initials = Column(String)
@@ -36,7 +36,7 @@ class Build_Info(Base):
 
 class Build_Parts(Base):
 	__tablename__ = "build_parts"
-	build_id = Column(Integer, ForeignKey("build_info.block_engraving,build_info.block_serial_number,build_info.block_revision"), nullable=False)
+	build_id = Column(Integer, ForeignKey("build_info.block_id"), nullable=False)
 	name = Column(String, nullable=False)
 	quantity = Column(Integer, nullable=False)
 	type = Column(String, nullable=False)
@@ -51,7 +51,7 @@ class Polarity(enum.Enum):
 
 class IV_Info(Base):
 	__tablename__ = "iv_info"
-	build_id = Column(Integer, ForeignKey("build_info.block_engraving,build_info.block_serial_number,build_info.block_revision"), nullable=False)
+	build_id = Column(Integer, ForeignKey("build_info.block_id"), nullable=False)
 	subassembly_tag = Column(String)
 	iv_id = Column(Integer, primary_key=True, autoincrement=True)
 	iv_date = Column(Date, nullable=False)
@@ -85,7 +85,7 @@ class Note_Type(enum.Enum):
 
 class Notes(Base):
 	__tablename__ = "notes"
-	build_id = Column(Integer, ForeignKey("build_info.block_engraving,build_info.block_serial_number,build_info.block_revision"), nullable=False)
+	build_id = Column(Integer, ForeignKey("build_info.block_id"), nullable=False)
 	note_id = Column(Integer, primary_key=True, autoincrement=True)
 	type = Column(Enum(Note_Type), nullable=False)
 
@@ -94,7 +94,7 @@ class Feedback(Base):
 	feedback_id = Column(Integer, primary_key=True, autoincrement=True)
 	user_initials = Column(String(3), nullable=False)
 	user_feedback = Column(String, nullable=False)
-	resolution_status = Column(String, nullable=False)
+	resolution_status = Column(String, nullable=False, default="Unresolved")
 	submission_datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
 	__table_args__ = (
 		CheckConstraint("length(user_initials) = 3", name="initials_length_check"),
