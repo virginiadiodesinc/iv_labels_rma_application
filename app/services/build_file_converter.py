@@ -1,5 +1,5 @@
-import app.services.block_file_converter as block_converter
 import os
+from app.services import date_converter as dc
 
 # RETURNS A DICTIONARY WITH ALL THE BUILD INFO EXTRACTED FROM THE FILE, INCLUDING A LIST OF PARTS AND A LIST OF NOTES
 # The expected format of the returned dict is as follows:
@@ -67,7 +67,7 @@ def convert_build_file(file):
 		# THIRD LINE: Inspection Date
 		if index == 2:
 			split_line = line.split()
-			build_info["inspection_date"] = split_line[0]
+			build_info["inspection_date"] = dc.labview_date_to_iso(split_line[0])
 		
 		# FOURTH LINE: Inspector Initials
 		if index == 3:
@@ -77,7 +77,7 @@ def convert_build_file(file):
 		# FIFTH LINE: PB1 Date
 		if index == 4:
 			split_line = line.split()
-			build_info["pb1_date"] = split_line[0]
+			build_info["pb1_date"] = dc.labview_date_to_iso(split_line[0])
 
 		# SIXTH LINE: PB1 Initials, PB2 Build Name (optional), PB2 Date (optional), 
 		# PB2 Initials (optional), PB2 Pass/Fail (optional), PB2 Bond Pads (optional),
@@ -88,7 +88,7 @@ def convert_build_file(file):
 			if len(split_line) > 1:
 				build_info["pb2_build_name"] = split_line[1]
 			if len(split_line) > 2:
-				build_info["pb2_date"] = split_line[2]
+				build_info["pb2_date"] = dc.labview_date_to_iso(split_line[2])
 			if len(split_line) > 3:
 				build_info["pb2_initials"] = split_line[3]
 			if len(split_line) > 4:
@@ -115,7 +115,7 @@ def convert_build_file(file):
 
 		# TENTH LINE: Build Date
 		if index == 9:
-			build_info["full_build_date"] = line
+			build_info["full_build_date"] = dc.labview_date_to_iso(line)
 
 		# ELEVENTH LINE: Circuit 1
 		if index == 10:
@@ -165,7 +165,7 @@ def convert_build_file(file):
 
 		# TWENTY-SECOND LINE: Build Date Again (optional)
 		if index == 21:
-			build_info["full_build_date_again"] = line
+			build_info["full_build_date_again"] = dc.labview_date_to_iso(line)
 
 		# TWENTY-THIRD LINE: Circuit 2 (optional)
 		if index == 22:

@@ -3,12 +3,12 @@
 </div>
 
 <div id="iv-plot-subcontainer" hx-swap-oob="true">
-	<h2 class="iv-plot-title">Diode IV Curve (A,V)</h2>
-	<div class="iv-plot-header-container">
+	<h2 id="iv-plot-title" class="iv-plot-title">Diode IV Curve (A,V)</h2>
+	<div id="iv-plot-header-container" class="iv-plot-header-container">
 		<h3>Polarity {{iv_curve.polarity if iv_curve and iv_curve.polarity else ""}}</h3>
 		<h3>Points per Decade {{iv_curve.points_per_decade if iv_curve and iv_curve.points_per_decade else ""}}</h3>
 	</div>
-	<div class="iv-plot-display-controls">
+	<div id="iv-plot-display-controls" class="iv-plot-display-controls">
 		<select>
 			<option value="linear">Linear</option>
 			<option value="log" selected>Log</option>

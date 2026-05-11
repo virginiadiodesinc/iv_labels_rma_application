@@ -9,6 +9,7 @@ from app.services import postprocess as pp
 from datetime import datetime
 import webview
 from app import config
+from app.services import date_converter as dc
 
 file_bp = Blueprint("file", __name__)
 
@@ -222,13 +223,13 @@ def save_block_file():
 	block_dict = {
 		"block_engraving": block_data.get("block-engraving-input", ""),
 		"block_sn": block_data.get("block-serial-number-input", "") + block_rev,
-		"inspection_date": block_data.get("inspection-date-input", ""),
+		"inspection_date": dc.iso_date_to_labview(block_data.get("inspection-date-input", "")),
 		"inspection_initials": block_data.get("inspection-initials-input", ""),
 		"PB1_name": block_data.get("pb1-build-name-input", ""),
-		"PB1_date": block_data.get("pb1-date-input", ""),
+		"PB1_date": dc.iso_date_to_labview(block_data.get("pb1-date-input", "")),
 		"PB1_initials": block_data.get("pb1-initials-input", ""),
 		"PB2_name": block_data.get("pb2-build-name-input", ""),
-		"PB2_date": block_data.get("pb2-date-input", ""),
+		"PB2_date": dc.iso_date_to_labview(block_data.get("pb2-date-input", "")),
 		"PB2_initials": block_data.get("pb2-initials-input", ""),
 		"PB2_passfail": block_data.get("pb2-pass-fail-input", ""),
 		"PB2_bond_wire_pads": block_data.get("pb2-bond-pads-count-input", ""),
@@ -280,13 +281,13 @@ def save_build_file():
 	block_dict = {
 		"block_engraving": build_data.get("block-engraving-input", ""),
 		"block_sn": build_data.get("block-serial-number-input", "") + block_rev,
-		"inspection_date": build_data.get("inspection-date-input", ""),
+		"inspection_date": dc.iso_date_to_labview(build_data.get("inspection-date-input", "")),
 		"inspection_initials": build_data.get("inspection-initials-input", ""),
 		"PB1_name": build_data.get("pb1-build-name-input", ""),
-		"PB1_date": build_data.get("pb1-date-input", ""),
+		"PB1_date": dc.iso_date_to_labview(build_data.get("pb1-date-input", "")),
 		"PB1_initials": build_data.get("pb1-initials-input", ""),
 		"PB2_name": build_data.get("pb2-build-name-input", ""),
-		"PB2_date": build_data.get("pb2-date-input", ""),
+		"PB2_date": dc.iso_date_to_labview(build_data.get("pb2-date-input", "")),
 		"PB2_initials": build_data.get("pb2-initials-input", ""),
 		"PB2_passfail": build_data.get("pb2-pass-fail-input", ""),
 		"PB2_bond_wire_pads": build_data.get("pb2-bond-pads-count-input", ""),
@@ -305,14 +306,14 @@ def save_build_file():
 	build_dict["diode1"] = all_diode_information[0][0] + "_LOT" + all_diode_information[0][2] if len(all_diode_information) > 0 else ""
 	build_dict["qty_chips1"] = all_diode_information[0][3] if len(all_diode_information) > 0 else ""
 	build_dict["assembly_initials1"] = build_data.get("full-build-initials-input", "")
-	build_dict["assembly_date1"] = build_data.get("full-build-date-input", "")
+	build_dict["assembly_date1"] = dc.iso_date_to_labview(build_data.get("full-build-date-input", ""))
 	build_dict["circuit1"] = all_circuit_information[0][0] + "_LOT" + all_circuit_information[0][2] if len(all_circuit_information) > 0 else ""
 	build_dict["filter1"] = all_filter_information[0][0] + "_LOT" + all_filter_information[0][2] if len(all_filter_information) > 0 else ""
 
 	build_dict["diode2"] = all_diode_information[1][0] + "_LOT" + all_diode_information[1][2] if len(all_diode_information) > 1 else ""
 	build_dict["qty_chips2"] = all_diode_information[1][3] if len(all_diode_information) > 1 else ""
 	build_dict["assembly_initials2"] = build_data.get("full-build-initials-input", "")
-	build_dict["assembly_date2"] = build_data.get("full-build-date-input", "")
+	build_dict["assembly_date2"] = dc.iso_date_to_labview(build_data.get("full-build-date-input", ""))
 	build_dict["circuit2"] = all_circuit_information[1][0] + "_LOT" + all_circuit_information[1][2] if len(all_circuit_information) > 1 else ""
 	build_dict["filter2"] = all_filter_information[1][0] + "_LOT" + all_filter_information[1][2] if len(all_filter_information) > 1 else ""
 
@@ -365,18 +366,18 @@ def save_iv_file():
 	formatted_date = current_datetime.strftime("%#m/%#d/%Y")
 	formatted_time = current_datetime.strftime("%#I:%M %p")
 
-	block_build_full_sn = iv_data.get("iv-block-sn", "") + iv_data.get("iv-block-revision", "")
+	block_build_full_sn = iv_data.get("iv-block-sn", "X") + iv_data.get("iv-block-revision", "A")
 
 	info_dict = {
-		"build_name": iv_data.get("iv-build-name", ""),
+		"build_name": iv_data.get("iv-build-name", "X"),
 		"build_sn": block_build_full_sn,
-		"diode": iv_data.get("iv-diode", ""),
-		"circuit": iv_data.get("iv-circuit", ""),
-		"assembly_no": iv_data.get("iv-assembly-number", ""),
+		"diode": iv_data.get("iv-diode", "X"),
+		"circuit": iv_data.get("iv-circuit", "X"),
+		"assembly_no": iv_data.get("iv-assembly-number", "X"),
 		"polarity": iv_data.get("iv-polarity", ""),
-		"block_engraving": iv_data.get("iv-block-engraving", ""),
+		"block_engraving": iv_data.get("iv-block-engraving", "X"),
 		"block_sn": block_build_full_sn,
-		"medium": iv_data.get("iv-additional-info", ""),
+		"medium": iv_data.get("iv-additional-info", "X"),
 		"date": formatted_date,
 		"time": formatted_time
 	}

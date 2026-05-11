@@ -281,3 +281,18 @@
 	padding: 10px;
 	cursor: pointer;
 }
+
+.iv-assembly-information-form {
+	display: flex;
+	flex-direction: column;
+}
+
+.iv-diode-information-line {
+	display: flex;
+	gap: 10px;
+}
+
+.iv-circuit-information-line {
+	display: flex;
+	gap: 10px;
+}

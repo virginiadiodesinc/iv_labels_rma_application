@@ -1,88 +1,103 @@
-<form id="iv-assembly-information-form">
-	<label> Block Engraving
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-block-engraving"
-				value="{{iv_data.block_name if iv_data and iv_data.block_name else ''}}"
-				>
-	</label>
-	<label> Block Serial Number
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-block-sn"
-				value="{{iv_data.block_sn if iv_data and iv_data.block_sn else ''}}"
-				size="7">
-	</label>
-	<label> Build Name
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-build-name"
-				value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
-				>
-	</label>
-	<label> Revision Letter
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-block-revision"
-				value="{{iv_data.block_revision if iv_data and iv_data.block_revision else ''}}"
-				size="2">
-	</label>
-	<label> Diode
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-diode"
-				value="{{iv_data.diode if iv_data and iv_data.diode else ''}}"
-				>
-	</label>
-	<label> Lot
-		<input 
-			type="text"
-			name="iv-diode-lot">
-	</label>
-	<label> Circuit
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-circuit"
-				value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}">
-	</label>
-	<label> Lot
-		<input 
-			type="text"
-			name="iv-circuit-lot">
-	</label>
-	<label> Assembly #
-		<input type="text"
-				oninput="this.value = this.value.toUpperCase();"
-				name="iv-assembly-number"
-				value="{{iv_data.assembly_number if iv_data and iv_data.assembly_number else ''}}"
-				>
-	</label>
-	<label> Additional Info
-		<input type="text"
-				name="iv-additional-info"
-				value="{{iv_data.additional_info if iv_data and iv_data.additional_info else ''}}"
-				>
-	</label>
+<form id="iv-assembly-information-form" class="iv-assembly-information-form">
+	<div id="iv-build-info-container" class="iv-build-info-container">
+		<label> Block Engraving
+			<input type="text"
+					oninput="this.value = this.value.toUpperCase();"
+					name="iv-block-engraving"
+					value="{{iv_data.block_name if iv_data and iv_data.block_name else ''}}"
+					>
+		</label>
+		<label> Block Serial Number
+			<input type="text"
+					oninput="this.value = this.value.toUpperCase();"
+					name="iv-block-sn"
+					value="{{iv_data.block_sn if iv_data and iv_data.block_sn else ''}}"
+					size="7">
+		</label>
+		<label> Build Name
+			<input type="text"
+					oninput="this.value = this.value.toUpperCase();"
+					name="iv-build-name"
+					value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
+					>
+		</label>
+		<label> Revision Letter
+			<input type="text"
+					oninput="this.value = this.value.toUpperCase();"
+					name="iv-block-revision"
+					value="{{iv_data.block_revision if iv_data and iv_data.block_revision else ''}}"
+					size="2">
+		</label>
+	</div>
+	<div id="iv-part-information-container" class="iv-part-information-container">
+		<div class="iv-diode-information-line">
+			<label> Diode
+				<input type="text" 
+							name="part" 
+							size="30"
+							id="iv-diode-name"
+							value="{{iv_data.diode if iv_data and iv_data.diode else ''}}"
+							hx-get="/search_part_lots/"
+							hx-trigger="revealed, keyup changed delay:300ms"
+							hx-target="next .lot-container"
+							hx-include="this"
+							oninput="this.value = this.value.toUpperCase();">
+			</label>
+			<div class="lot-container">
+				{% include "partials/build-page/lot-input.html" %}
+			</div>
+		</div>
+		<div class="iv-circuit-information-line">
+			<label> Circuit
+				<input type="text" 
+							size="30"
+							name="part" 
+							id="iv-circuit-name"
+							value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}"
+							hx-get="/search_part_lots/"
+							hx-trigger="revealed, keyup changed delay:300ms"
+							hx-target="next .lot-container"
+							hx-include="this"
+							oninput="this.value = this.value.toUpperCase();">
+			</label>
+			<div class="lot-container">
+				{% include "partials/build-page/lot-input.html" %}
+			</div>
+		</div>
+		<label> Assembly #
+			<input type="text"
+					oninput="this.value = this.value.toUpperCase();"
+					name="iv-assembly-number"
+					value="{{iv_data.assembly_number if iv_data and iv_data.assembly_number else ''}}"
+					>
+		</label>
+		<label> Additional Info
+			<input type="text"
+					name="iv-additional-info"
+					value="{{iv_data.additional_info if iv_data and iv_data.additional_info else ''}}"
+					>
+		</label>
 
-	<label class="not-implemented-yet">
-		Tag:
-		<select
-		name="part-tag"
-		class="part-tag">
-			<option>N/A</option>
-			<option>1</option>
-			<option>2</option>
-			<option>3</option>
-			<option>A</option>
-			<option>B</option>
-			<option>A1</option>
-			<option>A2</option>
-			<option>G1</option>
-			<option>G2</option>
-			<option>G3</option>
-			<option>G4</option>
-		</select>
-	</label>
+		<label class="not-implemented-yet">
+			Tag:
+			<select
+			name="part-tag"
+			class="part-tag">
+				<option>N/A</option>
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+				<option>A</option>
+				<option>B</option>
+				<option>A1</option>
+				<option>A2</option>
+				<option>G1</option>
+				<option>G2</option>
+				<option>G3</option>
+				<option>G4</option>
+			</select>
+		</label>
+	</div>
 
 	<input type="hidden" name="iv-build-sn" value="{{iv_data.build_sn if iv_data and iv_data.build_sn else ''}}">
 </form>

@@ -29,6 +29,7 @@ def write_block_file(block_dict):
 				block_dict['PB2_inspection'])
 	
 	file_name = f'{block_dict["block_engraving"]}' + ' ' + f'{block_dict["block_sn"]}' + '.txt'
+	file_name = file_name.lower()
 	
 	return file_name, rows
 
