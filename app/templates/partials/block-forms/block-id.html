@@ -52,9 +52,10 @@
 
 <button
 	hx-post="/populate_block_info"
-	hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info"
-	hx-target="#populate-section"
-	class="not-implemented-yet">
+	hx-include="#block-info"
+	hx-target="#block-forms-container"
+	hx-swap="innerHTML"
+>	
 	Populate Block/Build Information
 </button>
 <div id="populate-section"></div>

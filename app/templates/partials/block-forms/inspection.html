@@ -6,7 +6,8 @@
 		<tr>
 			<td>DATE</td>
 			<td>
-				<input 
+				<input
+					type="date"
 					size="10" 
 					id="inspection-date-input" 
 					name="inspection-date-input"
@@ -29,7 +30,10 @@
 </form>
 
 <button 
-	class="not-implemented-yet">
+	hx-post="/save_inspection_info"
+	hx-include="#inspection-info"
+	hx-target="#response"
+	hx-swap="innerHTML">
 	Save Inspection Info
 </button>
 
