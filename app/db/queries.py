@@ -9,16 +9,18 @@ def add_table_entry(db_session, model, **data):
 		db_session.refresh(entry)
 	
 		return entry
-	except:
+	except Exception as e:
 		db_session.rollback()
+
+		print(type(e))
+		print(e)
+		
 		raise
 
 # READ
 def get_table_entries(db_session, model, **filters):
 	query = select(model)
 	for attribute, value in filters.items():
-		if value in (None, ""):
-			continue
 		if hasattr(model, attribute):
 			query = query.where(getattr(model, attribute) == value)
 
@@ -27,6 +29,7 @@ def get_table_entries(db_session, model, **filters):
 	try:		
 		entries = db_session.execute(query).scalars().all()
 		print("query success")
+		print(entries)
 		return(entries)
 	
 	except Exception as e:

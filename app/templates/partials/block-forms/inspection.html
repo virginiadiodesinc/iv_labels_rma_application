@@ -29,11 +29,11 @@
 	</table>
 </form>
 
+
 <button 
 	hx-post="/save_inspection_info"
-	hx-include="#inspection-info"
-	hx-target="#response"
-	hx-swap="innerHTML">
+	hx-include="#inspection-info, #block-info"
+	hx-swap="none">
 	Save Inspection Info
 </button>
 
@@ -42,7 +42,6 @@
 	name="print-inspection-button"
 	hx-post="/print/inspection_label/"
 	hx-include="#inspection-info, #block-info"
-	hx-swap="none"
-	>
+	hx-swap="none">
 	Print Inspection Info
 </button>

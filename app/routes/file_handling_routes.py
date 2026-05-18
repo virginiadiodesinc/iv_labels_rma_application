@@ -9,7 +9,8 @@ from app.services import postprocess as pp
 from datetime import datetime
 import webview
 from app import config
-from app.services import date_converter as dc
+from app.services.date_converter import *
+from app.services.process_and_sanitize_entry import *
 
 file_bp = Blueprint("file", __name__)
 
@@ -223,18 +224,18 @@ def save_block_file():
 	block_dict = {
 		"block_engraving": block_data.get("block-engraving-input", ""),
 		"block_sn": block_data.get("block-serial-number-input", "") + block_rev,
-		"inspection_date": dc.iso_date_to_labview(block_data.get("inspection-date-input", "")),
+		"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")),
 		"inspection_initials": block_data.get("inspection-initials-input", ""),
 		"PB1_name": block_data.get("pb1-build-name-input", ""),
-		"PB1_date": dc.iso_date_to_labview(block_data.get("pb1-date-input", "")),
+		"PB1_date": string_to_python_date(block_data.get("pb1-date-input", "")),
 		"PB1_initials": block_data.get("pb1-initials-input", ""),
 		"PB2_name": block_data.get("pb2-build-name-input", ""),
-		"PB2_date": dc.iso_date_to_labview(block_data.get("pb2-date-input", "")),
+		"PB2_date": string_to_python_date(block_data.get("pb2-date-input", "")),
 		"PB2_initials": block_data.get("pb2-initials-input", ""),
 		"PB2_passfail": block_data.get("pb2-pass-fail-input", ""),
 		"PB2_bond_wire_pads": block_data.get("pb2-bond-pads-count-input", ""),
 		"PB2_components": block_data.get("pb2-components-count-input", ""),
-		"PB2_inspection": block_data.get("pb2-inspector-initials-input", "")
+		"PB2_inspection": block_data.get("pb2-inspection-initials-input", "")
 	}
 	
 	file_name, content_rows = write_block_file(block_dict)
@@ -251,6 +252,39 @@ def save_block_file():
 				file.write(line)
 				if index < len(content_rows) - 1:
 					file.write("\n")
+
+	if retrieve_block_and_build_info(block_dict["block_engraving"], block_dict["block_sn"], block_rev) != []: #need to fetch existing values for retention in case of blank inputs on form
+		updates = {
+			"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")),
+			"inspection_initials": block_data.get("inspection-initials-input", ""),
+			"PB1_name": block_data.get("pb1-build-name-input", ""),
+			"PB1_date": string_to_python_date(block_data.get("pb1-date-input", "")),
+			"PB1_initials": block_data.get("pb1-initials-input", ""),
+			"PB2_name": block_data.get("pb2-build-name-input", ""),
+			"PB2_date": string_to_python_date(block_data.get("pb2-date-input", "")),
+			"PB2_initials": block_data.get("pb2-initials-input", ""),
+			"PB2_inspection": block_data.get("pb2-inspection-initials-input", "")
+		}
+		update_table_entry(db_session, Build_Info, block_dict["block_engraving"]+" "+block_dict["block_sn"]+" "+block_rev, **updates)
+		return "Block file written", 204
+	elif validate_block_info(block_dict["block_engraving"], block_dict["block_sn"], block_rev):
+		new_entry = {
+			"block_id": block_dict["block_engraving"]+" "+block_dict["block_sn"]+" "+block_rev,
+			"block_engraving": block_dict["block_engraving"],
+			"block_serial_number": block_dict["block_sn"],
+			"block_revision": block_rev,
+			"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")),
+			"inspection_initials": block_data.get("inspection-initials-input", ""),
+			"PB1_name": block_data.get("pb1-build-name-input", ""),
+			"PB1_date": string_to_python_date(block_data.get("pb1-date-input", "")),
+			"PB1_initials": block_data.get("pb1-initials-input", ""),
+			"PB2_name": block_data.get("pb2-build-name-input", ""),
+			"PB2_date": string_to_python_date(block_data.get("pb2-date-input", "")),
+			"PB2_initials": block_data.get("pb2-initials-input", ""),
+			"PB2_inspection": block_data.get("pb2-inspection-initials-input", "")
+		}
+		add_table_entry(db_session, Build_Info, **new_entry)
+		return "Block file written", 204
 
 	return "Block file written", 204
 
