@@ -161,7 +161,7 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	for Vup, Vdown, I_source in zip(Vup_list, Vdown_list, I_source_list):
 		rows.append(Vup + '\t' + Vdown + '\t' + I_source)
 
-	file_name = rows[0] + '.iv'
+	file_name = rows[0].lower() + '.iv'
 
 	return file_name, rows
 

@@ -10,6 +10,7 @@ from datetime import datetime
 import webview
 from app import config
 from app.services import date_converter as dc
+import re
 
 file_bp = Blueprint("file", __name__)
 
@@ -274,9 +275,16 @@ def save_build_file():
 	all_part_information = list(zip(parts, part_types, lots, quantities))
 	all_note_information = list(zip(notes, note_types))
 
+	block_suffix_regex = ""
+	block_suffix_pattern = r"[^W][R]([\d])"
+	
+	regex_block_suffix_match = re.search(block_suffix_pattern, build_data.get("block-engraving-input", ""))
+	if regex_block_suffix_match:
+		block_suffix_regex = "_R" + regex_block_suffix_match.group(1)
+
 	block_rev = build_data.get("block-revision-input", "") if build_data.get("block-revision-input", "") != "A" else ""
 	block_suffix = "_R" + build_data.get("block-engraving-input", "")[-1] if build_data.get("block-engraving-input", "") else ""
-	build_name = build_data.get("full-build-name-input", "") + block_suffix if block_suffix else ""
+	build_name = build_data.get("full-build-name-input", "") + block_suffix_regex
 
 	block_dict = {
 		"block_engraving": build_data.get("block-engraving-input", ""),
