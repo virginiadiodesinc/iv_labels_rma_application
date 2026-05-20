@@ -14,16 +14,19 @@ def take_iv():
 	SMU = get_SMU()
 	
 	translated_settings = {
-		"delay_toggle": SMU_controls.get("default-delay"),
-		"integration_time": SMU_controls.get("integration-time"),
-		"filter_count": SMU_controls.get("filter-readings"),
+		# BASIC SETTINGS
 		"compliance_voltage": float(SMU_controls.get("compliance-voltage")),
 		"polarity": SMU_controls.get("polarity"),
-		"points_per_decade": SMU_controls.get("points-per-decade"),
-		"sweep_delay": float(SMU_controls.get("sweep-delay")) if SMU_controls.get("sweep-delay") else 0,
 		"maximum_current": SMU_controls.get("maximum-current") + "mA",
 		"reverse_polarity_start_current": SMU_controls.get("reverse-current"),
-		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance")
+		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance"),
+		# ADVANCED SETTINGS
+		"delay_toggle": SMU_controls.get("default-delay"),
+		"integration_time": SMU_controls.get("integration-time"),
+		"filter_readings": SMU_controls.get("filter-readings"),
+		"points_per_decade": SMU_controls.get("points-per-decade"),
+		"sweep_delay": float(SMU_controls.get("sweep-delay")) if SMU_controls.get("sweep-delay") else 0,
+		"gpib_address": SMU_controls.get("gpib-address")
 	}
 
 	SMU.update_settings(**translated_settings)

@@ -14,10 +14,12 @@ def get_build_page():
 
 @page_bp.get("/iv")
 def get_iv_page():
+	print(default_keithley_settings)
 	return render_template("iv-page.html", current_settings=default_keithley_settings)
 
 @page_bp.get("/iv_and_build")
 def get_iv_and_build_page():
+	print(default_keithley_settings)
 	return render_template("iv-and-build-page.html", current_settings=default_keithley_settings)
 
 @page_bp.get("/feedback")

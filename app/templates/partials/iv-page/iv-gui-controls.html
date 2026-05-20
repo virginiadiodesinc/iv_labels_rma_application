@@ -71,7 +71,7 @@
 			</label>
 			<label> GPIB Address
 				<input type="number" 
-						value="16"
+						value="{{ current_settings.gpib_address if current_settings and current_settings.gpib_address}}"
 						name="gpib-address">
 			</label>
 			<label> Points/Decade
@@ -124,16 +124,16 @@
 			</label>
 			<label>Time
 				<select name="integration-time">
-					<option value="60hz" 
-					{% if current_settings and current_settings.integration_time == '60hz' %}
+					<option value="60Hz" 
+					{% if current_settings and current_settings.integration_time == '60Hz' %}
 						selected
 					{% endif %}>60 Hz</option>
-					<option value="medium" 
-					{% if current_settings and current_settings.integration_time == 'medium' %}
+					<option value="Medium" 
+					{% if current_settings and current_settings.integration_time == 'Medium' %}
 						selected
 					{% endif %}>Medium</option>
-					<option value="fast" 
-					{% if current_settings and current_settings.integration_time == 'fast' %}
+					<option value="Fast" 
+					{% if current_settings and current_settings.integration_time == 'Fast' %}
 						selected
 					{% endif %}>Fast</option>
 				</select>
