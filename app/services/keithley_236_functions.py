@@ -54,7 +54,7 @@ class SMU_K236():
 		self.sign_reverse = '-' #default polarity negative
 		self.Q_command_reverse = 'Q2,'+self.sign_reverse+self.Imin_reverse+','+self.sign_reverse+'1E-3'+',0,0,0'
 
-		self.instrument_delay = 0.05
+		self.instrument_delay = 0.1
 		self.default_sweep_delay = .45
 
 	def connect(self):
@@ -106,16 +106,22 @@ class SMU_K236():
 		"""
 		if count == 'off':
 			self.P_command = 'P0'
+			self.filter_count = 1
 		elif count == '2':
 			self.P_command = 'P1'
+			self.filter_count = 2
 		elif count == '4':
 			self.P_command = 'P2'
+			self.filter_count = 4
 		elif count == '8':
 			self.P_command = 'P3'
+			self.filter_count = 8
 		elif count == '16':
 			self.P_command = 'P4'
+			self.filter_count = 16
 		elif count == '32':
 			self.P_command = 'P5'
+			self.filter_count = 32
 
 	def set_polarity(self, polarity):
 		"""
@@ -367,7 +373,7 @@ class SMU_K236():
 					 # BASIC SETTINGS
 						compliance_voltage = 4.0, polarity = '+', maximum_current = '1mA', reverse_polarity_start_current = 10.0, reverse_compliance_voltage = 100.0,
 					 # ADVANCED SETTINGS
-						address = 16, delay_toggle = 'on', integration_time = 'Medium', filter_count = '8', sweep_delay = 0, points_per_decade = '5'):
+						gpib_address = 16, default_delay = 'on', integration_time = 'Medium', filter_readings = '8', sweep_delay = 0, points_per_decade = '5'):
 		# BASIC SETTINGS
 		self.set_compliance_voltage(compliance_voltage)
 		self.set_polarity(polarity)
@@ -376,12 +382,12 @@ class SMU_K236():
 		self.set_reverse_polarity_end_current(reverse_polarity_start_current)
 		self.set_reverse_compliance_voltage(reverse_compliance_voltage)
 		# ADVANCED SETTINGS
-		self.set_default_delay(delay_toggle)
+		self.set_default_delay(default_delay)
 		self.set_user_sweep_delay(sweep_delay)
-		self.set_filter(filter_count)
+		self.set_filter(filter_readings)
 		self.set_integration_time(integration_time)
 		self.set_points_per_decade(points_per_decade)
-		self.set_gpib_address(address)
+		self.set_gpib_address(gpib_address)
 
 
 		settings_dict = {
@@ -394,10 +400,10 @@ class SMU_K236():
 			#ADVANCED SETTINGS
 			"points_per_decade": points_per_decade,
 			"sweep_delay": sweep_delay,
-			"gpib_address": address,
-			"default_delay": delay_toggle,
+			"gpib_address": gpib_address,
+			"default_delay": default_delay,
 			"integration_time": integration_time,
-			"filter_count": filter_count
+			"filter_readings": filter_readings
 		}
 
 		print(settings_dict)
@@ -417,6 +423,10 @@ class SMU_K236():
 		measure_values_down: a list of voltage values measured across the diode during ramp down current.
 		"""
 		start_time = time.time()
+		num_points = self.points_per_decade * 4 + 1
+		filter_count = self.filter_count
+		sweep_delay = num_points * filter_count * .0125
+
 		self.reset()
 
 		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
@@ -435,7 +445,7 @@ class SMU_K236():
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(self.default_sweep_delay + (self.points_per_decade * 4 + 1)) # Variable based on the the total number of points and delay time
+		time.sleep(sweep_delay) # Variable based on the the total number of points and delay time
 
 		self.inst.write('N0X') #Standby mode
 		time.sleep(self.instrument_delay)
@@ -456,7 +466,7 @@ class SMU_K236():
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(self.default_sweep_delay + (self.points_per_decade * 4 + 1)) # Variable based on the the total number of points and delay time
+		time.sleep(sweep_delay) # Variable based on the the total number of points and delay time
 
 		self.inst.write('N0X') #Standby mode
 		time.sleep(self.instrument_delay)
@@ -471,7 +481,7 @@ class SMU_K236():
 		end_time = time.time()
 		elapsed_time = end_time - start_time
 		print(f"IV sweep completed in {elapsed_time:.2f} seconds.")
-
+		
 		return source_values_up, measure_values_up, measure_values_down
 	
 

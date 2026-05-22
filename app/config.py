@@ -12,7 +12,7 @@ default_keithley_settings = {
 	"reverse_polarity_start_current": 10.0,
 	"reverse_compliance_voltage": 100.0,
 	# ADVANCED SETTINGS
-	"delay_toggle": 'on',
+	"default_delay": 'on',
 	"integration_time": 'Medium',
 	"sweep_delay": 0,
 	"points_per_decade": '5',

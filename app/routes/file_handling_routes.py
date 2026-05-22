@@ -423,5 +423,7 @@ def save_iv_file():
 				file.write(line)
 				if index < len(content_rows) - 1:
 					file.write("\n")
+		
+		iv_file_directory = os.path.dirname(path[0])
 
 	return "IV file written", 204

@@ -21,7 +21,7 @@ def take_iv():
 		"reverse_polarity_start_current": SMU_controls.get("reverse-current"),
 		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance"),
 		# ADVANCED SETTINGS
-		"delay_toggle": SMU_controls.get("default-delay"),
+		"default_delay": 'on' if SMU_controls.get("default-delay") == "on" else "off",
 		"integration_time": SMU_controls.get("integration-time"),
 		"filter_readings": SMU_controls.get("filter-readings"),
 		"points_per_decade": SMU_controls.get("points-per-decade"),
