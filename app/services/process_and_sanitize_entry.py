@@ -32,3 +32,11 @@ def retrieve_block_and_build_info(block_engraving, block_serial_number, block_re
 	result = get_table_entries(db_session, Build_Info,**filters)
 
 	return result
+
+def retrieve_build_parts(block_engraving, block_serial_number, block_revision):
+	filters = {
+		"block_id": block_engraving+" "+block_serial_number+" "+block_revision
+	}
+	result = get_table_entries(db_session, Build_Parts,**filters)
+
+	return result

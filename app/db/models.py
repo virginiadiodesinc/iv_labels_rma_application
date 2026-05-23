@@ -12,21 +12,21 @@ class Build_Info(Base):
 	block_serial_number = Column(String, nullable=False)
 	block_revision = Column(String, nullable=False)
 	# INSPECTION AND CLEANOUT INFORMATION
-	inspection_date = Column(Date)
+	inspection_date = Column(Date, nullable=True)
 	inspection_initials = Column(String)
-	cleanout_date = Column(Date)
+	cleanout_date = Column(Date, nullable=True)
 	cleanout_initials = Column(String)
 	# PB1 INFORMATION
 	pb1_build_name = Column(String)
-	pb1_date = Column(Date)
+	pb1_date = Column(Date, nullable=True)
 	pb1_initials = Column(String)
 	# PB2 INFORMATION
 	pb2_build_name = Column(String)
-	pb2_date = Column(Date)
+	pb2_date = Column(Date, nullable=True)
 	pb2_initials = Column(String)
 	pb2_inspection_initials = Column(String)
 	# FULL BUILD INFORMATION
-	full_build_date = Column(Date)
+	full_build_date = Column(Date, nullable=True)
 	full_build_initials = Column(String)
 	full_build_name = Column(String)
 	# FILE PATHS
@@ -36,14 +36,14 @@ class Build_Info(Base):
 
 class Build_Parts(Base):
 	__tablename__ = "build_parts"
-	build_id = Column(Integer, ForeignKey("build_info.block_id"), nullable=False)
-	name = Column(String, nullable=False)
-	quantity = Column(Integer, nullable=False)
-	type = Column(String, nullable=False)
-	weight = Column(Float, nullable=False)
 	instance_id = Column(Integer, primary_key=True, autoincrement=True)
-	subassembly_tag = Column(String)
-	notes = Column(String)
+	block_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
+	part_name = Column(String, nullable=False)
+	quantity = Column(Integer, nullable=False)
+	part_type = Column(String, nullable=False)
+	part_lot = Column(String, nullable=False)
+	#weight = Column(Float, nullable=False) not yet implemented
+	#subassembly_tag = Column(String) not yet implemented
 
 class Polarity(enum.Enum):
 	POSITIVE = "positive"

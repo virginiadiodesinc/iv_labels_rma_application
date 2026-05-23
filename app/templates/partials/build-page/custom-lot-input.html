@@ -1,3 +1,12 @@
-{% if selected_lot == "Other" %}
-	<input type="text" name="custom-lot-input" value="" size="15">
+{% if current_lot
+    and current_lot not in ["Unknown", "N/A"]
+    and current_lot not in lot_list %}
+
+    <input
+        type="text"
+        name="custom-lot-input"
+        value="{{ current_lot }}"
+        size="15"
+    >
+
 {% endif %}

@@ -3,11 +3,15 @@ from sqlalchemy import select
 # CREATE
 def add_table_entry(db_session, model, **data):
 	try:
+		#print("making entry")
 		entry = model(**data)
+		#print("adding entry")
 		db_session.add(entry)
+		#print("committing entry")
 		db_session.commit()
+		#print("refreshing DB with entry")
 		db_session.refresh(entry)
-	
+		#print("returning entry")
 		return entry
 	except Exception as e:
 		db_session.rollback()
@@ -43,15 +47,18 @@ def get_table_entries(db_session, model, **filters):
 def update_table_entry(db_session, model, entry_id, **updates):
 	entry = db_session.get(model, entry_id)
 	if not entry:
+		print("no entry found")
 		return False
 	
 	for key, value in updates.items():
+		print("adding updates")
 		if hasattr(entry, key):
 			setattr(entry, key, value)
-			
+	print("comitting to db")
 	db_session.commit()
+	print("refreshing db")
 	db_session.refresh(entry)
-	
+
 	return entry
 
 # DESTROY
