@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Blueprint, render_template, request
 from app.db.queries import *
 from app.services import build_file_converter as build_converter, block_file_converter as block_converter, iv_file_converter as iv_converter
