@@ -74,8 +74,8 @@
 			<td>
 				<input 
 					size="5" 
-					id="pb2-inspector-initials-input" 
-					name="pb2-inspector-initials-input"
+					id="pb2-inspection-initials-input" 
+					name="pb2-inspection-initials-input"
 					oninput="this.value = this.value.toUpperCase();"
 					value="{{block.pb2_inspection_initials if block and block.pb2_inspection_initials else ''}}">
 			</td>
@@ -84,7 +84,9 @@
 </form>
 
 <button
-	class="not-implemented-yet">
+	hx-post="/save_pb2_info"
+	hx-include="#pb2-info, #block-info"
+	hx-swap="none">
 	Save PB2 Info
 </button>
 

@@ -23,9 +23,9 @@ def write_block_file(block_dict):
 				block_dict['PB2_name'] + ';' +
 				block_dict['PB2_date'] + ';' +
 				block_dict['PB2_initials'] + ';' +
-				block_dict['PB2_passfail'] + ';' +
-				block_dict['PB2_bond_wire_pads'] + ';' +
-				block_dict['PB2_components'] + ';' +
+				" " + ';' +#block_dict['PB2_passfail'] + ';' + We're removing these so we'll need to come up with some way to read old files without breaking the code
+				" " + ';' +#block_dict['PB2_bond_wire_pads'] + ';' +
+				" " + ';' +#block_dict['PB2_components'] + ';' +
 				block_dict['PB2_inspection'])
 	
 	file_name = f'{block_dict["block_engraving"]}' + ' ' + f'{block_dict["block_sn"]}' + '.txt'

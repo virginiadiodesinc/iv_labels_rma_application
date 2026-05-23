@@ -1,3 +1,10 @@
+{% if part %}
+    {% set current_lot = part['part_lot'] %}
+{% elif item %}
+    {% set current_lot = item.part_lot %}
+{% else %}
+    {% set current_lot = '' %}
+{% endif %}
 <div class="lot-input-container">
 	<label>
 		Lot:
@@ -11,7 +18,14 @@
 			<option value="Unknown">Unknown</option>
 			<option value="N/A">N/A</option>
 			{% for lot in lot_list %}
-				<option value="{{lot}}" {% if part and part['part_lot'] == lot %}selected{% endif %}>
+				<option value="{{lot}}"
+					{{
+						'selected'
+           				if current_lot
+            			and current_lot not in ['Unknown', 'N/A']
+            			and current_lot not in lot_list
+            			else ''
+					}}></option>
 					{{lot}}
 				</option>
 			{% endfor %}

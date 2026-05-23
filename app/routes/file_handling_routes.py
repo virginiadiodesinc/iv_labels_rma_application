@@ -9,8 +9,8 @@ from app.services import postprocess as pp
 from datetime import datetime
 import webview
 from app import config
-from app.services import date_converter as dc
-import re
+from app.services.date_converter import *
+from app.services.process_and_sanitize_entry import *
 
 file_bp = Blueprint("file", __name__)
 
@@ -220,26 +220,27 @@ def upload_build_file():
 @file_bp.post("/save_block_file/")
 def save_block_file():
 	block_data = request.form
+
 	block_rev = block_data.get("block-revision-input", "") if block_data.get("block-revision-input", "") != "A" else ""
 	block_dict = {
 		"block_engraving": block_data.get("block-engraving-input", ""),
 		"block_sn": block_data.get("block-serial-number-input", "") + block_rev,
-		"inspection_date": dc.iso_date_to_labview(block_data.get("inspection-date-input", "")),
+		"inspection_date": iso_date_to_labview(block_data.get("inspection-date-input", "")),
 		"inspection_initials": block_data.get("inspection-initials-input", ""),
 		"PB1_name": block_data.get("pb1-build-name-input", ""),
-		"PB1_date": dc.iso_date_to_labview(block_data.get("pb1-date-input", "")),
+		"PB1_date": iso_date_to_labview(block_data.get("pb1-date-input", "")),
 		"PB1_initials": block_data.get("pb1-initials-input", ""),
 		"PB2_name": block_data.get("pb2-build-name-input", ""),
-		"PB2_date": dc.iso_date_to_labview(block_data.get("pb2-date-input", "")),
+		"PB2_date": iso_date_to_labview(block_data.get("pb2-date-input", "")),
 		"PB2_initials": block_data.get("pb2-initials-input", ""),
-		"PB2_passfail": block_data.get("pb2-pass-fail-input", ""),
-		"PB2_bond_wire_pads": block_data.get("pb2-bond-pads-count-input", ""),
-		"PB2_components": block_data.get("pb2-components-count-input", ""),
-		"PB2_inspection": block_data.get("pb2-inspector-initials-input", "")
+		#"PB2_passfail": block_data.get("pb2-pass-fail-input", ""),
+		#"PB2_bond_wire_pads": block_data.get("pb2-bond-pads-count-input", ""),
+		#"PB2_components": block_data.get("pb2-components-count-input", ""),
+		"PB2_inspection": block_data.get("pb2-inspection-initials-input", "")
 	}
 	
 	file_name, content_rows = write_block_file(block_dict)
-
+	
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.SAVE,
 		save_filename=file_name,
@@ -252,7 +253,50 @@ def save_block_file():
 				file.write(line)
 				if index < len(content_rows) - 1:
 					file.write("\n")
+	
+	if retrieve_block_and_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
+		
+		result = retrieve_block_and_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
+		
+		updates = {
+			"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else result.inspection_date,
+			"inspection_initials": block_data.get("inspection-initials-input", "").strip() if (block_data.get("inspection-initials-input", "") != "") else result.inspection_initials,
+			"pb1_build_name": block_data.get("pb1-build-name-input", "").strip() if (block_data.get("pb1-build-name-input", "") != "") else result.pb1_build_name,
+			"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else result.pb1_date,
+			"pb1_initials": block_data.get("pb1-initials-input", "").strip() if (block_data.get("pb1-initials-input", "") != "") else result.pb1_initials,
+			"pb2_build_name": block_data.get("pb2-build-name-input", "").strip() if (block_data.get("pb2-build-name-input", "") != "") else result.pb2_build_name,
+			"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else result.pb2_date,
+			"pb2_initials": block_data.get("pb2-initials-input", "").strip() if (block_data.get("pb2-initials-input", "") != "") else result.pb2_initials,
+			"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip() if (block_data.get("pb2-inspection-initials-input", "") != "") else result.pb2_inspection
+		}
 
+		block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip()
+		
+		update_table_entry(db_session, Build_Info, block_id, **updates)
+
+		return "Block file written", 204
+	
+	elif validate_block_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")):
+		
+		new_entry = {
+			"block_id": block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip(),
+			"block_engraving": block_dict["block_engraving"].strip(),
+			"block_serial_number": block_data.get("block-serial-number-input", "").strip(),
+			"block_revision": block_data.get("block-revision-input", "").strip(),
+			"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else None,
+			"inspection_initials": block_data.get("inspection-initials-input", "").strip(),
+			"pb1_build_name": block_data.get("pb1-build-name-input", "").strip(),
+			"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else None,
+			"pb1_initials": block_data.get("pb1-initials-input", "").strip(),
+			"pb2_build_name": block_data.get("pb2-build-name-input", "").strip(),
+			"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else None,
+			"pb2_initials": block_data.get("pb2-initials-input", "").strip(),
+			"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip(),
+			"block_file_path": path[0]
+		}
+		add_table_entry(db_session, Build_Info, **new_entry)
+		return "Block file written", 204
+	#Future response goes here if data inputs don't pass sanitization check
 	return "Block file written", 204
 
 @file_bp.post("/save_build_file/")
@@ -266,8 +310,8 @@ def save_build_file():
 	notes = build_data.getlist("note")
 	note_types = build_data.getlist("note_type")
 
+	custom_index = 0
 	for index, lot in enumerate(lots):
-		custom_index = 0
 		if lot == "Other":
 			lots[index] = custom_lots[custom_index]
 			custom_index += 1
@@ -289,13 +333,13 @@ def save_build_file():
 	block_dict = {
 		"block_engraving": build_data.get("block-engraving-input", ""),
 		"block_sn": build_data.get("block-serial-number-input", "") + block_rev,
-		"inspection_date": dc.iso_date_to_labview(build_data.get("inspection-date-input", "")),
+		"inspection_date": iso_date_to_labview(build_data.get("inspection-date-input", "")),
 		"inspection_initials": build_data.get("inspection-initials-input", ""),
 		"PB1_name": build_data.get("pb1-build-name-input", ""),
-		"PB1_date": dc.iso_date_to_labview(build_data.get("pb1-date-input", "")),
+		"PB1_date": iso_date_to_labview(build_data.get("pb1-date-input", "")),
 		"PB1_initials": build_data.get("pb1-initials-input", ""),
 		"PB2_name": build_data.get("pb2-build-name-input", ""),
-		"PB2_date": dc.iso_date_to_labview(build_data.get("pb2-date-input", "")),
+		"PB2_date": iso_date_to_labview(build_data.get("pb2-date-input", "")),
 		"PB2_initials": build_data.get("pb2-initials-input", ""),
 		"PB2_passfail": build_data.get("pb2-pass-fail-input", ""),
 		"PB2_bond_wire_pads": build_data.get("pb2-bond-pads-count-input", ""),
@@ -314,14 +358,14 @@ def save_build_file():
 	build_dict["diode1"] = all_diode_information[0][0] + "_LOT" + all_diode_information[0][2] if len(all_diode_information) > 0 else ""
 	build_dict["qty_chips1"] = all_diode_information[0][3] if len(all_diode_information) > 0 else ""
 	build_dict["assembly_initials1"] = build_data.get("full-build-initials-input", "")
-	build_dict["assembly_date1"] = dc.iso_date_to_labview(build_data.get("full-build-date-input", ""))
+	build_dict["assembly_date1"] = iso_date_to_labview(build_data.get("full-build-date-input", ""))
 	build_dict["circuit1"] = all_circuit_information[0][0] + "_LOT" + all_circuit_information[0][2] if len(all_circuit_information) > 0 else ""
 	build_dict["filter1"] = all_filter_information[0][0] + "_LOT" + all_filter_information[0][2] if len(all_filter_information) > 0 else ""
 
 	build_dict["diode2"] = all_diode_information[1][0] + "_LOT" + all_diode_information[1][2] if len(all_diode_information) > 1 else ""
 	build_dict["qty_chips2"] = all_diode_information[1][3] if len(all_diode_information) > 1 else ""
 	build_dict["assembly_initials2"] = build_data.get("full-build-initials-input", "")
-	build_dict["assembly_date2"] = dc.iso_date_to_labview(build_data.get("full-build-date-input", ""))
+	build_dict["assembly_date2"] = iso_date_to_labview(build_data.get("full-build-date-input", ""))
 	build_dict["circuit2"] = all_circuit_information[1][0] + "_LOT" + all_circuit_information[1][2] if len(all_circuit_information) > 1 else ""
 	build_dict["filter2"] = all_filter_information[1][0] + "_LOT" + all_filter_information[1][2] if len(all_filter_information) > 1 else ""
 
@@ -363,6 +407,24 @@ def save_build_file():
 				file.write(line)
 				if index < len(content_rows) - 1:
 					file.write("\n")
+	for part, part_type, lot, quantity in all_part_information:
+		add_table_entry(
+			db_session,
+			Build_Parts,
+			block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""),
+			part_name=part,
+			quantity=int(float(quantity)),
+			part_type=part_type,
+			part_lot=lot
+		)
+	print("adding build info to db")
+	updates = {
+			"build_file_path": path[0],
+			"full_build_name": build_name,
+			"full_build_initials": build_data.get("full-build-initials-input", ""),
+			"full_build_date": string_to_python_date(build_data.get("full-build-date-input", ""))
+		}
+	update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
 
 	return "Build file written", 204
 
