@@ -422,7 +422,7 @@ def save_build_file():
 			"build_file_path": path[0],
 			"full_build_name": build_name,
 			"full_build_initials": build_data.get("full-build-initials-input", ""),
-			"full_build_date": string_to_python_date(build_data.get("full-build-date-input", ""))
+			"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
 		}
 	update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
 
