@@ -29,6 +29,14 @@
 # }
 
 def convert_iv_file(file):
+	"""Converts an IV file to a pattern which can be used to populate the fields of the forms on the page
+	
+	This function converts a IV file to our input field format
+
+	@param file IV File.
+	@return iv_dict Return value of type(dict)
+	
+	"""
 	file_content = file.read()
 	lines = file_content.splitlines()
 	iv_dict = {}

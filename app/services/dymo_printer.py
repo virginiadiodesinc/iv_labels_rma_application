@@ -9,6 +9,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRINTER_NAME = "DYMO LabelWriter 450 Turbo"
 
 def print_engine(label_name: str, label_field_populator: callable, form_data: dict, label_preparer: Optional[Callable] = None):
+	"""Wrapper function for the various print calls
+
+	This function acts as the setup, teardown, and facilitator for the other print calls. 
+	It sets up the connection, calls the appropriate populator and preparation function for the labels, and closes down the connection.
+
+	@param label_name the file name of the appropriate label (string)
+	@param label_field_populator the populator function for the label (callable)
+	@param form_data the data from the input forms that are to be put into the label (dict)
+	@param label_preparer an optional additional label preparer function for full build labels, default None (callable)
+	@return None Return value of type (None)	
+	"""
 	label_path = os.path.join(BASE_DIR, "labels", label_name)
 
 	if label_preparer:
@@ -34,6 +45,14 @@ def print_engine(label_name: str, label_field_populator: callable, form_data: di
 		pythoncom.CoUninitialize()
 
 def populate_inspection_label_fields(label_text, form_data: dict):
+	"""Populates the inspection label
+	
+	This function populates specifically the inspection label
+
+	@param label_text the XML object to be modified (string?)
+	@param form_data the object containing the input fields to be added to the label (dict)
+	@return label_text Return value of type (string)
+	"""
 	# inspection-block-engraving: WR6.5R10
 	# inspection-block-serial-number: 3-01
 	# inspection-date: 10/21/2025
@@ -46,6 +65,14 @@ def populate_inspection_label_fields(label_text, form_data: dict):
 	return label_text
 
 def populate_pb1_label_fields(label_text, form_data: dict):
+	"""Populates the pb1 label
+	
+	This function populates specifically the inspection label
+
+	@param label_text the XML object to be modified (string?)
+	@param form_data the object containing the input fields to be added to the label (dict)
+	@return label_text Return value of type (string)
+	"""
 	# pb1-build-name: VDI6.5SHM_R10
 	# pb1-block-serial-number: 3-01
 	# pb1-date: 10/22/2025
@@ -58,6 +85,14 @@ def populate_pb1_label_fields(label_text, form_data: dict):
 	return label_text
 
 def populate_pb2_label_fields(label_text, form_data: dict):
+	"""Populates the pb2 label
+	
+	This function populates specifically the inspection label
+
+	@param label_text the XML object to be modified (string?)
+	@param form_data the object containing the input fields to be added to the label (dict)
+	@return label_text Return value of type (string)
+	"""
 	# pb2-build-name: VDI6.5SHM_R10
 	# pb2-block-serial-number: 3-01
 	# pb2-date: 10/23/2025
@@ -78,6 +113,14 @@ def populate_pb2_label_fields(label_text, form_data: dict):
 	return label_text
 
 def populate_full_build_label_fields(label_text, form_data: dict):
+	"""Populates the full build label
+	
+	This function populates specifically the inspection label
+
+	@param label_text the XML object to be modified (string?)
+	@param form_data the object containing the input fields to be added to the label (dict)
+	@return label_text Return value of type (string)
+	"""
 	parts = form_data.getlist("part")
 	lots  = form_data.getlist("lot-select")
 	custom_lots = form_data.getlist("custom-lot-input")
@@ -106,6 +149,15 @@ def populate_full_build_label_fields(label_text, form_data: dict):
 	return label_text
 
 def prepare_full_build_label(label_path: str, form_data: dict):
+	"""Prepares the inspection label
+	
+	This function prepares the dynamic number fields for the full build label.
+	This is the only label which requires this as the other labels have a predetermined number of fields.
+
+	@param label_text the XML object to be modified (string?)
+	@param form_data the object containing the input fields to be added to the label (dict)
+	@return temp_label_path Return value of type (string)
+	"""
 
 	parts = form_data.getlist("part")
 	notes = form_data.getlist("note")

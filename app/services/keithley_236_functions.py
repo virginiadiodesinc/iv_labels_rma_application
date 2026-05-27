@@ -4,6 +4,13 @@ import pyvisa
 
 # FUNCTION TO CHECK FOR REAL OR FAKE KEITHLEY
 def get_SMU():
+	"""Gets either a real SMU or a fake SMU
+	
+	This function tries to connect to a real SMU. 
+	If it fails, it returns a Fake SMU which can tell you there's no Keithley connected
+
+	@return SMU_K236() or Fake_SMU() (objects)
+	"""
 	smu = SMU_K236()
 	if smu.connect():
 		return smu

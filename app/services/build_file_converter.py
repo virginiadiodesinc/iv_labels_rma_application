@@ -35,6 +35,14 @@ from app.services import date_converter as dc
 
 
 def convert_build_file(file):
+	"""Converts a build file to a pattern which can be used to populate the fields of the forms on the page
+	
+	This function converts a build file to our input field format
+
+	@param file Build File.
+	@return build_info Return value of type(dict)
+	
+	"""
 	file_content = file.read()
 	lines = file_content.splitlines()
 	build_info = {}

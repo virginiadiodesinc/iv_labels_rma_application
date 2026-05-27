@@ -1,6 +1,14 @@
 from app.services import date_converter as dc
 
 def convert_block_file(file):
+	"""Converts a block file to a pattern which can be used to populate the fields of the forms on the page
+	
+	This function converts a block file to our input field format
+
+	@param file Block File.
+	@return block_info Return value of type(dict)
+	
+	"""
 	file_content = file.read()
 	lines = file_content.splitlines()
 	block_info = {}
