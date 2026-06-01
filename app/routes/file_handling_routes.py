@@ -20,6 +20,13 @@ build_file_directory = config.build_file_directory
 
 @file_bp.post("/populate_info_from_block_file/")
 def populate_info_from_block_file():
+	"""Populates the various input fields with information from a (likely LabView) block file
+
+	This function uses a LabView block file to populate all the block (inspection, PB1, PB2) fields
+
+
+	@return block-forms-container Return value of type (template partial)
+	"""
 	uploaded_file_path = request.form.get("block-file-path")
 
 	if uploaded_file_path and uploaded_file_path.endswith(".txt"):
@@ -31,6 +38,12 @@ def populate_info_from_block_file():
 
 @file_bp.post("/populate_info_from_build_file/")
 def populate_info_from_build_file():
+	"""Populates the various input fields with information from a (likely LabView) build file
+
+	This function uses a LabView build file to populate all the block (inspection, PB1, PB2) as well as build (part/note list) fields
+
+	@return build-file-population-response Return value of type (template partial)
+	"""
 	uploaded_file_path = request.form.get("build-file-path")
 
 	if uploaded_file_path and uploaded_file_path.endswith(".txt"):
@@ -98,6 +111,12 @@ def populate_info_from_build_file():
 
 @file_bp.post("/populate_info_from_iv_file/")
 def populate_info_from_iv_file():
+	"""Populates the various input fields with information from a (likely LabView) IV file
+
+	This function uses a LabView IV file to populate all the various related fields (graph, numbers, assembly info)
+
+	@return iv-file-population-response Return value of type (template partial)
+	"""
 
 	uploaded_file_path = request.form.get("iv-file-path")
 	if uploaded_file_path and uploaded_file_path.endswith(".iv"):
@@ -177,6 +196,14 @@ def populate_info_from_iv_file():
 
 @file_bp.post("/upload_iv_file/")
 def upload_iv_file():
+	"""Uploads an IV file to be used for populating fields
+	
+	This function is the precursor to its respective populator function.
+	You must upload the file, basically getting its file-path, before using it to upload.
+
+
+	@return iv-file-upload Return value of type(template partial with file path)
+	"""
 	global iv_file_directory
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.OPEN,
@@ -193,6 +220,14 @@ def upload_iv_file():
 
 @file_bp.post("/upload_block_file/")
 def upload_block_file():
+	"""Uploads a block file to be used for populating fields
+	
+	This function is the precursor to its respective populator function.
+	You must upload the file, basically getting its file-path, before using it to upload.
+
+
+	@return block-file-upload Return value of type(template partial with file path)
+	"""
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.OPEN,
 		allow_multiple=False,
@@ -206,6 +241,14 @@ def upload_block_file():
 
 @file_bp.post("/upload_build_file/")
 def upload_build_file():
+	"""Uploads a build file to be used for populating fields
+	
+	This function is the precursor to its respective populator function.
+	You must upload the file, basically getting its file-path, before using it to upload.
+
+
+	@return build-file-upload Return value of type(template partial with file path)
+	"""
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.OPEN,
 		allow_multiple=False,
@@ -219,6 +262,15 @@ def upload_build_file():
 
 @file_bp.post("/save_block_file/")
 def save_block_file():
+	"""Saves the data from the relevant input fields to a (LabView Style) block file 
+	
+	This function saves the data from the block input fields (inspection, PB1, PB2) to 
+	the LabView block file in the appropriate spot on the network.
+
+	This function also saves the same data into the database.
+
+	@return write_block_file/update_table_entry Return value of type (2 callables)
+	"""
 	block_data = request.form
 
 	block_rev = block_data.get("block-revision-input", "") if block_data.get("block-revision-input", "") != "A" else ""
@@ -301,6 +353,16 @@ def save_block_file():
 
 @file_bp.post("/save_build_file/")
 def save_build_file():
+	"""Saves the data from the relevant input fields to a (LabView Style) build file 
+	
+	This function saves the data from the block input fields (inspection, PB1, PB2) 
+	as well as the build input fields (part/note list) 
+	to the LabView build file in the appropriate spot on the network.
+
+	This function also saves the same data into the database.
+
+	@return write_build_file/update_table_entry Return value of type (2 callables)
+	"""
 	build_data = request.form
 	part_types = build_data.getlist("part_type")
 	parts = build_data.getlist("part")
@@ -430,6 +492,13 @@ def save_build_file():
 
 @file_bp.post("/save_iv_file/")
 def save_iv_file():
+	"""Saves the data from the relevant input fields to a (LabView Style) IV file 
+	
+	This function saves the data from the IV fields (special numbers, assembly info, curve numbers)  
+	to the LabView IV file in an appropriately chosen spot on the network.
+
+	@return write_iv_file Return value of type (callable)
+	"""
 	iv_data = request.form
 
 	current_datetime = datetime.now()

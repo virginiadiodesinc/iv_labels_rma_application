@@ -5,6 +5,13 @@ jb2_bp = Blueprint("jb2", __name__)
 
 @jb2_bp.get("/search_jb2_components/")
 def search_jb2_components():
+	"""Searches JB2 components (ie built parts)
+	
+	This function searches JB2 for all built components including the string entered in the BOM search field.
+	This is effectively for search suggestions/auto-complete.
+
+	@return bom-suggestion-results Return value of type (template partial)
+	"""
 	component_name = request.args.get("component-name")
 	results = jb2.get_Build_Name_List(component_name)
 	
@@ -12,6 +19,13 @@ def search_jb2_components():
 
 @jb2_bp.get("/get_jb2_bom_from_build_name/")
 def get_jb2_bom_from_build_name():
+	"""Populates a JB2 BOM from a given build name
+	
+	This function generates all parts (and sub-parts in case this build has a PB2) for a given component in JB2.
+	It will populate a list of all parts in any build and sub-build.
+
+	@return bom-list Return value of type (template partial)
+	"""
 	build_name = request.args.get("component-name")
 	parts = jb2.get_BOM(build_name)
 	sub_parts = []
@@ -41,6 +55,12 @@ def get_jb2_bom_from_build_name():
 
 @jb2_bp.get("/search_part_lots/")
 def search_part_lots():
+	"""Searches for all existing lots of a given part in JB2
+	
+	This function searches and lists (in the lot-input dropdown) all lots that exist for a part in JB2.
+
+	@return lot-input Return value of type (template partial)
+	"""
 	part = request.args.get("part")
 	lot_list = jb2.get_Lots(part)
 

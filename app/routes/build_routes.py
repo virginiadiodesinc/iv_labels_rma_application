@@ -4,24 +4,57 @@ build_bp = Blueprint("build", __name__)
 
 @build_bp.post("/check_custom_lot/")
 def check_custom_lot():
-	selected_lot = request.form.get("lot-select")
+	"""Adds a custom lot field if the lot dropdown select is the Unknown option
 	
+	This function adds a custom lot input field via a custom-lot-input partial. If the normal lot dropdown
+	is N/A or one of the JB2 queried lots, this field doesn't exist. If the lot dropdown choice is custom,
+	this custom lot field will appear and be used for all other functions
+
+	@return custom-lot-input.html Return value of type (template partial)
+	"""
+	selected_lot = request.form.get("lot-select")
+	print(selected_lot)
 	return render_template("partials/build-page/custom-lot-input.html", selected_lot=selected_lot)
 
 @build_bp.get("/clear_build_parts")
 def clear_build_parts():
+	"""Clears the current list of parts in a build
+
+	This function clears/empties the current list of parts making up the true BOM for a build.
+
+	@return clear-build-parts-response Return value of type (template partial)
+	"""
 	return render_template("partials/block-forms/clear-build-parts-response.html", items=[], notes=[])
 
 @build_bp.get("/add_empty_part_row/")
 def add_empty_part_row():
+	"""Adds an empty part row to build part list
+
+	This function adds an empty part row to the build part list
+
+	@return part-row Return value of type (template partial)	
+	"""
 	return render_template("partials/build-page/part-row.html", part=None)
 
 @build_bp.get("/add_empty_note_row/")
 def add_empty_note_row():
+	"""Adds an empty note row to build part list
+
+	This function adds an empty note row to the build note list
+
+	@return note-row Return value of type (template partial)	
+	"""
 	return render_template("partials/build-page/note-row.html", note=None)
 
 @build_bp.post("/add_part_rows_from_bom_list/")
 def add_part_rows_from_bom():
+	"""Adds all selected rows from JB2-queried BOM to build part list
+	
+	This function adds all selected rows from the BOM lookup (selected by checkboxes)
+	to the build part list
+
+	@return rows Return value of type (string of multiple template partials)
+	"""
 	indices = request.form.getlist("bom-part-check")
 	rows = []
 
