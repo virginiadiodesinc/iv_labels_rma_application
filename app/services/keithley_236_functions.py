@@ -493,12 +493,27 @@ class SMU_K236():
 		source_values: the current values sourced for the heat test
 		measure_values: the voltage values measured for the heat test
 		"""
+
+		sweep_delay = 426 * 8 * .0125 #426 points, 8 filter readings per point, .0125 seconds per point
+
 		self.reset()
 
 		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q2,100E-9,50E-3,0,0,0')
+		self.inst.write('W0'+':'+'S1'+':'+'P3'+':'+'L20,0'+'X') #Default delay disabled, integration time 'medium', filter readings 8, compliance voltage 20V
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('Q2,500E-9,50E-3,0,0,1X') #Start at 500nA and ramp up to 50mA heat current, 5 points per decade, user delay of 1mS per cycle (25mS)
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('Q6,50E-3,0,1,300') #Run at 50mA, 1mS delay, for 300 cycles (300mS)
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('Q6,1E-4,0,10,1') #Run at 0.1mA, 10ms delay, for 1 cycle (10mS)
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('Q6,1E-4,0,1,100') #Run at 0.1mA, 1mS delay, for 100 cycles (100mS)
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
@@ -513,10 +528,15 @@ class SMU_K236():
 		self.inst.write('N0X') #Standby mode
 		time.sleep(self.instrument_delay)
 
-		source_values_up = self.inst.query("G1,2,2X") #Current values
+		source_values = self.inst.query("G1,2,2X") #Current values
 		time.sleep(self.instrument_delay)
-		measure_values_up = self.inst.query("G4,2,2X") #Voltage values
+		measure_values = self.inst.query("G4,2,2X") #Voltage values
 		time.sleep(self.instrument_delay)
+
+		print(source_values)
+		print(measure_values)
+
+		return source_values, measure_values
 
 	
 
