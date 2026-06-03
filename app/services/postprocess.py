@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.constants import e,k
 
 class IV_curve():
-    def __init__(self, IV_source_up, IV_measure_up, IV_measure_down, Reverse_Breakdown_source='', Reverse_Breakdown_measure='', Polarity_Sweep_source='', Polarity_Sweep_measure='',):
+    def __init__(self, IV_source_up, IV_measure_up, IV_measure_down, Reverse_Breakdown_source='', Reverse_Breakdown_measure='', Polarity_Sweep_source='', Polarity_Sweep_measure='', Heat_Test_source='', Heat_Test_measure=''):
         """
         IV curve properties
 
@@ -85,6 +85,15 @@ class IV_curve():
 
         self.V_polarity_sweep = Polarity_Sweep_source.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
         self.I_polarity_sweep = Polarity_Sweep_measure.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
+
+        if Heat_Test_measure != '' and Heat_Test_source != '':
+            self.heat_test_currents = []
+            self.heat_test_voltages = []
+            for current in Heat_Test_source.replace(r'\r', '').replace(r'\n', '').split(','):
+                self.heat_test_currents.append(float(current))
+            for voltage in Heat_Test_measure.replace(r'\r', '').replace(r'\n', '').split(','):
+                self.heat_test_voltages.append(float(voltage))
+
 
     def calc_IV_parameters(self, T=293):
         """
@@ -232,3 +241,15 @@ class IV_curve():
         
         return self.var_dict
 
+    def calc_Heat_parameters(self, n, Rs, Is):
+        Vdiode = []
+        T = []
+        count = 0
+
+        for current, voltage in zip(self.heat_test_currents[-100:-1], self.heat_test_voltages[-100:-1]):
+            Vdiode.append(current - Rs * voltage)
+            T.append((Vdiode[count] / (np.log(current / Is) * ((n * k) / e))) - 273.15) #calculate temperature in kelvin and convert to celsius
+            count += 1
+
+        return Vdiode, T
+            
