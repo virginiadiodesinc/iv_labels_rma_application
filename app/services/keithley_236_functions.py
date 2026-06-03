@@ -484,6 +484,41 @@ class SMU_K236():
 		
 		return source_values_up, measure_values_up, measure_values_down
 	
+	def takeHeatTest(self):
+		"""
+		SMU 236 Heat Test
+
+		Returns
+		-------
+		source_values: the current values sourced for the heat test
+		measure_values: the voltage values measured for the heat test
+		"""
+		self.reset()
+
+		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('Q2,100E-9,50E-3,0,0,0')
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('N1X') #Operate mode
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('H0X') #Execute sweep
+		time.sleep(sweep_delay) # Variable based on the the total number of points and delay time
+
+		self.inst.write('N0X') #Standby mode
+		time.sleep(self.instrument_delay)
+
+		source_values_up = self.inst.query("G1,2,2X") #Current values
+		time.sleep(self.instrument_delay)
+		measure_values_up = self.inst.query("G4,2,2X") #Voltage values
+		time.sleep(self.instrument_delay)
+
+	
 
 	def takeReverseBreakdown(self):
 		"""
