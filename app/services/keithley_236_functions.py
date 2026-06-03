@@ -507,13 +507,13 @@ class SMU_K236():
 		self.inst.write('Q2,500E-9,50E-3,0,0,1X') #Start at 500nA and ramp up to 50mA heat current, 5 points per decade, user delay of 1mS per cycle (25mS)
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q6,50E-3,0,1,300') #Run at 50mA, 1mS delay, for 300 cycles (300mS)
+		self.inst.write('Q6,50E-3,0,1,300X') #Run at 50mA, 1mS delay, for 300 cycles (300mS)
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q6,1E-4,0,10,1') #Run at 0.1mA, 10ms delay, for 1 cycle (10mS)
+		self.inst.write('Q6,1E-4,0,10,1X') #Run at 0.1mA, 10ms delay, for 1 cycle (10mS)
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q6,1E-4,0,1,100') #Run at 0.1mA, 1mS delay, for 100 cycles (100mS)
+		self.inst.write('Q6,1E-4,0,1,100X') #Run at 0.1mA, 1mS delay, for 100 cycles (100mS)
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
