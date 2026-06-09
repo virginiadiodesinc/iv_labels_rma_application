@@ -260,9 +260,9 @@ class SMU_K236():
 		measure_values = self.inst.query("G4,2,2X") #Current values
 		time.sleep(self.instrument_delay)
 
-		compliance_voltage = float(self.I_compliance_polarity)
+		compliance_current = float(self.I_compliance_polarity)
 		
-		return source_values, measure_values, compliance_voltage
+		return source_values, measure_values, compliance_current
 	
 	def set_reverse_polarity(self):
 		"""
