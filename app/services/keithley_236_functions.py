@@ -230,7 +230,7 @@ class SMU_K236():
 		source_values: a list of voltage values forced across the diode.
 		measure_values: a list of current values measured through the diode.
 		"""
-		self.reset() 
+		self.reset()
 
 		self.inst.write('F0,1X') #Sources voltage, measures current (sweep)
 		time.sleep(self.instrument_delay)
@@ -259,8 +259,10 @@ class SMU_K236():
 		time.sleep(self.instrument_delay)
 		measure_values = self.inst.query("G4,2,2X") #Current values
 		time.sleep(self.instrument_delay)
+
+		compliance_voltage = float(self.I_compliance_polarity)
 		
-		return source_values, measure_values
+		return source_values, measure_values, compliance_voltage
 	
 	def set_reverse_polarity(self):
 		"""

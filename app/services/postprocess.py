@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.constants import e,k
 
 class IV_curve():
-    def __init__(self, IV_source_up, IV_measure_up, IV_measure_down, Reverse_Breakdown_source='', Reverse_Breakdown_measure='', Polarity_Sweep_source='', Polarity_Sweep_measure='', Heat_Test_source='', Heat_Test_measure=''):
+    def __init__(self, IV_source_up, IV_measure_up, IV_measure_down, Reverse_Breakdown_source='', Reverse_Breakdown_measure='', Polarity_Sweep_source='', Polarity_Sweep_measure='', Polarity_Compliance_Current='', Heat_Test_source='', Heat_Test_measure=''):
         """
         IV curve properties
 
@@ -85,6 +85,8 @@ class IV_curve():
 
         self.V_polarity_sweep = Polarity_Sweep_source.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
         self.I_polarity_sweep = Polarity_Sweep_measure.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
+        if Polarity_Compliance_Current != '':
+            self.I_Compliance = Polarity_Compliance_Current
 
         if Heat_Test_measure != '' and Heat_Test_source != '':
             self.heat_test_currents = []
@@ -253,3 +255,11 @@ class IV_curve():
 
         return Vdiode, T
             
+    def find_Polarity(self):
+        if float(self.I_polarity_sweep[0]) >= self.I_Compliance:
+            polarity = '-'
+        elif float(self.I_polarity_sweep[-1]) >= self.I_Compliance:
+            polarity = '+'
+        else:
+            polarity = 'n/a'
+        return polarity
