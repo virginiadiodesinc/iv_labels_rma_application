@@ -11,6 +11,7 @@ import webview
 from app import config
 from app.services.date_converter import *
 from app.services.process_and_sanitize_entry import *
+import re
 
 file_bp = Blueprint("file", __name__)
 
@@ -500,6 +501,7 @@ def save_iv_file():
 	@return write_iv_file Return value of type (callable)
 	"""
 	iv_data = request.form
+	global iv_file_directory
 
 	current_datetime = datetime.now()
 	formatted_date = current_datetime.strftime("%#m/%#d/%Y")
