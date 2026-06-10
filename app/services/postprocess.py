@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.constants import e,k
 
 class IV_curve():
-    def __init__(self, IV_source_up, IV_measure_up, IV_measure_down, Reverse_Breakdown_source='', Reverse_Breakdown_measure='', Polarity_Sweep_source='', Polarity_Sweep_measure='', Polarity_Compliance_Current='', Heat_Test_source='', Heat_Test_measure=''):
+    def __init__(self, IV_source_up, IV_measure_up, IV_measure_down, Reverse_Breakdown_source='', Reverse_Breakdown_measure='', Polarity_Sweep_source='', Polarity_Sweep_measure='', Heat_Test_source='', Heat_Test_measure=''):
         """
         IV curve properties
 
@@ -83,10 +83,8 @@ class IV_curve():
             self.V_reverse_breakdown = abs(float(Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')[len(Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')) - 1]))
             #last value of reverse breakdown voltage list
 
-        self.V_polarity_sweep = Polarity_Sweep_source.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
-        self.I_polarity_sweep = Polarity_Sweep_measure.replace(r'\r', '').replace(r'\n', '').split(',') #haven't written any functions to use this yet
-        if Polarity_Compliance_Current != '':
-            self.I_Compliance = Polarity_Compliance_Current
+        self.V_polarity_sweep = Polarity_Sweep_source.replace(r'\r', '').replace(r'\n', '').split(',')
+        self.I_polarity_sweep = Polarity_Sweep_measure.replace(r'\r', '').replace(r'\n', '').split(',')
 
         if Heat_Test_measure != '' and Heat_Test_source != '':
             self.heat_test_currents = []
@@ -249,17 +247,17 @@ class IV_curve():
         count = 0
 
         for current, voltage in zip(self.heat_test_currents[-100:-1], self.heat_test_voltages[-100:-1]):
-            Vdiode.append(current - Rs * voltage)
+            Vdiode.append(voltage - Rs * current)
             T.append((Vdiode[count] / (np.log(current / Is) * ((n * k) / e))) - 273.15) #calculate temperature in kelvin and convert to celsius
             count += 1
 
         return Vdiode, T
             
     def find_Polarity(self):
-        if float(self.I_polarity_sweep[0]) >= self.I_Compliance:
+        if float(self.I_polarity_sweep[0]) > float(self.I_polarity_sweep[-1]) and (float(self.I_polarity_sweep[0]) / float(self.I_polarity_sweep[-1]) > 10):
             polarity = '-'
-        elif float(self.I_polarity_sweep[-1]) >= self.I_Compliance:
+        elif float(self.I_polarity_sweep[-1]) > float(self.I_polarity_sweep[0]) and (float(self.I_polarity_sweep[-1]) / float(self.I_polarity_sweep[0]) > 10):
             polarity = '+'
         else:
-            polarity = 'n/a'
+            polarity = 'bidirectional'
         return polarity

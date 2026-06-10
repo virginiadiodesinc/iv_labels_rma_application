@@ -259,10 +259,8 @@ class SMU_K236():
 		time.sleep(self.instrument_delay)
 		measure_values = self.inst.query("G4,2,2X") #Current values
 		time.sleep(self.instrument_delay)
-
-		compliance_current = float(self.I_compliance_polarity)
 		
-		return source_values, measure_values, compliance_current
+		return source_values, measure_values
 	
 	def set_reverse_polarity(self):
 		"""
@@ -503,7 +501,7 @@ class SMU_K236():
 		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('W0'+':'+'S1'+':'+'P3'+':'+'L20,0'+'X') #Default delay disabled, integration time 'medium', filter readings 8, compliance voltage 20V
+		self.inst.write('W1'+':'+'S1'+':'+'P3'+':'+'L20,0'+'X') #Default delay enabled, integration time 'medium', filter readings 8, compliance voltage 20V
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('Q2,500E-9,50E-3,0,0,1X') #Start at 500nA and ramp up to 50mA heat current, 5 points per decade, user delay of 1mS per cycle (25mS)
@@ -512,10 +510,7 @@ class SMU_K236():
 		self.inst.write('Q6,50E-3,0,1,300X') #Run at 50mA, 1mS delay, for 300 cycles (300mS)
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q6,1E-4,0,10,1X') #Run at 0.1mA, 10ms delay, for 1 cycle (10mS)
-		time.sleep(self.instrument_delay)
-
-		self.inst.write('Q6,1E-4,0,1,100X') #Run at 0.1mA, 1mS delay, for 100 cycles (100mS)
+		self.inst.write('Q6,1E-4,0,0,100X') #Run at 0.1mA, 0mS delay, for 100 cycles (?mS)
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
