@@ -5,6 +5,13 @@ from app.db.models import *
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 def create_app():
+	"""Creates the Flask app.
+
+	This is the function which actually creates the Flask app.
+	This sets up the blueprints (the routes/urls), initializes/checks the DB, and closes down the app on exit.
+
+	@return app Return value of type (Flask).
+	"""
 	UPLOAD_FOLDER = 'uploads'
 
 	app = Flask(

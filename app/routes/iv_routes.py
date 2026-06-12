@@ -9,6 +9,14 @@ iv_bp = Blueprint("iv", __name__)
 
 @iv_bp.post("/take_iv/")
 def take_iv():
+	"""Takes an IV using the connected Keithley SMU
+
+	This function attempts to performs an IV sweep using the connected Keithley SMU.
+	If no Keithley is connected, it will notify the user of this. Otherwise, it will run a sweep
+	with the commands sent via whatever is noted in the GUI.
+
+	@return run-iv-response/no-keithley-connected-error Return value of type (template partial)
+	"""
 	SMU_controls = request.form
 
 	SMU = get_SMU()
@@ -113,6 +121,13 @@ def take_iv():
 
 @iv_bp.get("/get_empty_plot")
 def get_empty_plot():
+	"""Gets an empty plot on page load
+	
+	This function simply puts in a placeholder plot on page load before any real IVs are run or loaded.
+
+
+	@return iv-plot-figure Return value of type (template partial)
+	"""
 	df = pd.DataFrame({
 		"Voltage (V)": [],
 		"Current (uA)": []

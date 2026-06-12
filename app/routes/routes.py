@@ -1,3 +1,5 @@
+# THIS IS A DEPRECATED COPY OF ALL THE ROUTES WHICH ARE NOW SEPARATED INTO VARIOUS FILES BY CATEGORY
+
 # import os
 # from flask import Blueprint, render_template, request, current_app
 # from app.db.database import db_session
