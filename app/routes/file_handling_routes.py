@@ -192,7 +192,9 @@ def populate_info_from_iv_file():
 		
 		full_iv_dict = {**clean_process_dict, **iv_dict}
 
-		return render_template("partials/iv-page/iv-file-population-response.html", iv_data=full_iv_dict, iv_curve=iv_curve)
+		tag_list = ["N/A", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
+
+		return render_template("partials/iv-page/iv-file-population-response.html", iv_data=full_iv_dict, iv_curve=iv_curve, tags=tag_list, selected_tag="N/A")
 	
 	return "No file uploaded", 204
 
@@ -475,7 +477,7 @@ def save_build_file():
 		add_table_entry(
 			db_session,
 			Build_Parts,
-			block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""),
+			block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
 			part_name=part,
 			quantity=int(float(quantity)),
 			part_type=part_type,
@@ -559,5 +561,46 @@ def save_iv_file():
 					file.write("\n")
 		
 		iv_file_directory = os.path.dirname(path[0])
+
+	iv_info_dict = {
+		"build_id": iv_data.get("iv-block-engraving", "")+" "+iv_data.get("iv-block-sn", "")+" "+iv_data.get("iv-block-revision", "A"),
+		"subassembly_tag": iv_data.get("part-tag", ""),
+		"iv_date": current_datetime.date(),
+		"points_per_decade": int(iv_dict["Points/Decade"]),
+		"ideality": float(iv_dict["n (ideality)"]),
+		"saturation_current": float(iv_dict["Is"]),
+		"series_resistance": float(iv_dict["Rs"]),
+		"mean_square_error": float(iv_dict["Mean Square Error"]),
+		"r_squared_error": float(iv_dict["R^2 Error"]),
+		"polarity": Polarity.POSITIVE if iv_dict["Polarity"] == "+" else Polarity.NEGATIVE,
+		"hysteresis_standard_deviation": float(iv_dict["Hysteresis SD (mV)"]),
+		"hysteresis_mean": float(iv_dict["Hysteresis Mean (mV)"]),
+		"hysteresis_maximum": float(iv_dict["Hysteresis Max (mV)"]),
+		"hysteresis_minimum": float(iv_dict["Hysteresis Min (mV)"]),
+		"reverse_current": float(iv_dict["Reverse Current (uA)"]),
+		"reverse_voltage": float(iv_dict["Reverse Voltage (V)"]),
+		"iv_file_path": path[0]
+	}
+
+	iv_info = add_table_entry(
+		db_session,
+		IV_Info,
+		**iv_info_dict
+				 )
+	
+	iv_points_dict = {
+		"iv_id": iv_info.iv_id,
+		"voltage_up_mv": iv_data.get("iv-voltage-up", "").replace(r'\r', '').replace(r'\n', ''),
+		"voltage_down_mv": iv_data.get("iv-voltage-down", "").replace(r'\r', '').replace(r'\n', ''),
+		"current_ua": iv_data.get("iv-source-values").replace(r'\r', '').replace(r'\n', '')
+	}
+
+	add_table_entry(
+		db_session,
+		IV_Points,
+		**iv_points_dict
+	)
+	
+
 
 	return "IV file written", 204
