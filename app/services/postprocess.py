@@ -231,4 +231,3 @@ class IV_curve():
         print("Postprocessing finished.")
         
         return self.var_dict
-

@@ -1,8 +1,10 @@
-"""Extracts the correct revision number from every entry in VDI-547 and generates a new text file with engraving and tab-separated revision number"""
+"""Extracts the correct revision number from every entry in VDI-547 and unique build in VDI-548 and generates new text files"""
 import re
 
 revision_pattern = re.compile(r'(?<!(?<![a-zA-Z0-9])W)R\d(\.\d)?')
 multi_pattern = re.compile(r'R\d(?:\.\d)?')
+swg_length_pattern = re.compile(r'SWG(\d)')
+swgmd_length_pattern = re.compile(r'SWGMD(\d)')
 
 """The following three lists can be used for troubleshooting"""
 no_match_list = []
@@ -18,13 +20,33 @@ with open('VDI-547 Block Name List.txt', 'r', encoding='utf-8') as file:
         count = len(re.findall(revision_pattern, line))
 
         if count == 0:
-            no_match_list.append(line)
-            engraving_revision_list.append(line+"\tN/A\n")
+            if "SWG" in line and "SWGMD" not in line:
+                if swg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1R1\n") #1 inch plus R1
+                elif swg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swg_length_pattern.search(line).group(1)+"R1\n") #length plus R1
+            elif "SWGMD" in line:
+                if swgmd_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1R1\n") #1 inch plus R1
+                elif swgmd_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swgmd_length_pattern.search(line).group(1)+"R1\n") #length plus R1
+            else:
+                engraving_revision_list.append(line+"\tN\n")
         elif count == 1:
-            one_match_list.append(line)
-            engraving_revision_list.append(line+"\t"+re.search(revision_pattern, line).group()+"\n")
+            if "SWG" in line:
+                if swg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(revision_pattern, line).group()+"\n") #1 inch plus Revision number
+                elif swg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swg_length_pattern.search(line).group(1)+re.search(revision_pattern, line).group()+"\n") #length plus Revision number
+            elif"SWGMD" in line:
+                if swgmd_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(revision_pattern, line).group()+"\n") #1 inch plus Revision number
+                elif swgmd_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swgmd_length_pattern.search(line).group(1)+re.search(revision_pattern, line).group()+"\n") #length plus Revision number
+            else:
+                engraving_revision_list.append(line+"\t"+re.search(revision_pattern, line).group()+"\n")
         else:
-            multi_match_list.append(line)
+            #excluding SWG conditional since no SWG engravings have multiple instances of R occurring
             engraving_revision_list.append(line+"\t"+re.findall(multi_pattern, line)[-1]+"\n")
     
 with open('engraving_with_revision.txt', 'w') as file:
@@ -79,7 +101,7 @@ with open('VDI-548 Build Name List.txt', 'r', encoding='utf-8') as file:
                 print(repr(line))
                 line = line[:-1]
         for pattern in pattern_list:
-            if pattern.search(line) != None and line[:-len(pattern.search(line).group())] != previous_line:
+            if pattern.search(line) is not None and line[:-len(pattern.search(line).group())] != previous_line:
                 unique_build_list.append(line[:-len(pattern.search(line).group())]+"\n")
                 previous_line = line[:-len(pattern.search(line).group())]
                 """
@@ -95,10 +117,10 @@ with open('VDI-548 Build Name List.txt', 'r', encoding='utf-8') as file:
                 """
                 counter = 0
                 break
-            elif pattern.search(line) != None and line[:-len(pattern.search(line).group())] == previous_line:
+            elif pattern.search(line) is not None and line[:-len(pattern.search(line).group())] == previous_line:
                 counter = 0
                 break
-            elif pattern.search(line) == None:
+            elif pattern.search(line) is None:
                 counter += 1
             
             if counter == 16:
