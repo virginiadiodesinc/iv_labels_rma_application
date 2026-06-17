@@ -28,7 +28,7 @@ class IV_curve():
             for I in IV_source_up:
                 self.IV_Iup.append(float(I)/1E6) #from .iv file, convert to Amps
         else:
-            for I in IV_source_up.replace(r'\r', '').replace(r'\n', '').split(','):
+            for I in IV_source_up.replace('\r', '').replace('\n', '').split(','):
                 self.IV_Iup.append(float(I))
                 
         self.IV_Iup = list(map(abs, self.IV_Iup))
@@ -40,7 +40,7 @@ class IV_curve():
             for V in IV_measure_up:
                 self.IV_Vup.append(float(V)/1E3) #from .iv file, convert to Volts
         else:
-            for V in IV_measure_up.replace(r'\r', '').replace(r'\n', '').split(','):
+            for V in IV_measure_up.replace('\r', '').replace('\n', '').split(','):
                 self.IV_Vup.append(float(V))
                 
         self.IV_Vup = list(map(abs, self.IV_Vup))
@@ -52,7 +52,7 @@ class IV_curve():
             for V in IV_measure_down:
                 self.IV_Vdown.append(float(V)/1E3) #from .iv file, convert to Volts
         else:
-            for V in IV_measure_down.replace(r'\r', '').replace(r'\n', '').split(','):
+            for V in IV_measure_down.replace('\r', '').replace('\n', '').split(','):
                 self.IV_Vdown.append(float(V))
             self.IV_Vdown.reverse() #Only needed for SMU output. .iv file data formatted in the correct order.
             
@@ -74,24 +74,24 @@ class IV_curve():
         if Reverse_Breakdown_source == '':
             self.I_reverse_breakdown = '0.0'
         else:
-            self.I_reverse_breakdown = abs(float(Reverse_Breakdown_source.replace(r'\r', '').replace(r'\n', '').split(',')[0]))
+            self.I_reverse_breakdown = abs(float(Reverse_Breakdown_source.replace('\r', '').replace('\n', '').split(',')[0]))
             #last value of reverse breakdown current list
 
         if Reverse_Breakdown_measure == '':
             self.V_reverse_breakdown  = '0.0'
         else:
-            self.V_reverse_breakdown = abs(float(Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')[len(Reverse_Breakdown_measure.replace(r'\r', '').replace(r'\n', '').split(',')) - 1]))
+            self.V_reverse_breakdown = abs(float(Reverse_Breakdown_measure.replace('\r', '').replace('\n', '').split(',')[len(Reverse_Breakdown_measure.replace('\r', '').replace('\n', '').split(',')) - 1]))
             #last value of reverse breakdown voltage list
 
-        self.V_polarity_sweep = Polarity_Sweep_source.replace(r'\r', '').replace(r'\n', '').split(',')
-        self.I_polarity_sweep = Polarity_Sweep_measure.replace(r'\r', '').replace(r'\n', '').split(',')
+        self.V_polarity_sweep = Polarity_Sweep_source.replace('\r', '').replace('\n', '').split(',')
+        self.I_polarity_sweep = Polarity_Sweep_measure.replace('\r', '').replace('\n', '').split(',')
 
         if Heat_Test_measure != '' and Heat_Test_source != '':
             self.heat_test_currents = []
             self.heat_test_voltages = []
-            for current in Heat_Test_source.replace(r'\r', '').replace(r'\n', '').split(','):
+            for current in Heat_Test_source.replace('\r', '').replace('\n', '').split(','):
                 self.heat_test_currents.append(float(current))
-            for voltage in Heat_Test_measure.replace(r'\r', '').replace(r'\n', '').split(','):
+            for voltage in Heat_Test_measure.replace('\r', '').replace('\n', '').split(','):
                 self.heat_test_voltages.append(float(voltage))
 
 
@@ -254,9 +254,12 @@ class IV_curve():
         return Vdiode, T
             
     def find_Polarity(self):
-        if float(self.I_polarity_sweep[0]) > float(self.I_polarity_sweep[-1]) and (float(self.I_polarity_sweep[0]) / float(self.I_polarity_sweep[-1]) > 10):
+        first_current_abs_value = abs(float(self.I_polarity_sweep[0]))
+        last_current_abs_value = abs(float(self.I_polarity_sweep[-1]))
+
+        if (first_current_abs_value > last_current_abs_value) and (first_current_abs_value / last_current_abs_value > 8):
             polarity = '-'
-        elif float(self.I_polarity_sweep[-1]) > float(self.I_polarity_sweep[0]) and (float(self.I_polarity_sweep[-1]) / float(self.I_polarity_sweep[0]) > 10):
+        elif (last_current_abs_value > first_current_abs_value) and (last_current_abs_value / first_current_abs_value > 8):
             polarity = '+'
         else:
             polarity = 'bidirectional'

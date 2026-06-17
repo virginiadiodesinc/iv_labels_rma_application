@@ -250,7 +250,7 @@ class SMU_K236():
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(1)
+		time.sleep(7)
 
 		self.inst.write('N0X') #Standby mode
 		time.sleep(self.instrument_delay)
