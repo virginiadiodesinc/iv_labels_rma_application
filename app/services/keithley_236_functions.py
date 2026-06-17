@@ -494,35 +494,53 @@ class SMU_K236():
 		measure_values: the voltage values measured for the heat test
 		"""
 
-		sweep_delay = 426 * 8 * .0125 #426 points, 8 filter readings per point, .0125 seconds per point
+		sweep_delay = 410 * .0125 #426 points, no filter readings, .0125 seconds per point
 
-		self.reset()
+		self.reset() #J0X
 
-		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
+		"""
+		F1,1 source current measure voltage
+		O0 local sense for V-source feedback and measurement
+		P0 filter disabled
+		Z0 disable suppression
+		S0 integration time fast
+		W0 disable default delay
+		B0.0E+0,0,0 bias level zero, range zero, delay zero
+		L6.0E+0,2 set voltage compliance to 6V and source current range to 10nA
+		X execute
+		M0, sum of zero binary bits and delay/idle period conditions for service request
+		X execute
+		M2, sum of two binary bits and delay/idle period conditions for service request
+		X execute
+		"""
+		self.inst.write('F1,1O0P0Z0S0W0B0.0E+0,0,0L6.0E+0,2XM0,XM2,X') 
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('W1'+':'+'S1'+':'+'P3'+':'+'L20,0'+'X') #Default delay enabled, integration time 'medium', filter readings 8, compliance voltage 20V
+		self.inst.write('U4X') #send measurement parameters and execute
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q2,500E-9,50E-3,0,0,1X') #Start at 500nA and ramp up to 50mA heat current, 5 points per decade, user delay of 1mS per cycle (25mS)
+		self.inst.write('B0.0E+0,,Q0,-1.0E-4,9,0,10X') #Bias level zero, range zero, delay zero; Fixed level sweep at -100uA, 100mA range, 0mS delay, 10 cycles and execute
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q6,50E-3,0,1,300X') #Run at 50mA, 1mS delay, for 300 cycles (300mS)
+		self.inst.write('U4X') #send measurement parameters and execute
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('Q6,1E-4,0,0,100X') #Run at 0.1mA, 0mS delay, for 100 cycles (?mS)
+		self.inst.write('B0.0E+0,,Q6,-5.0E-2,9,0,300X') #Bias level zero, range zero, delay zero; Append fixed level sweep at -50mA, 100mA range, 0mS delay, 300 cycles and execute
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('U4X') #send measurement parameters and execute
+		time.sleep(self.instrument_delay)
+
+		self.inst.write('B0.0E+0,,Q6,-1.0E-4,9,0,100X') #Bias level zero, range zero, delay zero; Append fixed level sweep at -100uA, 100mA range, 0mS delay, 100 cycles and execute
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(self.instrument_delay)
-
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(sweep_delay) # Variable based on the the total number of points and delay time
+		time.sleep(sweep_delay)
 
-		self.inst.write('N0X') #Standby mode
+		self.inst.write('U4X') #send measurement parameters and execute
 		time.sleep(self.instrument_delay)
 
 		source_values = self.inst.query("G1,2,2X") #Current values
@@ -530,6 +548,11 @@ class SMU_K236():
 		measure_values = self.inst.query("G4,2,2X") #Voltage values
 		time.sleep(self.instrument_delay)
 
+		heat_data = self.inst.query('G15,2,2U8X') #Include all items in string, ASCII data no prefix no suffix, all lines of sweep data per talk; send defined sweep size and execute
+		time.sleep(self.instrument_delay)
+
+
+		print(heat_data)
 		print(source_values)
 		print(measure_values)
 
