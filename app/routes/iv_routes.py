@@ -10,6 +10,7 @@ iv_bp = Blueprint("iv", __name__)
 @iv_bp.post("/take_iv/")
 def take_iv():
 	SMU_controls = request.form
+	heat_test = request.form.get("heat_test") == "true"
 
 	SMU = get_SMU()
 	
@@ -78,6 +79,14 @@ def take_iv():
 			"polarity": translated_settings["polarity"],
 			"points_per_decade": translated_settings["points_per_decade"]
 		}
+
+		if heat_test:
+			heat_current, heat_voltage = SMU.takeHeatTest()
+			heat_current = heat_current.split(',')
+			heat_voltage = heat_voltage.split(',')
+
+			temperature = process.calc_heat_parameters(heat_current, heat_voltage, float(iv_dict["ideality"]))
+			iv_dict["temperature"] = temperature[0]
 		
 		source_values = process_dict['I (uA)']
 		source_values = [str(abs(float(value))) for value in source_values]
@@ -110,6 +119,7 @@ def take_iv():
 	
 	except RuntimeError:
 		return render_template("partials/iv-page/no-keithley-connected-error.html")
+
 
 @iv_bp.get("/get_empty_plot")
 def get_empty_plot():

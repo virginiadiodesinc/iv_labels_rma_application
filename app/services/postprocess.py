@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import statistics
 from scipy.constants import e,k
 
 class IV_curve():
@@ -241,19 +242,21 @@ class IV_curve():
         
         return self.var_dict
 
-    def calc_Heat_parameters(self, n, Rs, Is):
-        Vdiode = []
+    def calc_heat_parameters(self, heat_test_currents, heat_test_voltages, n):
         T = []
-        count = 0
+        cold_voltages_strings = heat_test_voltages[0:10]
+        cold_voltages = [float(voltage) for voltage in cold_voltages_strings]
+        average_cold_voltage = statistics.mean(cold_voltages)
 
-        for current, voltage in zip(self.heat_test_currents[-100:-1], self.heat_test_voltages[-100:-1]):
-            Vdiode.append(voltage - Rs * current)
-            T.append((Vdiode[count] / (np.log(current / Is) * ((n * k) / e))) - 273.15) #calculate temperature in kelvin and convert to celsius
-            count += 1
+        for current, voltage in zip(heat_test_currents[-100:-1], heat_test_voltages[-100:-1]):
+            current = float(current)
+            voltage = float(voltage)
 
-        return Vdiode, T
+            strange_temperature = abs(voltage - average_cold_voltage) * 849 / n + 25
+            T.append(strange_temperature)
+        return T
             
-    def find_Polarity(self):
+    def find_polarity(self):
         first_current_abs_value = abs(float(self.I_polarity_sweep[0]))
         last_current_abs_value = abs(float(self.I_polarity_sweep[-1]))
 

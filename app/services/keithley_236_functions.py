@@ -519,19 +519,19 @@ class SMU_K236():
 		self.inst.write('U4X') #send measurement parameters and execute
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('B0.0E+0,,Q0,-1.0E-4,9,0,10X') #Bias level zero, range zero, delay zero; Fixed level sweep at -100uA, 100mA range, 0mS delay, 10 cycles and execute
+		self.inst.write('B0.0E+0,,Q0,1.0E-4,9,0,10X') #Bias level zero, range zero, delay zero; Fixed level sweep at -100uA, 100mA range, 0mS delay, 10 cycles and execute
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('U4X') #send measurement parameters and execute
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('B0.0E+0,,Q6,-5.0E-2,9,0,300X') #Bias level zero, range zero, delay zero; Append fixed level sweep at -50mA, 100mA range, 0mS delay, 300 cycles and execute
+		self.inst.write('B0.0E+0,,Q6,5.0E-2,9,0,300X') #Bias level zero, range zero, delay zero; Append fixed level sweep at -50mA, 100mA range, 0mS delay, 300 cycles and execute
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('U4X') #send measurement parameters and execute
 		time.sleep(self.instrument_delay)
 
-		self.inst.write('B0.0E+0,,Q6,-1.0E-4,9,0,100X') #Bias level zero, range zero, delay zero; Append fixed level sweep at -100uA, 100mA range, 0mS delay, 100 cycles and execute
+		self.inst.write('B0.0E+0,,Q6,1.0E-4,9,0,100X') #Bias level zero, range zero, delay zero; Append fixed level sweep at -100uA, 100mA range, 0mS delay, 100 cycles and execute
 		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
@@ -552,7 +552,6 @@ class SMU_K236():
 		time.sleep(self.instrument_delay)
 
 
-		print(heat_data)
 		print(source_values)
 		print(measure_values)
 
