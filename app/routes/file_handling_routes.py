@@ -310,9 +310,9 @@ def save_block_file():
 				if index < len(content_rows) - 1:
 					file.write("\n")
 	
-	if retrieve_block_and_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
+	if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
 		
-		result = retrieve_block_and_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
+		result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
 		
 		updates = {
 			"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else result.inspection_date,

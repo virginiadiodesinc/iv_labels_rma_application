@@ -23,7 +23,7 @@ def sanitize_and_save_feedback(initials, feedback):
 	)
 
 
-def retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision):
+def retrieve_build_info(block_engraving, block_serial_number, block_revision):
 	filters = {
 		"block_engraving": block_engraving,
 		"block_serial_number": block_serial_number,

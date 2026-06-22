@@ -22,11 +22,11 @@ def populate_block_info():
 	block_engraving = request.form.get("block-engraving-input", "").strip()
 	block_serial_number = request.form.get("block-serial-number-input", "").strip()
 	block_revision = request.form.get("block-revision-input", "").strip()
-	if retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) == []:
-		block = retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision)[0]
+	if retrieve_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) == []:
+		block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
 		return render_template("partials/block-forms/block-and-build-population.html", block=block)
-	elif retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) != []:
-		block = retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision)[0]
+	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) != []:
+		block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
 		items = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
 		return render_template("partials/block-forms/block-and-build-population.html", block=block, items=items)
 
@@ -38,7 +38,7 @@ def save_inspection_info():
 	block_revision = request.form.get("block-revision-input", "").strip()
 	inspection_date = string_to_python_date(request.form.get("inspection-date-input", "")) if (request.form.get("inspection-date-input", "") != "") else None
 	inspection_initials = request.form.get("inspection-initials-input", "").strip()
-	if retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision) != []:
+	if retrieve_build_info(block_engraving, block_serial_number, block_revision) != []:
 		updates = {
 			"inspection_date": inspection_date,
 			"inspection_initials": inspection_initials
@@ -71,7 +71,7 @@ def save_pb1_info():
 	pb1_build_name = request.form.get("pb1-build-name-input", "").strip()
 	pb1_date = string_to_python_date(request.form.get("pb1-date-input", "")) if (request.form.get("pb1-date-input", "") != "") else None
 	pb1_initials = request.form.get("pb1-initials-input", "").strip()
-	if retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision) != []:
+	if retrieve_build_info(block_engraving, block_serial_number, block_revision) != []:
 		updates = {
 			"pb1_build_name": pb1_build_name,
 			"pb1_date": pb1_date,
@@ -106,7 +106,7 @@ def save_pb2_info():
 	pb2_date = string_to_python_date(request.form.get("pb2-date-input", "")) if (request.form.get("pb2-date-input", "") != "") else None
 	pb2_initials = request.form.get("pb2-initials-input", "").strip()
 	pb2_inspection_initials = request.form.get("pb2-inspection-initials-input", "").strip()
-	if retrieve_block_and_build_info(block_engraving, block_serial_number, block_revision) != []:
+	if retrieve_build_info(block_engraving, block_serial_number, block_revision) != []:
 		updates = {
 			"pb2_build_name": pb2_build_name,
 			"pb2_date": pb2_date,

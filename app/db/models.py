@@ -52,6 +52,11 @@ class Polarity(enum.Enum):
 class IV_Info(Base):
 	__tablename__ = "iv_info"
 	build_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
+	diode = Column(String, nullable=False)
+	diode_lot = Column(String, nullable=False)
+	circuit = Column(String, nullable=False)
+	circuit_lot = Column(String, nullable=False)
+	assembly_no = Column(Integer)
 	subassembly_tag = Column(String)
 	iv_id = Column(Integer, primary_key=True, autoincrement=True)
 	iv_date = Column(Date, nullable=False)
