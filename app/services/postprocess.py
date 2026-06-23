@@ -248,7 +248,7 @@ class IV_curve():
         cold_voltages = [float(voltage) for voltage in cold_voltages_strings]
         average_cold_voltage = statistics.mean(cold_voltages)
 
-        for current, voltage in zip(heat_test_currents[-100:-1], heat_test_voltages[-100:-1]):
+        for current, voltage in zip(heat_test_currents[-100:], heat_test_voltages[-100:]):
             current = float(current)
             voltage = float(voltage)
 

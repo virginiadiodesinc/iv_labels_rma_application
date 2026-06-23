@@ -80,13 +80,16 @@ def take_iv():
 			"points_per_decade": translated_settings["points_per_decade"]
 		}
 
+		temperature_list = []
+		heat_current_list = []
+		heat_voltage_list = []
 		if heat_test:
-			heat_current, heat_voltage = SMU.takeHeatTest()
-			heat_current = heat_current.split(',')
-			heat_voltage = heat_voltage.split(',')
+			heat_current_string, heat_voltage_string = SMU.takeHeatTest()
+			heat_current_list = heat_current_string.split(',')
+			heat_voltage_list = heat_voltage_string.split(',')
 
-			temperature = process.calc_heat_parameters(heat_current, heat_voltage, float(iv_dict["ideality"]))
-			iv_dict["temperature"] = temperature[0]
+			temperature_list = process.calc_heat_parameters(heat_current_list, heat_voltage_list, float(iv_dict["ideality"]))
+			iv_dict["temperature"] = temperature_list[0]
 		
 		source_values = process_dict['I (uA)']
 		source_values = [str(abs(float(value))) for value in source_values]
@@ -114,6 +117,11 @@ def take_iv():
 		iv_curve["iv_voltage_down"] = ",".join(voltage_down_values)
 		iv_curve["polarity"] = SMU_controls.get("polarity", "")
 		iv_curve["points_per_decade"] = SMU_controls.get("points-per-decade", "")
+
+		if heat_test:
+			iv_curve["heat_current_list"] = ",".join(str(item) for item in heat_current_list)
+			iv_curve["heat_voltage_list"] = ",".join(str(item) for item in heat_voltage_list)
+			iv_curve["temperature_list"] = ",".join(str(item) for item in temperature_list)
 
 		return render_template("partials/iv-page/run-iv-response.html", iv_curve=iv_curve, iv_data=iv_dict)
 	

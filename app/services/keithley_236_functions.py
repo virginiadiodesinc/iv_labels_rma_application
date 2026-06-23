@@ -552,8 +552,8 @@ class SMU_K236():
 		time.sleep(self.instrument_delay)
 
 
-		print(source_values)
-		print(measure_values)
+		# print(source_values)
+		# print(measure_values)
 
 		return source_values, measure_values
 

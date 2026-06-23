@@ -5,7 +5,7 @@ from app.db.queries import *
 from app.services import build_file_converter as build_converter, block_file_converter as block_converter, iv_file_converter as iv_converter
 import plotly.express as px
 import pandas as pd
-from app.services.write_MicroA_files import write_block_file, write_IV_file, write_build_file
+from app.services.write_MicroA_files import write_block_file, write_IV_file, write_build_file, write_heat_test_file
 from app.services import postprocess as pp
 from datetime import datetime
 import webview
@@ -475,7 +475,16 @@ def save_iv_file():
 	Vdown_list = iv_data.get("iv-voltage-down", "").split(",")
 	I_source_list = iv_data.get("iv-source-values", "").split(",")
 
+	heat_current_list = iv_data.get("heat-current-list", "").split(",")
+	heat_voltage_list = iv_data.get("heat-voltage-list", "").split(",")
+	temperature_list = iv_data.get("temperature-list", "").split(",")
+	heat_test_taken = all([heat_current_list, heat_voltage_list, temperature_list])
+
 	file_name, content_rows = write_IV_file(info_dict, iv_dict, Vup_list, Vdown_list, I_source_list)
+
+	if heat_test_taken:
+		if ", w_heat" not in file_name:
+			file_name = file_name.replace(".iv", ", w_heat.iv")
 
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.SAVE,
@@ -490,5 +499,13 @@ def save_iv_file():
 					file.write("\n")
 		
 		iv_file_directory = os.path.dirname(path[0])
+
+	if heat_test_taken:
+		heat_file_name, heat_content_rows = write_heat_test_file(file_name, heat_current_list, heat_voltage_list, temperature_list,
+															formatted_date, formatted_time,
+															iv_data.get("n", ""), iv_data.get("is", ""))
+		print(heat_file_name)
+		for line in heat_content_rows:
+			print(line)
 
 	return "IV file written", 204
