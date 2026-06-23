@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 # CREATE
 def add_table_entry(db_session, model, **data):
