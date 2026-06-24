@@ -1,46 +1,44 @@
-<div id="modal-container">
-    <div class="modal-overlay">
-        <div class="modal">
+<div class="modal-overlay">
+    <div class="modal">
 
-            <h2>Confirm Save</h2>
+        <h2>Confirm Save</h2>
 
-            <p>
-                The following quantities differ from the stored values:
-            </p>
+        <p>
+            The following part quantities differ from those on the BOM:
+        </p>
 
-            <table>
-                <tr>
-                    <th>Part</th>
-                    <th>Current</th>
-                    <th>Stored</th>
-                </tr>
+        <table>
+            <tr>
+                <th>Part</th>
+                <th>Current</th>
+                <th>Stored</th>
+            </tr>
 
-                {% for diff in differences %}
-                <tr>
-                    <td>{{ diff.name }}</td>
-                    <td>{{ diff.form_quantity }}</td>
-                    <td>{{ diff.stored_quantity }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+            {% for name, form_quantity, BOM_quantity in differences %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ form_quantity }}</td>
+                <td>{{ BOM_quantity }}</td>
+            </tr>
+            {% endfor %}
+        </table>
 
-            <div class="button-row">
-                <button
-                    hx-post="/confirm_save"
-                    hx-include="#full-build-form"
-                    hx-target="#modal-container"
-                    hx-swap="innerHTML">
-                    Save
-                </button>
+        <div class="button-row">
+            <button
+                hx-post="/confirm_build_file_save/"
+                hx-include="#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info, #block-id"
+                hx-target="#save-build-popup"
+                hx-swap="innerHTML">
+                Save
+            </button>
 
-                <button
-                    hx-get="/close_modal"
-                    hx-target="#modal-container"
-                    hx-swap="innerHTML">
-                    Cancel
-                </button>
-            </div>
-
+            <button
+                hx-post="/cancel_build_file_save/"
+                hx-target="#save-build-popup"
+                hx-swap="innerHTML">
+                Cancel
+            </button>
         </div>
+
     </div>
 </div>

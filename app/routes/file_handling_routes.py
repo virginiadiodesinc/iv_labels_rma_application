@@ -356,7 +356,7 @@ def save_block_file():
 	#Future response goes here if data inputs don't pass sanitization check
 	return "Block file written", 204
 
-@file_bp.post("/attempt_save_build_file")
+@file_bp.post("/attempt_save_build_file/")
 def attempt_save_build_file():
 	"""
 	Checks the existing list of parts on the Full Build Info form and compares it to the parts on the standard BOM.
@@ -407,12 +407,21 @@ def attempt_save_build_file():
 		standard_BOM_names_set.add(entry[0])
 
 	nonstandard_part_names_set = user_parts_names_set - standard_BOM_names_set #parts the user added that are not on the standard BOM
+	missing_parts_names_set = standard_BOM_names_set - user_parts_names_set
 	mismatched_quantities_list = []
 
 	for user_part in user_parts:
 		for standard in standard_BOM:
-			if user_part[0] == standard[0] and user_part[1] != standard[1]: #if part names match but BOM quantity does not match that on Full Build Info form
-				mismatched_quantities_list.append((user_part[0], user_part[1], standard[1])) #name of part, user quantity, BOM quantity for every instance on the Full Build Info form
+			if user_part[0] == standard[0] and int(float(user_part[1])) != standard[1]: #if part names match but BOM quantity does not match that on Full Build Info form
+				mismatched_quantities_list.append((user_part[0], int(float(user_part[1])), standard[1])) #name of part, user quantity, BOM quantity for every instance on the Full Build Info form
+
+	for name in nonstandard_part_names_set:
+		mismatched_quantities_list.append((name, int(float(user_part[1])), 0)) #adds all parts listed by user but not on BOM
+
+	for name in missing_parts_names_set:
+		for standard in standard_BOM:
+			if standard[0] == name:
+				mismatched_quantities_list.append((name, 0, standard[1])) #adds all parts on BOM not listed by user
 
 	if (not nonstandard_part_names_set) and mismatched_quantities_list == []: #if no mismatches are found save to build file and DB
 		part_types = build_data.getlist("part_type")
@@ -514,41 +523,46 @@ def attempt_save_build_file():
 			save_filename=file_name,
 			directory=build_file_directory
 			)
-		if path and path[0] and path[0].endswith(".txt"):
-			with open(path[0], "w") as file:
-				for index, line in enumerate(content_rows):
-					file.write(line)
-					if index < len(content_rows) - 1:
-						file.write("\n")
+		
+		if path is None: #Someone closed out the save dialog box without actually saving the file
+			return "", 200
+		else:
+			if path and path[0] and path[0].endswith(".txt"):
+				with open(path[0], "w") as file:
+					for index, line in enumerate(content_rows):
+						file.write(line)
+						if index < len(content_rows) - 1:
+							file.write("\n")
 
-		db_session.execute(
-			delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
-		)
-
-		for part, part_type, lot, quantity in all_part_information:
-			add_table_entry(
-				db_session,
-				Build_Parts,
-				block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
-				part_name=part,
-				quantity=int(float(quantity)),
-				part_type=part_type,
-				part_lot=lot
+			db_session.execute(
+				delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
 			)
-		print("adding build info to db")
-		updates = {
-				"build_file_path": path[0],
-				"full_build_name": BOM_for,
-				"full_build_initials": build_data.get("full-build-initials-input", ""),
-				"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
-			}
-		update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
-		return "Build file written", 204
-	else:
-		return render_template()
 
-@file_bp.post("/save_build_file/")
-def save_build_file():
+			for part, part_type, lot, quantity in all_part_information:
+				add_table_entry(
+					db_session,
+					Build_Parts,
+					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+					part_name=part,
+					quantity=int(float(quantity)),
+					part_type=part_type,
+					part_lot=lot
+				)
+			print("adding build info to db")
+			updates = {
+					"build_file_path": path[0],
+					"full_build_name": BOM_for,
+					"full_build_initials": build_data.get("full-build-initials-input", ""),
+					"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
+				}
+			update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
+			return "Build file written", 204
+	else:
+		print("Mismatched quantities found")
+		return render_template("partials/build-page/confirm-build-file-save.html", differences=mismatched_quantities_list)
+
+@file_bp.post("/confirm_build_file_save/")
+def confirm_build_file_save():
 	"""
 	Saves the data from the relevant input fields to a (LabView Style) build file 
 	
@@ -661,69 +675,47 @@ def save_build_file():
 		save_filename=file_name,
 		directory=build_file_directory
 		)
-	if path and path[0] and path[0].endswith(".txt"):
-		with open(path[0], "w") as file:
-			for index, line in enumerate(content_rows):
-				file.write(line)
-				if index < len(content_rows) - 1:
-					file.write("\n")
+	
+	if path is None: #Someone closed out the save dialog box without actually saving the file
+		return "", 200
 
-	print("At BOM generation")
-	BOM_for = build_data.get("full-build-name-input", "")
-	print(BOM_for)
-	parts = jb2.get_BOM(BOM_for)
-	sub_parts = []
+	else:
+		if path and path[0] and path[0].endswith(".txt"):
+			with open(path[0], "w") as file:
+				for index, line in enumerate(content_rows):
+					file.write(line)
+					if index < len(content_rows) - 1:
+						file.write("\n")
 
-	for part in parts:
-		if part["part_type"] == "COMPONENT":
-			parts.remove(part)
-			sub_part = {
-				"name": part["part_name"],
-				"sub_parts": jb2.get_BOM(part["part_name"])
-			}
-			sub_parts.append(sub_part)
-		if part["part_type"] == "BLOCK":
-			parts.remove(part)
-
-	for sub_part_entry in sub_parts:
-		for sub_part in sub_part_entry["sub_parts"]:
-			if sub_part["part_type"] == "BLOCK":
-				sub_part_entry["sub_parts"].remove(sub_part)
-
-	standard_BOM = []
-
-	for entry in parts:
-		standard_BOM.append((entry['part_name'], int(float(entry['part_quantity']))))
-
-
-	for entry in sub_parts:
-		for subpart in entry['sub_parts']:
-			standard_BOM.append((subpart['part_name'], int(float(subpart['part_quantity']))))
-
-	db_session.execute(
-		delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
-	)
-
-	for part, part_type, lot, quantity in all_part_information:
-		add_table_entry(
-			db_session,
-			Build_Parts,
-			block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
-			part_name=part,
-			quantity=int(float(quantity)),
-			part_type=part_type,
-			part_lot=lot
+		db_session.execute(
+			delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
 		)
-	print("adding build info to db")
-	updates = {
-			"build_file_path": path[0],
-			"full_build_name": BOM_for,
-			"full_build_initials": build_data.get("full-build-initials-input", ""),
-			"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
-		}
-	update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
 
-	return "Build file written", 204
+		for part, part_type, lot, quantity in all_part_information:
+			add_table_entry(
+				db_session,
+				Build_Parts,
+				block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+				part_name=part,
+				quantity=int(float(quantity)),
+				part_type=part_type,
+				part_lot=lot
+			)
+		
+		updates = {
+				"build_file_path": path[0],
+				"full_build_name": build_data.get("full-build-name-input", ""),
+				"full_build_initials": build_data.get("full-build-initials-input", ""),
+				"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
+			}
+		
+		update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
+		
+		return "", 200
+
+@file_bp.post("/cancel_build_file_save/")
+def cancel_build_file_save():
+	return "", 200
 
 @file_bp.post("/save_iv_file/")
 def save_iv_file():
