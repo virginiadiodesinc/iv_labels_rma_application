@@ -441,11 +441,25 @@ def save_iv_file():
 
 	block_build_full_sn = iv_data.get("iv-block-sn", "X") + iv_data.get("iv-block-revision", "A")
 
+	full_diode_info = "X"
+	full_circuit_info = "X"
+
+	parts = iv_data.getlist("part")
+	lots = iv_data.getlist("lot-select")
+
+	diode_name = parts[0]
+	diode_lot = lots[0]
+	full_diode_info = "" + diode_name + "_LOT" + diode_lot
+
+	circuit_name = parts[1]
+	circuit_lot = lots[1]
+	full_circuit_info = "" + circuit_name + "_LOT" + circuit_lot
+
 	info_dict = {
 		"build_name": iv_data.get("iv-build-name", "X"),
 		"build_sn": block_build_full_sn,
-		"diode": iv_data.get("iv-diode", "X"),
-		"circuit": iv_data.get("iv-circuit", "X"),
+		"diode": full_diode_info,
+		"circuit": full_circuit_info,
 		"assembly_no": iv_data.get("iv-assembly-number", "X"),
 		"polarity": iv_data.get("iv-polarity", ""),
 		"block_engraving": iv_data.get("iv-block-engraving", "X"),
@@ -504,8 +518,14 @@ def save_iv_file():
 		heat_file_name, heat_content_rows = write_heat_test_file(file_name, heat_current_list, heat_voltage_list, temperature_list,
 															formatted_date, formatted_time,
 															iv_data.get("n", ""), iv_data.get("is", ""))
-		print(heat_file_name)
-		for line in heat_content_rows:
-			print(line)
+		# print(heat_file_name)
+		# for line in heat_content_rows:
+		# 	print(line)
+		heat_file = os.path.join(config.heat_data_directory, heat_file_name)
+		with open(heat_file, "w") as heat_file:
+			for index, line in enumerate(heat_content_rows):
+				heat_file.write(line)
+				if index < len(heat_content_rows) - 1:
+					heat_file.write("\n")
 
 	return "IV file written", 204

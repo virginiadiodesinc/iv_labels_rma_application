@@ -39,7 +39,9 @@ def convert_iv_file(file):
 		if index == 0:
 			split_line = line.split()
 			iv_dict["build_name"] = split_line[0]
-			iv_dict["build_sn"] = split_line[1]
+			iv_dict["full_build_sn"] = split_line[1][1:]
+			iv_dict["build_sn"] = split_line[1][1:-1] if split_line[1][-1].isalpha() else split_line[1][1:]
+			iv_dict["build_revision"] = split_line[1][-1] if split_line[1][-1].isalpha() else ''
 			iv_dict["diode"] = split_line[2]
 			iv_dict["circuit"] = split_line[3].replace("Cir", "")
 			iv_dict["assembly_number"] = split_line[4].replace("A#", "")  # Remove "A#" if present
