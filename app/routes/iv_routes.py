@@ -163,7 +163,6 @@ def take_polarity_sweep():
 	except RuntimeError:
 		return render_template("partials/iv-page/no-keithley-connected-error.html")
 
-
 @iv_bp.get("/get_empty_plot")
 def get_empty_plot():
 	df = pd.DataFrame({
