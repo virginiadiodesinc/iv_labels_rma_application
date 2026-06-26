@@ -2,13 +2,27 @@
 	<div>
 		<label>
 			Note Type:
-			<select name="note_type">
-				<option value="GENERIC">General Note</option>
-				<option value="PCB DEVIATIONS">PCB Edits</option>
-				<option value="CURRENT_TEST">Current Test</option>
-				<option value="REWORK SUMMARY">Rework Summary</option>
-				<option value="INDIUM">Indium</option>
-				<option value="TEMPERATURE">Temperature</option>
+			<select 
+				onchange="sortNotesContainer()"
+				name="note_type">
+				<option value="GENERIC" {% if note and note['note_type'] == "GENERIC" %}
+						selected
+					{% endif %}>General Note</option>
+				<option value="PCB_DEVIATIONS" {% if note and note['note_type'] == "PCB_DEVIATIONS" %}
+						selected
+					{% endif %}>PCB Edits</option>
+				<option value="CURRENT_TEST" {% if note and note['note_type'] == "CURRENT_TEST" %}
+						selected
+					{% endif %}>Current Test</option>
+				<option value="REWORK_SUMMARY" {% if note and note['note_type'] == "REWORK_SUMMARY" %}
+						selected
+					{% endif %}>Rework Summary</option>
+				<option value="INDIUM" {% if note and note['note_type'] == "INDIUM" %}
+						selected
+					{% endif %}>Indium</option>
+				<option value="TEMPERATURE" {% if note and note['note_type'] == "TEMPERATURE" %}
+						selected
+					{% endif %}>Temperature</option>
 			</select>
 		</label>
 	</div>

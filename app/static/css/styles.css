@@ -112,7 +112,7 @@
 }
 
 
-.actual-bom-list > div:nth-child(even) {
+.actual-bom-list > div > div:nth-child(even) {
 	background-color: lightblue;
 }
 

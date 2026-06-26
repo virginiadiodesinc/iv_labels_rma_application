@@ -7,10 +7,14 @@
 </table>
 
 <div id="actual-bom-container" class="actual-bom-list" hx-swap-oob="true">
-	{% for part in parts %}
-		{% include "partials/build-page/part-row.html" %}
-	{% endfor %}
-	{% for note in notes %}
-		{% include "partials/build-page/note-row.html" %}
-	{% endfor %}
+	<div id="actual-parts-container">
+		{% for part in parts %}
+			{% include "partials/build-page/part-row.html" %}
+		{% endfor %}
+	</div>
+	<div id="actual-notes-container">
+		{% for note in notes %}
+			{% include "partials/build-page/note-row.html" %}
+		{% endfor %}
+	</div>
 </div>

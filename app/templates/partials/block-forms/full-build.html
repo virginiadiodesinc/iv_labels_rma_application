@@ -13,7 +13,7 @@
 		name="add-empty-row-button"
 		hx-swap-oob="true"
 		hx-get="/add_empty_part_row/"
-		hx-target="#actual-bom-container"
+		hx-target="#actual-parts-container"
 		hx-swap="beforeend"
 		>
 		Add Custom Part
@@ -24,7 +24,7 @@
 		name="add-empty-note-button"
 		hx-swap-oob="true"
 		hx-get="/add_empty_note_row/"
-		hx-target="#actual-bom-container"
+		hx-target="#actual-notes-container"
 		hx-swap="beforeend"
 		>
 		Add Note
@@ -62,11 +62,15 @@
 	</button>
 	
 	<div id="actual-bom-container" class="actual-bom-list">
-			{% for item in items %}
+		<div id="actual-parts-container">
+			{% for part in parts %}
 				{% include "partials/build-page/part-row.html" %}
 			{% endfor %}
+		</div>
+		<div id="actual-notes-container">
 			{% for note in notes %}
 				{% include "partials/build-page/note-row.html" %}
 			{% endfor %}
+		</div>
 	</div>
 </form>

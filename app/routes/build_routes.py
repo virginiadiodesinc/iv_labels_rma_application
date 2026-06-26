@@ -24,7 +24,7 @@ def clear_build_parts():
 
 	@return clear-build-parts-response Return value of type (template partial)
 	"""
-	return render_template("partials/block-forms/clear-build-parts-response.html", items=[], notes=[])
+	return render_template("partials/block-forms/clear-build-parts-response.html", parts=[], notes=[])
 
 @build_bp.get("/add_empty_part_row/")
 def add_empty_part_row():

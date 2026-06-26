@@ -3,7 +3,8 @@
 		<label>
 			Part Type:
 			<select 
-					name="part_type">
+				onchange="sortPartsContainer()" 
+				name="part_type">
 				<option value="N/A" {% if part and part['part_type'] == "N/A" %}
 						selected
 						{% elif item and item.part_type == "N/A" %}
@@ -11,37 +12,23 @@
 					{% endif %}>N/A</option>
 				<option value="MISC" {% if part and part['part_type'] == "MISC" %}
 						selected
-						{% elif item and item.part_type == "MISC" %}
-						selected
 					{% endif %}>MISC</option>
 				<option value="DIODE" {% if part and part['part_type'] == "DIODE" %}
-						selected
-						{% elif item and item.part_type == "DIODE" %}
 						selected
 					{% endif %}>DIODE</option>
 				<option value="PCB" {% if part and part['part_type'] == "PCB" %}
 						selected
-						{% elif item and item.part_type == "PCB" %}
-						selected
 					{% endif %}>PCB</option>
 				<option value="CONNECTOR" {% if part and part['part_type'] == "CONNECTOR" %}
-						selected
-						{% elif item and item.part_type == "CONNECTOR" %}
 						selected
 					{% endif %}>CONNECTOR</option>
 				<option value="CIRCUIT" {% if part and part['part_type'] == "CIRCUIT" %}
 						selected
-						{% elif item and item.part_type == "CIRCUIT" %}
-						selected
 					{% endif %}>CIRCUIT</option>
 				<option value="MMIC" {% if part and part['part_type'] == "MMIC" %}
 						selected
-						{% elif item and item.part_type == "MMIC" %}
-						selected
 					{% endif %}>MMIC</option>
 				<option value="FILTER" {% if part and part['part_type'] == "FILTER" %}
-						selected
-						{% elif item and item.part_type == "FILTER" %}
 						selected
 					{% endif %}>FILTER</option>
 			</select>
