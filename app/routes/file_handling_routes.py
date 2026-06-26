@@ -1,6 +1,7 @@
 import os
 import re
 from flask import Blueprint, render_template, request
+from app.db import JB2_queries as jb2
 from app.db.queries import *
 from app.services import build_file_converter as build_converter, block_file_converter as block_converter, iv_file_converter as iv_converter
 import plotly.express as px
@@ -355,9 +356,215 @@ def save_block_file():
 	#Future response goes here if data inputs don't pass sanitization check
 	return "Block file written", 204
 
-@file_bp.post("/save_build_file/")
-def save_build_file():
-	"""Saves the data from the relevant input fields to a (LabView Style) build file 
+@file_bp.post("/attempt_save_build_file/")
+def attempt_save_build_file():
+	"""
+	Checks the existing list of parts on the Full Build Info form and compares it to the parts on the standard BOM.
+
+	If the parts and quantities don't match, display a dialog box prompting the user to confirm if to save or to cancel.
+	"""
+	build_data = request.form
+
+	parts = build_data.getlist("part")
+	quantities = build_data.getlist("quantity")
+
+	user_parts = list(zip(parts, quantities))
+
+	BOM_for = build_data.get("full-build-name-input", "")
+	parts = jb2.get_BOM(BOM_for)
+	sub_parts = []
+
+	for part in parts:
+		if part["part_type"] == "COMPONENT":
+			parts.remove(part)
+			sub_part = {
+				"name": part["part_name"],
+				"sub_parts": jb2.get_BOM(part["part_name"])
+			}
+			sub_parts.append(sub_part)
+		if part["part_type"] == "BLOCK":
+			parts.remove(part)
+
+	for sub_part_entry in sub_parts:
+		for sub_part in sub_part_entry["sub_parts"]:
+			if sub_part["part_type"] == "BLOCK":
+				sub_part_entry["sub_parts"].remove(sub_part)
+
+	standard_BOM = []
+
+	for entry in parts:
+		standard_BOM.append((entry['part_name'], int(float(entry['part_quantity']))))
+
+	for entry in sub_parts:
+		for subpart in entry['sub_parts']:
+			standard_BOM.append((subpart['part_name'], int(float(subpart['part_quantity']))))
+
+	user_parts_names_set = set()
+	for entry in user_parts:
+		user_parts_names_set.add(entry[0])
+	standard_BOM_names_set = set()
+	for entry in standard_BOM:
+		standard_BOM_names_set.add(entry[0])
+
+	nonstandard_part_names_set = user_parts_names_set - standard_BOM_names_set #parts the user added that are not on the standard BOM
+	missing_parts_names_set = standard_BOM_names_set - user_parts_names_set
+	mismatched_quantities_list = []
+
+	for user_part in user_parts:
+		for standard in standard_BOM:
+			if user_part[0] == standard[0] and int(float(user_part[1])) != standard[1]: #if part names match but BOM quantity does not match that on Full Build Info form
+				mismatched_quantities_list.append((user_part[0], int(float(user_part[1])), standard[1])) #name of part, user quantity, BOM quantity for every instance on the Full Build Info form
+
+	for name in nonstandard_part_names_set:
+		mismatched_quantities_list.append((name, int(float(user_part[1])), 0)) #adds all parts listed by user but not on BOM
+
+	for name in missing_parts_names_set:
+		for standard in standard_BOM:
+			if standard[0] == name:
+				mismatched_quantities_list.append((name, 0, standard[1])) #adds all parts on BOM not listed by user
+
+	if (not nonstandard_part_names_set) and mismatched_quantities_list == []: #if no mismatches are found save to build file and DB
+		part_types = build_data.getlist("part_type")
+		parts = build_data.getlist("part")
+		lots = build_data.getlist("lot-select")
+		custom_lots = build_data.getlist("custom-lot-input")
+		quantities = build_data.getlist("quantity")
+		notes = build_data.getlist("note")
+		note_types = build_data.getlist("note_type")
+
+		custom_index = 0
+		for index, lot in enumerate(lots):
+			if lot == "Other":
+				lots[index] = custom_lots[custom_index]
+				custom_index += 1
+
+		all_part_information = list(zip(parts, part_types, lots, quantities))
+		all_note_information = list(zip(notes, note_types))
+
+		block_suffix_regex = ""
+		block_suffix_pattern = r"[^W][R]([\d])"
+		
+		regex_block_suffix_match = re.search(block_suffix_pattern, build_data.get("block-engraving-input", ""))
+		if regex_block_suffix_match:
+			block_suffix_regex = "_R" + regex_block_suffix_match.group(1)
+
+		block_rev = build_data.get("block-revision-input", "") if build_data.get("block-revision-input", "") != "A" else ""
+		block_suffix = "_R" + build_data.get("block-engraving-input", "")[-1] if build_data.get("block-engraving-input", "") else ""
+		build_name = build_data.get("full-build-name-input", "") + block_suffix_regex
+
+		block_dict = {
+			"block_engraving": build_data.get("block-engraving-input", ""),
+			"block_sn": build_data.get("block-serial-number-input", "") + block_rev,
+			"inspection_date": iso_date_to_labview(build_data.get("inspection-date-input", "")),
+			"inspection_initials": build_data.get("inspection-initials-input", ""),
+			"PB1_name": build_data.get("pb1-build-name-input", ""),
+			"PB1_date": iso_date_to_labview(build_data.get("pb1-date-input", "")),
+			"PB1_initials": build_data.get("pb1-initials-input", ""),
+			"PB2_name": build_data.get("pb2-build-name-input", ""),
+			"PB2_date": iso_date_to_labview(build_data.get("pb2-date-input", "")),
+			"PB2_initials": build_data.get("pb2-initials-input", ""),
+			"PB2_passfail": build_data.get("pb2-pass-fail-input", ""),
+			"PB2_bond_wire_pads": build_data.get("pb2-bond-pads-count-input", ""),
+			"PB2_components": build_data.get("pb2-components-count-input", ""),
+			"PB2_inspection": build_data.get("pb2-inspector-initials-input", "")
+		}
+
+		all_diode_information = [part for part in all_part_information if part[1] == "DIODE"]
+		all_circuit_information = [part for part in all_part_information if part[1] == "CIRCUIT"]
+		all_filter_information = [part for part in all_part_information if part[1] == "FILTER"]
+		pcb_information = [part for part in all_part_information if part[1] == "PCB"]
+		MMIC_information = [part for part in all_part_information if part[1] == "MMIC"]
+
+		build_dict = {}
+
+		build_dict["diode1"] = all_diode_information[0][0] + "_LOT" + all_diode_information[0][2] if len(all_diode_information) > 0 else ""
+		build_dict["qty_chips1"] = all_diode_information[0][3] if len(all_diode_information) > 0 else ""
+		build_dict["assembly_initials1"] = build_data.get("full-build-initials-input", "")
+		build_dict["assembly_date1"] = iso_date_to_labview(build_data.get("full-build-date-input", ""))
+		build_dict["circuit1"] = all_circuit_information[0][0] + "_LOT" + all_circuit_information[0][2] if len(all_circuit_information) > 0 else ""
+		build_dict["filter1"] = all_filter_information[0][0] + "_LOT" + all_filter_information[0][2] if len(all_filter_information) > 0 else ""
+
+		build_dict["diode2"] = all_diode_information[1][0] + "_LOT" + all_diode_information[1][2] if len(all_diode_information) > 1 else ""
+		build_dict["qty_chips2"] = all_diode_information[1][3] if len(all_diode_information) > 1 else ""
+		build_dict["assembly_initials2"] = build_data.get("full-build-initials-input", "")
+		build_dict["assembly_date2"] = iso_date_to_labview(build_data.get("full-build-date-input", ""))
+		build_dict["circuit2"] = all_circuit_information[1][0] + "_LOT" + all_circuit_information[1][2] if len(all_circuit_information) > 1 else ""
+		build_dict["filter2"] = all_filter_information[1][0] + "_LOT" + all_filter_information[1][2] if len(all_filter_information) > 1 else ""
+
+		build_dict["MMIC"] = MMIC_information[0][0] if len(MMIC_information) > 0 else ""
+		build_dict["MMIC_lot"] = MMIC_information[0][2] if len(MMIC_information) > 0 else ""
+		build_dict["PCB"] = pcb_information[0][0] + "_LOT" + pcb_information[0][2] if len(pcb_information) > 0 else ""
+		
+		indium_note = [note for note in all_note_information if note[1] == "INDIUM"]
+		vbr_note = [note for note in all_note_information if note[1] == "VBR"]
+		other_notes = [note for note in all_note_information if note[1] != "INDIUM" and note[1] != "VBR"]
+
+		build_dict["indium"] = indium_note[0][0] if len(indium_note) > 0 else ""
+		build_dict["Vbr"] = vbr_note[0][0] if len(vbr_note) > 0 else ""
+
+		build_dict["notes"] = ""
+		for i in range(1, 7):
+			build_dict[f"notes{i}"] = ""
+		
+		for index, note in enumerate(other_notes):
+			if (index == 0):
+				build_dict["notes"] = note[0]
+			else:
+				if (index <= 6):
+					build_dict[f"notes{index}"] = note[0]
+
+		# PARTS : diode1, qty_chips1, assembly_initials1, assembly_date1, circuit1 MMIC, MMIC_lot, PCB, filter1, diode2, qty_chips2,
+		# assembly_initials2, assembly_date2, circuit2 filter2
+		# NOTES: notes, indium, Vbr, notes1, notes2, notes3, notes4, notes5, notes6
+		file_name, content_rows = write_build_file(block_dict, build_dict, build_name)
+
+		path = webview.windows[0].create_file_dialog(
+			webview.FileDialog.SAVE,
+			save_filename=file_name,
+			directory=build_file_directory
+			)
+		
+		if path is None: #Someone closed out the save dialog box without actually saving the file
+			return "", 200
+		else:
+			if path and path[0] and path[0].endswith(".txt"):
+				with open(path[0], "w") as file:
+					for index, line in enumerate(content_rows):
+						file.write(line)
+						if index < len(content_rows) - 1:
+							file.write("\n")
+
+			db_session.execute(
+				delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
+			)
+
+			for part, part_type, lot, quantity in all_part_information:
+				add_table_entry(
+					db_session,
+					Build_Parts,
+					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+					part_name=part,
+					quantity=int(float(quantity)),
+					part_type=part_type,
+					part_lot=lot
+				)
+			print("adding build info to db")
+			updates = {
+					"build_file_path": path[0],
+					"full_build_name": BOM_for,
+					"full_build_initials": build_data.get("full-build-initials-input", ""),
+					"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
+				}
+			update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
+			return "Build file written", 204
+	else:
+		print("Mismatched quantities found")
+		return render_template("partials/build-page/confirm-build-file-save.html", differences=mismatched_quantities_list)
+
+@file_bp.post("/confirm_build_file_save/")
+def confirm_build_file_save():
+	"""
+	Saves the data from the relevant input fields to a (LabView Style) build file 
 	
 	This function saves the data from the block input fields (inspection, PB1, PB2) 
 	as well as the build input fields (part/note list) 
@@ -368,6 +575,7 @@ def save_build_file():
 	@return write_build_file/update_table_entry Return value of type (2 callables)
 	"""
 	build_data = request.form
+
 	part_types = build_data.getlist("part_type")
 	parts = build_data.getlist("part")
 	lots = build_data.getlist("lot-select")
@@ -467,32 +675,47 @@ def save_build_file():
 		save_filename=file_name,
 		directory=build_file_directory
 		)
-	if path and path[0] and path[0].endswith(".txt"):
-		with open(path[0], "w") as file:
-			for index, line in enumerate(content_rows):
-				file.write(line)
-				if index < len(content_rows) - 1:
-					file.write("\n")
-	for part, part_type, lot, quantity in all_part_information:
-		add_table_entry(
-			db_session,
-			Build_Parts,
-			block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
-			part_name=part,
-			quantity=int(float(quantity)),
-			part_type=part_type,
-			part_lot=lot
-		)
-	print("adding build info to db")
-	updates = {
-			"build_file_path": path[0],
-			"full_build_name": build_name,
-			"full_build_initials": build_data.get("full-build-initials-input", ""),
-			"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
-		}
-	update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
+	
+	if path is None: #Someone closed out the save dialog box without actually saving the file
+		return "", 200
 
-	return "Build file written", 204
+	else:
+		if path and path[0] and path[0].endswith(".txt"):
+			with open(path[0], "w") as file:
+				for index, line in enumerate(content_rows):
+					file.write(line)
+					if index < len(content_rows) - 1:
+						file.write("\n")
+
+		db_session.execute(
+			delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
+		)
+
+		for part, part_type, lot, quantity in all_part_information:
+			add_table_entry(
+				db_session,
+				Build_Parts,
+				block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+				part_name=part,
+				quantity=int(float(quantity)),
+				part_type=part_type,
+				part_lot=lot
+			)
+		
+		updates = {
+				"build_file_path": path[0],
+				"full_build_name": build_data.get("full-build-name-input", ""),
+				"full_build_initials": build_data.get("full-build-initials-input", ""),
+				"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
+			}
+		
+		update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
+		
+		return "", 200
+
+@file_bp.post("/cancel_build_file_save/")
+def cancel_build_file_save():
+	return "", 200
 
 @file_bp.post("/save_iv_file/")
 def save_iv_file():
@@ -512,11 +735,25 @@ def save_iv_file():
 
 	block_build_full_sn = iv_data.get("iv-block-sn", "X") + iv_data.get("iv-block-revision", "A")
 
+	full_diode_info = "X"
+	full_circuit_info = "X"
+
+	parts = iv_data.getlist("part")
+	lots = iv_data.getlist("lot-select")
+
+	diode_name = parts[0]
+	diode_lot = lots[0]
+	full_diode_info = "" + diode_name + "_LOT" + diode_lot
+
+	circuit_name = parts[1]
+	circuit_lot = lots[1]
+	full_circuit_info = "" + circuit_name + "_LOT" + circuit_lot
+
 	info_dict = {
 		"build_name": iv_data.get("iv-build-name", "X"),
 		"build_sn": block_build_full_sn,
-		"diode": iv_data.get("iv-diode", "X"),
-		"circuit": iv_data.get("iv-circuit", "X"),
+		"diode": full_diode_info,
+		"circuit": full_circuit_info,
 		"assembly_no": iv_data.get("iv-assembly-number", "X"),
 		"polarity": iv_data.get("iv-polarity", ""),
 		"block_engraving": iv_data.get("iv-block-engraving", "X"),
@@ -546,7 +783,17 @@ def save_iv_file():
 	Vdown_list = iv_data.get("iv-voltage-down", "").split(",")
 	I_source_list = iv_data.get("iv-source-values", "").split(",")
 
+	heat_current_list = iv_data.get("heat-current-list", "").split(",")
+	heat_voltage_list = iv_data.get("heat-voltage-list", "").split(",")
+	temperature_list = iv_data.get("temperature-list", "").split(",")
+	heat_test_taken = all([heat_current_list, heat_voltage_list, temperature_list])
+
 	file_name, content_rows = write_IV_file(info_dict, iv_dict, Vup_list, Vdown_list, I_source_list)
+
+	if heat_test_taken:
+		if ", w_heat" not in file_name:
+			file_name = file_name.replace(".iv", ", w_heat.iv")
+
 
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.SAVE,
