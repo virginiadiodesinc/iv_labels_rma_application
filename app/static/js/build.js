@@ -1,5 +1,6 @@
 const PART_TYPE_ORDER = ["MMIC", "DIODE", "CIRCUIT", "PCB", "FILTER", "N/A", "MISC", "CONNECTOR"];
 const NOTE_TYPE_ORDER = ["REWORK_SUMMARY", "CURRENT_TEST", "PCB_DEVIATIONS", "INDIUM", "TEMPERATURE", "GENERIC"];
+const ILLEGAL_FILENAME_CHARACTERS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
 
 function sortPartsContainer() {
     const container = document.getElementById("actual-parts-container");
@@ -25,4 +26,15 @@ function sortNotesContainer() {
         return indexA - indexB;
     });
     rows.forEach(row => container.appendChild(row));
+}
+
+
+function sanitizeInput(input, restrictedChars, upperCase) {
+    const escaped = restrictedChars.map(c => c.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
+    const stripPattern = new RegExp(`[${escaped.join('')}]`, 'g');
+    let val = input.value.replace(stripPattern, '');
+    if (upperCase) {
+        val = val.toUpperCase();
+    }
+    input.value = val;
 }

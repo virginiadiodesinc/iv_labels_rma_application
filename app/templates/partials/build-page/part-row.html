@@ -5,11 +5,11 @@
 			<select 
 				onchange="sortPartsContainer()" 
 				name="part_type">
-				<option value="N/A" {% if part and part['part_type'] == "N/A" %}
+				<option value="NA" {% if part and part['part_type'] == "NA" %}
 						selected
-						{% elif item and item.part_type == "N/A" %}
+						{% elif item and item.part_type == "NA" %}
 						selected
-					{% endif %}>N/A</option>
+					{% endif %}>NA</option>
 				<option value="MISC" {% if part and part['part_type'] == "MISC" %}
 						selected
 					{% endif %}>MISC</option>
@@ -51,7 +51,7 @@
 					hx-trigger="revealed, keyup changed delay:300ms"
 					hx-target="next .lot-container"
 					hx-include="this"
-					oninput="this.value = this.value.toUpperCase();">
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 		</label>
 	</div>
 	<div class="lot-container">
@@ -82,7 +82,7 @@
 			<select
 			name="part-tag"
 			class="part-tag">
-				<option>N/A</option>
+				<option>NA</option>
 				<option>1</option>
 				<option>2</option>
 				<option>3</option>

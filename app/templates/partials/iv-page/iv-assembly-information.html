@@ -2,28 +2,28 @@
 	<div id="iv-build-info-container" class="iv-build-info-container">
 		<label> Block Engraving
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-engraving"
 					value="{{iv_data.block_name if iv_data and iv_data.block_name else ''}}"
 					>
 		</label>
 		<label> Block Serial Number
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-sn"
 					value="{{iv_data.block_sn if iv_data and iv_data.block_sn else ''}}"
 					size="7">
 		</label>
 		<label> Build Name
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-build-name"
 					value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
 					>
 		</label>
 		<label> Revision Letter
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-revision"
 					value="{{iv_data.block_revision if iv_data and iv_data.block_revision else ''}}"
 					size="2">
@@ -41,7 +41,7 @@
 							hx-trigger="revealed, keyup changed delay:300ms"
 							hx-target="next .lot-container"
 							hx-include="this"
-							oninput="this.value = this.value.toUpperCase();">
+							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 			</label>
 			<div class="lot-container">
 				{% include "partials/build-page/lot-input.html" %}
@@ -58,7 +58,7 @@
 							hx-trigger="revealed, keyup changed delay:300ms"
 							hx-target="next .lot-container"
 							hx-include="this"
-							oninput="this.value = this.value.toUpperCase();">
+							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 			</label>
 			<div class="lot-container">
 				{% include "partials/build-page/lot-input.html" %}
@@ -66,7 +66,7 @@
 		</div>
 		<label> Assembly #
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-assembly-number"
 					value="{{iv_data.assembly_number if iv_data and iv_data.assembly_number else ''}}"
 					>
@@ -83,7 +83,7 @@
 			<select
 			name="part-tag"
 			class="part-tag">
-				<option>N/A</option>
+				<option>NA</option>
 				<option>1</option>
 				<option>2</option>
 				<option>3</option>

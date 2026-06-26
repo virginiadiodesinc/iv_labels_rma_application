@@ -14,7 +14,7 @@
 					hx-target="#search-results"
 					hx-trigger="keyup changed delay:500ms"
 					list="search-results"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 				>
 			</td>
 		</tr>

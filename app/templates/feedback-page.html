@@ -9,7 +9,7 @@
 
 	<div class="feedback-form-row">
 		<label>User Initials:</label>
-		<input type="text" name="User_Initials" oninput="this.value = this.value.toUpperCase()" required minlength="3" maxlength="3">
+		<input type="text" name="User_Initials" oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)" required minlength="3" maxlength="3">
 	</div>
 
 	<div class="feedback-form-row">
