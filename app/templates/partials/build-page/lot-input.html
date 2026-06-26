@@ -16,13 +16,13 @@
 		hx-swap="innerHTML"
 		hx-vals='js:{ "lot-select": this.value }'>
 			<option value="Unknown">Unknown</option>
-			<option value="N/A">N/A</option>
+			<option value="NA">NA</option>
 			{% for lot in lot_list %}
 				<option value="{{lot}}"
 					{{
 						'selected'
 						if current_lot
-						and current_lot not in ['Unknown', 'N/A']
+						and current_lot not in ['Unknown', 'NA']
 						and current_lot not in lot_list
 						else ''
 					}}>
