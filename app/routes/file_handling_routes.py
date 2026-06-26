@@ -562,9 +562,30 @@ def save_iv_file():
 		
 		iv_file_directory = os.path.dirname(path[0])
 
+	if (iv_data.getlist("custom-lot-input") != []) and len(iv_data.getlist("custom-lot-input")) == 2:
+		print("Both Custom")
+		diode_lot = iv_data.getlist("custom-lot-input")[0]
+		circuit_lot = iv_data.getlist("custom-lot-input")[1]
+	elif (iv_data.getlist("custom-lot-input") != []) and (iv_data.getlist("lot-select")[0] == "Other") and (iv_data.getlist("lot-select")[1] != "Other"):
+		diode_lot = iv_data.getlist("custom-lot-input")[0]
+		circuit_lot = iv_data.getlist("lot-select")[1]
+	elif(iv_data.getlist("custom-lot-input") != []) and (iv_data.getlist("lot-select")[1] == "Other") and (iv_data.getlist("lot-select")[0] != "Other"):
+		print("Circuit Custom")
+		diode_lot = iv_data.getlist("lot-select")[0]
+		circuit_lot = iv_data.getlist("custom-lot-input")[0]
+	else:
+		print("Both Standard")
+		diode_lot = iv_data.getlist("lot-select")[0]
+		circuit_lot = iv_data.getlist("lot-select")[1]
+
 	iv_info_dict = {
 		"build_id": iv_data.get("iv-block-engraving", "")+" "+iv_data.get("iv-block-sn", "")+" "+iv_data.get("iv-block-revision", "A"),
-		"subassembly_tag": iv_data.get("part-tag", ""),
+		"diode": iv_data.get("iv-diode-name", "X"),
+		"diode_lot": diode_lot,
+		"circuit": iv_data.get("iv-circuit-name", "X"),
+		"circuit_lot": circuit_lot,
+		"assembly_no": iv_data.get("iv-assembly-number", "X"),
+		"subassembly_tag": iv_data.get("part-tag", "X"),
 		"iv_date": current_datetime.date(),
 		"points_per_decade": int(iv_dict["Points/Decade"]),
 		"ideality": float(iv_dict["n (ideality)"]),
@@ -601,6 +622,4 @@ def save_iv_file():
 		**iv_points_dict
 	)
 	
-
-
 	return "IV file written", 204
