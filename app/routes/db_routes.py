@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template
 from app.services.process_and_sanitize_entry import *
 from app.services.date_converter import string_to_python_date
-
+from pathlib import Path
 
 db_bp = Blueprint("db", __name__)
 
@@ -133,3 +133,27 @@ def save_pb2_info():
 	else:
 		print("Invalid block information entered, no block information has been added.") #Remove this when sanitizing functionality is added.
 		return
+	
+@db_bp.post("/open_iv_from_db/")
+def open_iv_from_db():
+	build_info = request.form
+
+	build_id_query = build_info.get("iv-block-engraving")+" "+build_info.get("iv-block-sn")+" "+build_info.get("iv-block-revision", "A")
+
+	ivs = get_table_entries(db_session,
+							IV_Info,
+							build_id=build_id_query)
+	
+	file_paths = [Path(iv.iv_file_path).stem for iv in ivs]
+
+	return render_template("partials/iv-page/select-iv-from-db.html", file_paths=file_paths)
+
+@db_bp.post("/populate_iv_from_db/")
+def populate_iv_from_db():
+	selected_path = request.form.get("selected_iv_path")
+
+	return render_template("partials/iv-page/iv-file-population-response.html", iv_data=iv_data, iv_curve=iv_curve)
+	
+@db_bp.post("/cancel_iv_selection/")
+def cancel_iv_selection():
+    return ""

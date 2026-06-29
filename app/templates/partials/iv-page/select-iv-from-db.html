@@ -1,0 +1,49 @@
+<div class="modal-overlay">
+    <div class="modal">
+
+        <h3>Select IV File</h3>
+
+        <form id="iv-selection-form">
+
+            <div class="scroll-box">
+
+                {% for path in file_paths %}
+                <label class="path-option">
+                    <input
+                        type="radio"
+                        name="selected_iv_path"
+                        value="{{ path }}"
+                        {% if loop.first %}checked{% endif %}
+                    >
+                    {{ path }}
+                </label>
+                <br>
+                {% endfor %}
+
+            </div>
+
+            <div class="button-row">
+
+                <button
+                    type="button"
+                    hx-post="/populate_iv_from_db/"
+                    hx-include="#iv-selection-form"
+                    hx-target="#iv-basic-controls-form,#iv-advanced-controls-form,#iv-assembly-information-form,#iv-plot"
+                    hx-swap="innerHTML">
+                    Confirm
+                </button>
+
+                <button
+                    type="button"
+                    hx-post="/cancel_iv_selection/"
+                    hx-target="#open-iv-popup"
+                    hx-swap="innerHTML">
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>

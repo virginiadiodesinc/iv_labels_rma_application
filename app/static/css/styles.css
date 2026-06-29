@@ -316,3 +316,22 @@
 	max-width: 250px;
 	width: 80%
 }
+
+.scroll-box {
+    border: 1px solid #ccc;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
+}
+
+.path-option {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+}
