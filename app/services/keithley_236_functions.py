@@ -23,6 +23,8 @@ class Fake_SMU():
 		return kwargs
 	def takeIV(self):
 		raise RuntimeError("No Keithley connected")
+	def takePolaritySweep(self):
+		raise RuntimeError("No Keithley connected")
 
 class SMU_K236():
 

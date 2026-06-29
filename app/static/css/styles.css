@@ -2,7 +2,7 @@
 
 *{
 	font-family: 'Roboto', sans-serif;
-	font-size: x-small;
+	font-size: small;
 }
 
 .not-implemented-yet {
@@ -155,9 +155,14 @@
 
 .iv-info {
 	display: flex;
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
 	flex-direction: row;
 	justify-content: center;
+}
+
+.line-break {
+	flex-basis: 100%;
+	height: 0;
 }
 
 .iv-curve-information table {
@@ -185,7 +190,7 @@
 
 .combined-page {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 4fr 3fr;
 }
 
 .combined-page .build-page-container {
@@ -295,4 +300,41 @@
 .iv-circuit-information-line {
 	display: flex;
 	gap: 10px;
+}
+
+.hidden-inputs {
+	border: none !important;
+}
+
+.important-button {
+	background-color: green;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: large;
+	cursor: pointer;
+	border-radius: 8px;
+}
+
+.important-button:disabled {
+	background-color: lightgreen;
+	color: white
+}
+
+button {
+	background-color: lightskyblue;
+	color: black;
+	border: none;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: small;
+	cursor: pointer;
+	border-radius: 8px;
+}
+
+button:disabled {
+	color: lightblue
 }

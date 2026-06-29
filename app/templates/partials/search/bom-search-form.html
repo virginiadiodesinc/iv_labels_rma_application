@@ -15,6 +15,7 @@
 					hx-trigger="keyup changed delay:500ms"
 					list="search-results"
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+					value="{{ populated_build_name if populated_build_name else '' }}"
 				>
 			</td>
 		</tr>

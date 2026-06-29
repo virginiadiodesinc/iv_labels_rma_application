@@ -70,26 +70,6 @@
 		</tr>
 	</table>
 
-	<table class="reverse-breakdown-table">
-		<tr>
-			<th>Reverse Breakdown</th>
-		</tr>
-		<tr>
-			<td>Set Current</td>
-			<td>{{iv_data.reverse_current|float|round(2, 'floor') if iv_data and iv_data.reverse_current is not none else ''}}</td>
-			<td>
-				<input type="hidden" name="reverse-current" value="{{iv_data.reverse_current if iv_data and iv_data.reverse_current is not none else ''}}">
-			</td>
-		</tr>
-		<tr>
-			<td>Reverse Voltage</td>
-			<td>{{iv_data.reverse_voltage|float|round(2, 'floor') if iv_data and iv_data.reverse_voltage is not none else ''}}</td>
-			<td>
-				<input type="hidden" name="reverse-voltage" value="{{iv_data.reverse_voltage if iv_data and iv_data.reverse_voltage is not none else ''}}">
-			</td>
-		</tr>
-	</table>
-
 	<table class="series-resistance-table">
 		<tr>
 			<td>Rs 4pt</td>
@@ -113,6 +93,28 @@
 			<td>{{iv_data.rs_3pt|float|round(2, 'floor') if iv_data and iv_data.rs_3pt is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="rs-3pt" value="{{iv_data.rs_3pt if iv_data and iv_data.rs_3pt is not none else ''}}">
+			</td>
+		</tr>
+	</table>
+
+	<div class="line-break"></div>
+
+	<table class="reverse-breakdown-table">
+		<tr>
+			<th>Reverse Breakdown</th>
+		</tr>
+		<tr>
+			<td>Set Current</td>
+			<td>{{iv_data.reverse_current|float|round(2, 'floor') if iv_data and iv_data.reverse_current is not none else ''}}</td>
+			<td>
+				<input type="hidden" name="reverse-current" value="{{iv_data.reverse_current if iv_data and iv_data.reverse_current is not none else ''}}">
+			</td>
+		</tr>
+		<tr>
+			<td>Reverse Voltage</td>
+			<td>{{iv_data.reverse_voltage|float|round(2, 'floor') if iv_data and iv_data.reverse_voltage is not none else ''}}</td>
+			<td>
+				<input type="hidden" name="reverse-voltage" value="{{iv_data.reverse_voltage if iv_data and iv_data.reverse_voltage is not none else ''}}">
 			</td>
 		</tr>
 	</table>
@@ -202,7 +204,7 @@
 			<td>Vknee=V@1uA; dV=DeltaV2</td>
 		</tr>
 	</table>
-	<table>
+	<table class="hidden-inputs">
 		<tr>
 			<input type="hidden" name="iv-polarity" value="{{iv_data.polarity if iv_data and iv_data.polarity is not none else ''}}">
 			<input type="hidden" name="iv-points-per-decade" value="{{iv_data.points_per_decade if iv_data and iv_data.points_per_decade is not none else ''}}">

@@ -112,7 +112,7 @@ def populate_info_from_build_file():
 		NOTE_TYPE_ORDER = ["REWORK_SUMMARY", "CURRENT_TEST", "PCB_DEVIATIONS", "INDIUM", "TEMPERATURE", "GENERIC"]
 		note_rows.sort(key=lambda p: NOTE_TYPE_ORDER.index(p["note_type"]) if p["note_type"] in NOTE_TYPE_ORDER else 99)
 
-		return render_template("partials/block-forms/build-file-population-response.html", block=build_dict, parts=part_rows, notes=note_rows)
+		return render_template("partials/block-forms/build-file-population-response.html", block=build_dict, parts=part_rows, notes=note_rows, populated_build_name=build_dict["full_build_name"])
 
 	return "No file uploaded", 204
 

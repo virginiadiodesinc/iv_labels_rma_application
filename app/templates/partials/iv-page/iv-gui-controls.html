@@ -143,23 +143,38 @@
 	</details>
 
 	<div id="iv-control-buttons">
-		<button id="run-iv-button"
+		<button class="important-button"
+				id="run-iv-button"
 				hx-post="/take_iv/"
 				hx-target="#iv-plot"
 				hx-swap="innerHTML"
 				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
-				hx-disabled-elt="#iv-control-buttons button">
+				hx-disabled-elt="#iv-control-buttons button"
+				hx-vals='{"heat_test":"false"}'>
 				Run IV
 		</button>
-		<button 
-			id="run-iv-with-heat-test-button">
-			Run IV with Heat Test
+		<button class="important-button"
+				id="run-iv-button"
+				hx-post="/take_iv/"
+				hx-target="#iv-plot"
+				hx-swap="innerHTML"
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
+				hx-disabled-elt="#iv-control-buttons button"
+				hx-vals='{"heat_test":"true"}'>
+				Run IV with Heat Test
 		</button>
-		<button id="save-iv-button"
+		<button class="important-button"
+				id="save-iv-button"
 				hx-post="/save_iv_file/"
 				hx-include="#iv-info, #iv-curve-points, #iv-assembly-information"
 				hx-swap="none">
 				Save IV File
+		</button>
+		<button id="polarity-test-button"
+				hx-post="/take_polarity_sweep/"
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
+				hx-swap="innerHTML">
+				Run Polarity Test
 		</button>
 	</div>
 </div>
