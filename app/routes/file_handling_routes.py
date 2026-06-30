@@ -4,7 +4,7 @@ from app.db.queries import *
 from app.services import build_file_converter as build_converter, block_file_converter as block_converter, iv_file_converter as iv_converter
 import plotly.express as px
 import pandas as pd
-from app.services.write_MicroA_files import write_block_file, write_IV_file, write_build_file
+from app.services.write_MicroA_files import write_block_file, write_IV_file, write_build_file, write_heat_test_file
 from app.services import postprocess as pp
 from datetime import datetime
 import webview
@@ -499,13 +499,6 @@ def save_build_file():
 
 @file_bp.post("/save_iv_file/")
 def save_iv_file():
-	"""Saves the data from the relevant input fields to a (LabView Style) IV file 
-	
-	This function saves the data from the IV fields (special numbers, assembly info, curve numbers)  
-	to the LabView IV file in an appropriately chosen spot on the network.
-
-	@return write_iv_file Return value of type (callable)
-	"""
 	iv_data = request.form
 	global iv_file_directory
 
@@ -515,11 +508,25 @@ def save_iv_file():
 
 	block_build_full_sn = iv_data.get("iv-block-sn", "X") + iv_data.get("iv-block-revision", "A")
 
+	full_diode_info = "X"
+	full_circuit_info = "X"
+
+	parts = iv_data.getlist("part")
+	lots = iv_data.getlist("lot-select")
+
+	diode_name = parts[0]
+	diode_lot = lots[0]
+	full_diode_info = "" + diode_name + "_LOT" + diode_lot
+
+	circuit_name = parts[1]
+	circuit_lot = lots[1]
+	full_circuit_info = "" + circuit_name + "_LOT" + circuit_lot
+
 	info_dict = {
 		"build_name": iv_data.get("iv-build-name", "X"),
 		"build_sn": block_build_full_sn,
-		"diode": iv_data.get("iv-diode", "X"),
-		"circuit": iv_data.get("iv-circuit", "X"),
+		"diode": full_diode_info,
+		"circuit": full_circuit_info,
 		"assembly_no": iv_data.get("iv-assembly-number", "X"),
 		"polarity": iv_data.get("iv-polarity", ""),
 		"block_engraving": iv_data.get("iv-block-engraving", "X"),
@@ -549,7 +556,16 @@ def save_iv_file():
 	Vdown_list = iv_data.get("iv-voltage-down", "").split(",")
 	I_source_list = iv_data.get("iv-source-values", "").split(",")
 
+	heat_current_list = iv_data.get("heat-current-list", "").split(",")
+	heat_voltage_list = iv_data.get("heat-voltage-list", "").split(",")
+	temperature_list = iv_data.get("temperature-list", "").split(",")
+	heat_test_taken = all([heat_current_list, heat_voltage_list, temperature_list])
+
 	file_name, content_rows = write_IV_file(info_dict, iv_dict, Vup_list, Vdown_list, I_source_list)
+
+	if heat_test_taken:
+		if ", w_heat" not in file_name:
+			file_name = file_name.replace(".iv", ", w_heat.iv")
 
 	path = webview.windows[0].create_file_dialog(
 		webview.FileDialog.SAVE,
@@ -564,5 +580,17 @@ def save_iv_file():
 					file.write("\n")
 		
 		iv_file_directory = os.path.dirname(path[0])
+
+	if heat_test_taken:
+		heat_file_name, heat_content_rows = write_heat_test_file(file_name, heat_current_list, heat_voltage_list, temperature_list,
+															formatted_date, formatted_time,
+															iv_data.get("n", ""), iv_data.get("is", ""))
+		
+		heat_file = os.path.join(config.heat_data_directory, heat_file_name)
+		with open(heat_file, "w") as heat_file:
+			for index, line in enumerate(heat_content_rows):
+				heat_file.write(line)
+				if index < len(heat_content_rows) - 1:
+					heat_file.write("\n")
 
 	return "IV file written", 204

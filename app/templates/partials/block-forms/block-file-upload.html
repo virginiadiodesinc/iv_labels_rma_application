@@ -3,7 +3,7 @@
 		hx-post="/upload_block_file/"
 		hx-target="#block-file-upload-form"
 		hx-swap="innerHTML">
-		Upload Block File
+		Choose Block File
 	</button>
 	<text name="block-file-upload-text" id="block-file-upload-text">{{file_path if file_path else 'No file selected'}}</text>
 	<input type="hidden" name="block-file-path" id="block-file-path" value="{{file_path if file_path else ''}}">

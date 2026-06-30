@@ -14,6 +14,7 @@
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+	max-height: none;
 }
 
 .navbar {
@@ -51,9 +52,9 @@
 	order: 3;
 	background-color: #0099ff;
 	color: black;
+
 	text-align: center;
-	left: 0;
-	bottom: 0;
+	align-self: flex-end;
 
 	display: flex;
 	flex-direction: column;
@@ -61,9 +62,7 @@
 }
 
 .content {
-	padding-top: 15px;
-	padding-bottom: 15px;
-	flex-grow: 1;
+	flex-grow: 2;
 	flex: 1;
 	order: 2;
 	margin-top: 15px;
@@ -72,8 +71,10 @@
 
 .build-page-container {
 	display: grid;
-	grid-template-columns: repeat(13, 1fr);
-	grid-template-rows: 5% 95%;
+	grid-template-columns: repeat(3, 1fr) .25fr repeat(3, 1fr) .25fr repeat(7, 1fr) .25fr;
+	grid-template-rows: 5vh 1fr;
+	justify-content: start;
+	align-content: start;
 }
 
 .block-info-container {
@@ -84,15 +85,15 @@
 }
 
 .bom-container {
-	grid-column-start: 4;
-	grid-column-end: 7;
+	grid-column-start: 5;
+	grid-column-end: 8;
 	grid-row-start: 2;
 	grid-row-end: 3;
 }
 
 .full-build-container {
-	grid-column-start: 7;
-	grid-column-end: 14;
+	grid-column-start: 9;
+	grid-column-end: 16;
 	grid-row-start: 2;
 	grid-row-end: 3;
 }
@@ -101,14 +102,14 @@
 	grid-row-start: 1;
 	grid-row-end: 2;
 	grid-column-start: 1;
-	grid-column-end: 7;
+	grid-column-end: 8;
 }
 
 .build-file-upload-form {
 	grid-row-start: 1;
 	grid-row-end: 2;
-	grid-column-start: 7;
-	grid-column-end: 14;
+	grid-column-start: 9;
+	grid-column-end: 16;
 }
 
 
@@ -140,6 +141,8 @@
 .iv-page-container {
 	display: grid;
 	grid-template-rows: auto auto auto;
+	justify-content: start;
+	align-content: start;
 }
 
 .iv-gui-controls {
@@ -190,7 +193,7 @@
 
 .combined-page {
 	display: grid;
-	grid-template-columns: 4fr 3fr;
+	grid-template-columns: 9fr 5fr;
 }
 
 .combined-page .build-page-container {
@@ -220,12 +223,18 @@
 	box-sizing: border-box;
 }
 
-.actual-bom-list label {
+.part-row {
 	display: flex;
 	flex-direction: column;
+	justify-content: flex-start;
 }
 
-.part-row {
+.part-row-line-1 {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+.part-row-line-2 {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -245,8 +254,8 @@
 	justify-content: flex-end;
 }
 
-.quantity {
-	width: 50%;
+.part-row-part-quantity {
+	width: 7ch;
 	min-width: 50%;
 	max-width: 60%;
 }
@@ -337,4 +346,34 @@ button {
 
 button:disabled {
 	color: lightblue
+}
+
+.part-row-part-name {
+	width: 35ch;
+}
+
+.iv-number-input {
+	width: 7ch;
+}
+
+input[type="date"] {
+	width: 14ch;
+}
+
+.initials-input {
+	width: 9ch;
+}
+
+.build-name-input {
+	width: 22ch;
+}
+
+.lot-input-container {
+	display: flex;
+	flex-direction: row;
+	justify-content:space-between;
+}
+
+.full-build-container {
+	flex-grow: 1;
 }

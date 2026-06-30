@@ -1,3 +1,5 @@
+import statistics
+
 def write_block_file(block_dict):
 	"""
 	Takes a dictionary with the following keys:
@@ -171,3 +173,40 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	# 		if i != len(rows) - 1:
 	# 			i += 1
 	# 			IV_file.write('\n')
+
+def write_heat_test_file(iv_file_name, heat_current_list, heat_voltage_list, temperature_list, 
+						 date, time,
+						 ideality, saturation_current):
+	cold_voltage_list = heat_voltage_list[0:10]
+	cold_mean_voltage = statistics.mean(float(item) for item in cold_voltage_list)
+
+	hot_current_list = heat_current_list[-100:]
+	hot_voltage_list = heat_voltage_list[-100:]
+
+	ten_pt_delta = float(temperature_list[0]) - float(temperature_list[9])
+	hundred_pt_delta = float(temperature_list[9]) - float(temperature_list[99])
+	end_delta = float(temperature_list[-1]) - 25
+
+	file_rows = []
+
+	first_row = (f"{date} {time}\t{iv_file_name}" 
+			f";Heat(mA)=5.000E+1;Meas(mA)=1.000E-1;Htime(mS)=300;Mtime(mS)=100;PreTime(mS)=10;" 
+				f"n={float(ideality):.3f};Is={float(saturation_current):.3e};10ptdeltaT={ten_pt_delta:.3f};100ptdeltaT={hundred_pt_delta:.3f};EnddeltaT={end_delta:.3f}")
+	second_row = "Time(ms)\tTemp(C) (V)"
+
+	data_rows = []
+	for i in range(len(hot_voltage_list)):
+		row = f"{(1 + i):5e}\t{float(temperature_list[i]):.5e}\t{float(hot_voltage_list[i]):.5e}\t{1:.5e}"
+		data_rows.append(row)
+
+	file_rows.append(first_row)
+	file_rows.append(second_row)
+	for row in data_rows:
+		file_rows.append(row)
+
+	settled_temperature_row = f"{(len(hot_voltage_list) + 1):.5e}\t{25:.5e}\t{cold_mean_voltage:.5e}\t{1:.5e}"
+	file_rows.append(settled_temperature_row)
+
+	heat_file_name = iv_file_name.replace(".iv", ".txt")
+
+	return heat_file_name, file_rows

@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="combined-page">
+
 	<div id="build-page-container" class="build-page-container">
 		{% include "partials/block-forms/block-file-upload.html" %}
 		{% include "partials/block-forms/build-file-upload.html" %}
@@ -20,15 +21,19 @@
 	</div>
 
 	<div id="iv-page-container" class="iv-page-container">
-
-		{% include "partials/iv-page/iv-plot.html" %}
+		<div>
+			{% include "partials/iv-page/iv-plot.html" %}
+		<div>
 
 		<div id="iv-curve-information" class="iv-curve-information">
 			{% include "partials/iv-page/iv-info.html" %}
 		</div>
 		
-		{% include "partials/iv-page/iv-gui-controls.html" %}
+		<div>
+			{% include "partials/iv-page/iv-gui-controls.html" %}
+		</div>
 	
 	</div>	
+	
 </div>
 {% endblock %}

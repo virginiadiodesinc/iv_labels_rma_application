@@ -13,13 +13,17 @@
 		<summary>IV Basic Controls</summary>
 		<form id="iv-basic-controls-form">
 			<label> Compliance Voltage (V)
-				<input type="number" 
+				<input 
+						class="iv-number-input"
+						type="number" 
 						step="0.1"
 						value="{{ current_settings.compliance_voltage if current_settings and current_settings.compliance_voltage}}"
 						name="compliance-voltage">
 			</label>
 			<label> Maximum Current (mA)
-				<input type="number"
+				<input 
+						class="iv-number-input"
+						type="number"
 						value="{{ current_settings.maximum_current.replace('mA', '') if current_settings and current_settings.maximum_current}}"
 						min="1"
 						max="5"
@@ -41,13 +45,17 @@
 				<input type="checkbox" name="reverse-breakdown-test">
 			</label>
 			<label> Reverse Current (uA)
-				<input type="number" 
+				<input 
+						class="iv-number-input"
+						type="number" 
 						step="0.1"
 						value="{{ current_settings.reverse_polarity_start_current if current_settings and current_settings.reverse_polarity_start_current}}"
 						name="reverse-current">
 			</label>
 			<label> Reverse Compliance (V)
-				<input type="number" 
+				<input 
+						class="iv-number-input"
+						type="number" 
 						step="0.1"
 						value="{{ current_settings.reverse_compliance_voltage if current_settings and current_settings.reverse_compliance_voltage}}"
 						name="reverse-compliance">
@@ -66,12 +74,16 @@
 						value="on">
 			</label>
 			<label> Sweep Delay (mse)
-				<input type="number"
+				<input 
+						class="iv-number-input"
+						type="number"
 						value="{{ current_settings.sweep_delay if current_settings and current_settings.sweep_delay}}"
 						name="sweep-delay">
 			</label>
 			<label> GPIB Address
-				<input type="number" 
+				<input 
+						class="iv-number-input"
+						type="number" 
 						value="{{ current_settings.gpib_address if current_settings and current_settings.gpib_address}}"
 						name="gpib-address">
 			</label>
