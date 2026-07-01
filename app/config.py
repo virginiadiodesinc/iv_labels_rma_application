@@ -3,6 +3,7 @@ import os
 iv_file_directory = os.path.abspath('I:/')
 block_file_directory = os.path.abspath('K:/block')
 build_file_directory = os.path.abspath('K:/build')
+heat_data_directory = os.path.abspath('I:/Heat Data')
 
 default_keithley_settings = {
 	# BASIC SETTINGS

@@ -185,7 +185,8 @@
 		<button id="polarity-test-button"
 				hx-post="/take_polarity_sweep/"
 				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
-				hx-swap="innerHTML">
+				hx-swap="innerHTML"
+				hx-target="this">
 				Run Polarity Test
 		</button>
 	</div>

@@ -63,6 +63,8 @@ def convert_build_file(file):
 	build_info["full_build_name"] = build_name
 
 	for index, line in enumerate(lines):
+		if line.isspace() or line == "":
+			continue
 		# FIRST LINE: Block Engraving, PB1 Name (optional)
 		if index == 0:
 			split_line = line.split()

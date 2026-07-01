@@ -192,7 +192,7 @@ def write_heat_test_file(iv_file_name, heat_current_list, heat_voltage_list, tem
 	first_row = (f"{date} {time}\t{iv_file_name}" 
 			f";Heat(mA)=5.000E+1;Meas(mA)=1.000E-1;Htime(mS)=300;Mtime(mS)=100;PreTime(mS)=10;" 
 				f"n={float(ideality):.3f};Is={float(saturation_current):.3e};10ptdeltaT={ten_pt_delta:.3f};100ptdeltaT={hundred_pt_delta:.3f};EnddeltaT={end_delta:.3f}")
-	second_row = "Time(ms)\tTemp(C) (V)"
+	second_row = "Time(mS)\tTemp(C) (V)"
 
 	data_rows = []
 	for i in range(len(hot_voltage_list)):

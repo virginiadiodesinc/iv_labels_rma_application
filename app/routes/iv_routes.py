@@ -152,13 +152,12 @@ def take_polarity_sweep():
 	SMU.update_settings(**translated_settings)
 
 	try:
-
 		polarity_source_voltage, polarity_measure_current = SMU.takePolaritySweep()
 
 		process = pp.IV_curve([], [], [], Polarity_Sweep_source = polarity_source_voltage, Polarity_Sweep_measure = polarity_measure_current)
 		polarity = process.find_polarity()
 
-		return ("Polarity: ", polarity)
+		return (f"Polarity: {polarity}")
 
 	except RuntimeError:
 		return ("Polarity: No Keithley Connected")
