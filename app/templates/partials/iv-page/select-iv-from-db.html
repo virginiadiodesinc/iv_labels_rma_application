@@ -11,7 +11,7 @@
                 <label class="path-option">
                     <input
                         type="radio"
-                        name="selected_iv_path"
+                        name="selected-iv-path"
                         value="{{ path }}"
                         {% if loop.first %}checked{% endif %}
                     >
@@ -27,9 +27,7 @@
                 <button
                     type="button"
                     hx-post="/populate_iv_from_db/"
-                    hx-include="#iv-selection-form"
-                    hx-target="#iv-basic-controls-form,#iv-advanced-controls-form,#iv-assembly-information-form,#iv-plot"
-                    hx-swap="innerHTML">
+                    hx-include="#iv-selection-form,#iv-assembly-information-form">
                     Confirm
                 </button>
 
