@@ -161,7 +161,7 @@ def take_polarity_sweep():
 		return ("Polarity: ", polarity)
 
 	except RuntimeError:
-		return ("No Keithley Connected: Connect and Try Again")
+		return ("Polarity: No Keithley Connected")
 
 
 @iv_bp.get("/get_empty_plot")
