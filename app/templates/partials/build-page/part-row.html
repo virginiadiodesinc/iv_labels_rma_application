@@ -57,6 +57,14 @@
 						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 			</label>
 		</div>
+		<div class="delete-row-button-container">
+			<button
+				type="button"
+				onclick="this.closest('.part-row').remove()"
+				class="delete-row-button">
+				X
+			</button>
+		</div>
 	</div>
 	<div class="part-row-line-2">
 		<div class="lot-container">
@@ -101,15 +109,6 @@
 					<option>G4</option>
 				</select>
 			</label>
-		</div>
-		
-		<div class="delete-row-button-container">
-			<button
-				type="button"
-				onclick="this.closest('.part-row').remove()"
-				class="delete-row-button">
-				X
-			</button>
 		</div>
 	</div>
 </div>

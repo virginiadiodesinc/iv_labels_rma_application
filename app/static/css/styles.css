@@ -126,6 +126,7 @@
 {
 	background-color: lightblue;
 }
+
 /* .bom-list td:nth-child(even), th:nth-child(even) {
   background-color: gray;
 }
@@ -252,6 +253,10 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
+}
+
+.delete-row-button {
+	background-color: transparent;
 }
 
 .part-row-part-quantity {
