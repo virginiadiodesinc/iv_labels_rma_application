@@ -38,12 +38,17 @@
 							id="iv-diode-name"
 							value="{{iv_data.diode if iv_data and iv_data.diode else ''}}"
 							hx-get="/search_part_lots/"
-							hx-trigger="revealed, keyup changed delay:300ms"
+							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
 							hx-include="this"
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 			</label>
 			<div class="lot-container">
+				{% set current_lot = iv_data.diode_lot
+					if iv_data is defined and iv_data.diode_lot
+					else ''
+				%}
+				{% set lot_list = diode_lots_list if lot_list is undefined else '' %}
 				{% include "partials/build-page/lot-input.html" %}
 			</div>
 		</div>
@@ -55,12 +60,17 @@
 							id="iv-circuit-name"
 							value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}"
 							hx-get="/search_part_lots/"
-							hx-trigger="revealed, keyup changed delay:300ms"
+							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
 							hx-include="this"
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 			</label>
 			<div class="lot-container">
+				{% set current_lot = iv_data.circuit_lot
+					if iv_data is defined and iv_data.circuit_lot
+					else ''
+				%}
+				{% set lot_list = circuit_lots_list if lot_list is undefined else '' %}
 				{% include "partials/build-page/lot-input.html" %}
 			</div>
 		</div>

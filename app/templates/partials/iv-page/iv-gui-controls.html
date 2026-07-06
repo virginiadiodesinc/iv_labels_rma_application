@@ -1,6 +1,12 @@
 <div id="iv-gui-controls" class="iv-gui-controls">
 	<div>
-		<button id="open-iv-button" class="not-implemented-yet">Open IV File from DB</button>
+		<button id="open-iv-button"
+				hx-post="/open_iv_from_db/"
+				hx-target="#open-iv-popup"
+				hx-swap="innerHTML"
+				hx-include="#iv-assembly-information-form">
+				Open IV File from DB
+		</button>
 	</div>
 	{% include "partials/iv-page/iv-file-upload.html" %}
 
@@ -191,3 +197,5 @@
 		</button>
 	</div>
 </div>
+
+<div id="open-iv-popup"></div>

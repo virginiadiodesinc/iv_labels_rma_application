@@ -1,36 +1,54 @@
-{% if part %}
-	{% set current_lot = part['part_lot'] %}
-{% elif item %}
-	{% set current_lot = item.part_lot %}
-{% else %}
-	{% set current_lot = '' %}
+
+{% if current_lot == '' %}
+	{% if part %}
+		{% set current_lot = part['part_lot'] %}
+	{% elif item %}
+		{% set current_lot = item.part_lot %}
+	{% else %}
+		{% set current_lot = '' %}
+	{% endif %}
 {% endif %}
+
+{% set is_custom_lot =
+    current_lot
+    and current_lot not in ['Unknown', 'N/A']
+    and current_lot not in lot_list
+%}
+
 <div class="lot-input-container">
 	<label>
 		Lot:
 		<select 
-		name="lot-select"
-		hx-post="/check_custom_lot/"
-		hx-trigger="change"
-		hx-target="next .custom-lot-input-container"
-		hx-swap="innerHTML"
-		hx-vals='js:{ "lot-select": this.value }'>
-			<option value="Unknown">Unknown</option>
-			<option value="NA">NA</option>
+			name="lot-select"
+			hx-post="/check_custom_lot/"
+			hx-trigger="change"
+			hx-target="next .custom-lot-input-container"
+			hx-swap="innerHTML"
+			hx-vals='js:{ "lot-select": this.value }'>
+
+			<option value="Unknown"
+				{% if current_lot == "Unknown" %}selected{% endif %}>
+				Unknown
+			</option>
+
+			<option value="N/A"
+				{% if current_lot == "N/A" %}selected{% endif %}>
+				N/A
+			</option>
 			{% for lot in lot_list %}
-				<option value="{{lot}}"
-					{{
-						'selected'
-						if current_lot
-						and current_lot not in ['Unknown', 'NA']
-						and current_lot not in lot_list
-						else ''
-					}}>
-					{{lot}}</option>
+				<option value="{{ lot }}"
+					{% if current_lot == lot %}selected{% endif %}>
+					{{ lot }}
+				</option>
 			{% endfor %}
-			<option value="Other">Other</option>
+
+			<option value="Other"
+				{% if is_custom_lot %}selected{% endif %}>
+				Other
+			</option>
 		</select>	
 	</label>
+	{% set selected_lot = "Other" if is_custom_lot else current_lot %}
 	<div class="custom-lot-input-container">
 		{% include "partials/build-page/custom-lot-input.html" %}
 	</div>
