@@ -382,3 +382,42 @@ input[type="date"] {
 .full-build-container {
 	flex-grow: 1;
 }
+
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	z-index: 9999;
+}
+
+.modal {
+	background: white;
+	padding: 20px;
+	border-radius: 8px;
+	max-width: 250px;
+	width: 80%
+}
+
+.scroll-box {
+    border: 1px solid #ccc;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
+}
+
+.path-option {
+	display: block;
+	margin-bottom: 8px;
+}
+
+.button-row {
+	display: flex;
+	justify-content: space-between;
+}

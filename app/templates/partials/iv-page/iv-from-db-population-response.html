@@ -1,0 +1,27 @@
+<div id="open-iv-popup" hx-swap-oob="true"></div>
+
+<details open id="iv-assembly-information" hx-swap-oob="true">
+    <summary>Part Information</summary>
+    {% include "partials/iv-page/iv-assembly-information.html" %}
+</details>
+
+<div id="iv-curve-information" class="iv-curve-information" hx-swap-oob="true">
+	{% include "partials/iv-page/iv-info.html" %}
+</div>
+
+<div id="iv-plot-subcontainer" hx-swap-oob="true">
+	<h2 id="iv-plot-title" class="iv-plot-title">Diode IV Curve (A,V)</h2>
+	<div id="iv-plot-header-container" class="iv-plot-header-container">
+		<h3>Polarity {{iv_curve.polarity if iv_curve and iv_curve.polarity else ""}}</h3>
+		<h3>Points per Decade {{iv_curve.points_per_decade if iv_curve and iv_curve.points_per_decade else ""}}</h3>
+	</div>
+	<div id="iv-plot-display-controls" class="iv-plot-display-controls">
+		<select>
+			<option value="linear">Linear</option>
+			<option value="log" selected>Log</option>
+		</select>
+	</div>
+
+	{% include "partials/iv-page/iv-plot-figure.html" %}
+	
+</div>

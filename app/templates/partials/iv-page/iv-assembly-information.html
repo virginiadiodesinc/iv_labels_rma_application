@@ -83,18 +83,13 @@
 			<select
 			name="part-tag"
 			class="part-tag">
-				<option>NA</option>
-				<option>1</option>
-				<option>2</option>
-				<option>3</option>
-				<option>A</option>
-				<option>B</option>
-				<option>A1</option>
-				<option>A2</option>
-				<option>G1</option>
-				<option>G2</option>
-				<option>G3</option>
-				<option>G4</option>
+			{% for tag in tags %}
+				<option 
+					value="{{ tag }}"
+					{% if selected_tag == tag %}selected{% endif %}
+				>
+					{{ tag }}
+				</option>
 			</select>
 		</label>
 	</div>

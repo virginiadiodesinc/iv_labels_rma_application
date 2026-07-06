@@ -51,14 +51,20 @@ class Polarity(enum.Enum):
 
 class IV_Info(Base):
 	__tablename__ = "iv_info"
-	build_id = Column(Integer, ForeignKey("build_info.block_id"), nullable=False)
+	build_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
+	diode = Column(String, nullable=False)
+	diode_lot = Column(String, nullable=False)
+	circuit = Column(String, nullable=False)
+	circuit_lot = Column(String, nullable=False)
+	assembly_no = Column(Integer)
 	subassembly_tag = Column(String)
 	iv_id = Column(Integer, primary_key=True, autoincrement=True)
 	iv_date = Column(Date, nullable=False)
 	points_per_decade = Column(Integer, nullable=False)
-	reverse_saturation_current = Column(Float, nullable=False)
+	ideality = Column(Float, nullable=False)
+	saturation_current = Column(Float, nullable=False)
 	series_resistance = Column(Float, nullable=False)
-	mean_square_area = Column(Float, nullable=False)
+	mean_square_error = Column(Float, nullable=False)
 	r_squared_error = Column(Float, nullable=False)
 	polarity = Column(Enum(Polarity), nullable=False)
 	hysteresis_standard_deviation = Column(Float, nullable=False)
@@ -73,9 +79,9 @@ class IV_Points(Base):
 	__tablename__ = "iv_points"
 	iv_id = Column(Integer, ForeignKey("iv_info.iv_id"), nullable=False)
 	point_id = Column(Integer, primary_key=True, autoincrement=True)
-	voltage_up_mv = Column(Float, nullable=False)
-	voltage_down_mv = Column(Float, nullable=False)
-	current_ua = Column(Float, nullable=False)
+	voltage_up_mv = Column(String, nullable=False)
+	voltage_down_mv = Column(String, nullable=False)
+	current_ua = Column(String, nullable=False)
 
 class Note_Type(enum.Enum):
 	GENERAL = "general"
