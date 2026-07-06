@@ -91,6 +91,10 @@ def populate_info_from_build_file():
 		filter_2_lot = filter_2_split[1].strip() if len(filter_2_split) > 1 else ""
 		filter_2_full_name = build_dict.get("filter_2", "").upper()
 
+		mmic_name = build_dict.get("mmic_name", "")
+		mmic_lot = build_dict.get("mmic_lot", "")
+
+
 		part_rows = [
 			{"part_name": diode_1_full_name, "part_quantity": diode_1_quantity, "part_type": "DIODE", "part_lot": diode_1_lot},
 			{"part_name": circuit_1_full_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_1_lot},
@@ -98,7 +102,8 @@ def populate_info_from_build_file():
 			{"part_name": circuit_2_full_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_2_lot},
 			{"part_name": pcb_info_full_name, "part_quantity": 1, "part_type": "PCB", "part_lot": pcb_info_lot},
 			{"part_name": filter_1_full_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_1_lot},
-			{"part_name": filter_2_full_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_2_lot}
+			{"part_name": filter_2_full_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_2_lot},
+			{"part_name": mmic_name, "part_quantity": 1, "part_type": "MMIC", "part_lot": mmic_lot}
 		]
 
 		note_rows = []
@@ -784,7 +789,8 @@ def save_iv_file():
 	heat_current_list = iv_data.get("heat-current-list", "").split(",")
 	heat_voltage_list = iv_data.get("heat-voltage-list", "").split(",")
 	temperature_list = iv_data.get("temperature-list", "").split(",")
-	heat_test_taken = all([heat_current_list, heat_voltage_list, temperature_list])
+	combined_heat_list = [*heat_current_list, *heat_voltage_list, *temperature_list]
+	heat_test_taken = all([heat_current_list, heat_voltage_list, temperature_list]) and any(combined_heat_list)
 
 	file_name, content_rows = write_IV_file(info_dict, iv_dict, Vup_list, Vdown_list, I_source_list)
 

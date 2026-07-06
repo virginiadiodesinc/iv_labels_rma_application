@@ -31,8 +31,8 @@ def populate_block_info():
 		return render_template("partials/block-forms/block-and-build-population.html", block=block)
 	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) != []:
 		block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
-		items = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
-		return render_template("partials/block-forms/block-and-build-population.html", block=block, items=items)
+		parts = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
+		return render_template("partials/block-forms/block-and-build-population.html", block=block, parts=parts)
 
 
 @db_bp.post("/save_inspection_info") #add some intelligent return statements

@@ -46,7 +46,7 @@ def convert_iv_file(file):
 		# Polarity?, Block Name, Block SN(and Rev Letter), Additional Info
 		if index == 0:
 			split_line = line.split()
-			iv_dict["build_name"] = split_line[0]
+			iv_dict["build_name"] = split_line[0].split('_')[0]
 			iv_dict["full_build_sn"] = split_line[1][1:]
 			iv_dict["build_sn"] = split_line[1][1:-1] if split_line[1][-1].isalpha() else split_line[1][1:]
 			iv_dict["build_revision"] = split_line[1][-1] if split_line[1][-1].isalpha() else ''
