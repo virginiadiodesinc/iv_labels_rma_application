@@ -14,19 +14,19 @@
 					value="{{iv_data.build_sn if iv_data and iv_data.build_sn else ''}}"
 					size="7">
 		</label>
-		<label> Build Name
-			<input type="text"
-					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
-					name="iv-build-name"
-					value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
-					>
-		</label>
 		<label> Revision Letter
 			<input type="text"
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-revision"
 					value="{{iv_data.build_revision if iv_data and iv_data.build_revision else ''}}"
 					size="2">
+		</label>
+		<label> Build Name
+			<input type="text"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+					name="iv-build-name"
+					value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
+					>
 		</label>
 	</div>
 	<div id="iv-part-information-container" class="iv-part-information-container">

@@ -842,9 +842,9 @@ def save_iv_file():
 
 	iv_info_dict = {
 		"build_id": iv_data.get("iv-block-engraving", "")+" "+iv_data.get("iv-block-sn", "")+" "+iv_data.get("iv-block-revision", "A"),
-		"diode": iv_data.get("iv-diode-name", "X"),
+		"diode": diode_name,
 		"diode_lot": diode_lot,
-		"circuit": iv_data.get("iv-circuit-name", "X"),
+		"circuit": circuit_name,
 		"circuit_lot": circuit_lot,
 		"assembly_no": iv_data.get("iv-assembly-number", "X"),
 		"subassembly_tag": iv_data.get("part-tag", "X"),

@@ -159,6 +159,8 @@ def populate_iv_from_db():
 	selected_path = build_info.get("selected-iv-path")
 	build_id_query = build_info.get("iv-block-engraving")+" "+build_info.get("iv-block-sn")+" "+build_info.get("iv-block-revision", "A")
 
+	build_name = Path(selected_path).stem.split("_")[0]
+
 	ivs = get_table_entries(db_session,
 							IV_Info,
 							build_id=build_id_query)
@@ -221,17 +223,21 @@ def populate_iv_from_db():
 
 	iv_population_dict = {
 		"block_name": build_info.get("iv-block-engraving"),
-		"block_sn": build_info.get("iv-block-sn"),
-		"block_revision": build_info.get("iv-block-revision"),
+		"build_sn": build_info.get("iv-block-sn"),
+		"build_revision": build_info.get("iv-block-revision"),
 		"diode": iv_info_dict["diode"],
 		"diode_lot": iv_info_dict["diode_lot"],
 		"circuit": iv_info_dict["circuit"],
 		"circuit_lot": iv_info_dict["circuit_lot"],
 		"assembly_number": iv_info_dict["assembly_no"],
-		"subassembly_tag": iv_info_dict["subassembly_tag"]
+		"subassembly_tag": iv_info_dict["subassembly_tag"],
+		"build_name": build_name
 	}
 
 	full_iv_dict = {**clean_process_dict, **iv_population_dict}
+
+	print(build_info)
+	print(full_iv_dict)
 
 	print("IV info dictionaries created")
 	df = pd.DataFrame({
