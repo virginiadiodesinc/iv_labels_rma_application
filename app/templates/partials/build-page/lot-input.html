@@ -11,7 +11,7 @@
 
 {% set is_custom_lot =
     current_lot
-    and current_lot not in ['Unknown', 'N/A']
+    and current_lot not in ['Unknown', 'NA']
     and current_lot not in lot_list
 %}
 
@@ -31,9 +31,9 @@
 				Unknown
 			</option>
 
-			<option value="N/A"
-				{% if current_lot == "N/A" %}selected{% endif %}>
-				N/A
+			<option value="NA"
+				{% if current_lot == "NA" %}selected{% endif %}>
+				NA
 			</option>
 			{% for lot in lot_list %}
 				<option value="{{ lot }}"

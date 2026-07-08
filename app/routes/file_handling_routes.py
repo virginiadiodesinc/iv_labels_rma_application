@@ -112,7 +112,7 @@ def populate_info_from_build_file():
 		note_rows.append({"text": build_dict.get("vbr", ""), "note_type": "GENERIC"})
 		note_rows.append({"text": build_dict.get("indium_info"), "note_type": "INDIUM"})
 
-		PART_TYPE_ORDER = ["MMIC", "DIODE", "CIRCUIT", "PCB", "FILTER", "N/A", "MISC", "CONNECTOR"]
+		PART_TYPE_ORDER = ["MMIC", "DIODE", "CIRCUIT", "PCB", "FILTER", "NA", "MISC", "CONNECTOR"]
 		part_rows.sort(key=lambda p: PART_TYPE_ORDER.index(p["part_type"]) if p["part_type"] in PART_TYPE_ORDER else 99)
 
 		NOTE_TYPE_ORDER = ["REWORK_SUMMARY", "CURRENT_TEST", "PCB_DEVIATIONS", "INDIUM", "TEMPERATURE", "GENERIC"]
@@ -203,9 +203,9 @@ def populate_info_from_iv_file():
 		
 		full_iv_dict = {**clean_process_dict, **iv_dict}
 
-		tag_list = ["N/A", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
+		tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
 
-		return render_template("partials/iv-page/iv-file-population-response.html", iv_data=full_iv_dict, iv_curve=iv_curve, tags=tag_list, selected_tag="N/A")
+		return render_template("partials/iv-page/iv-file-population-response.html", iv_data=full_iv_dict, iv_curve=iv_curve, tags=tag_list, selected_tag="NA")
 	
 	return "No file uploaded", 204
 

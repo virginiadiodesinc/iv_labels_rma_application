@@ -252,7 +252,7 @@ def populate_iv_from_db():
 	iv_curve["polarity"] = iv_info_dict["polarity"]
 
 
-	tag_list = ["N/A", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
+	tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
 
 	diode_lots_list = jb2.get_Lots(full_iv_dict["diode"])
 	circuit_lots_list = jb2.get_Lots(full_iv_dict["circuit"])

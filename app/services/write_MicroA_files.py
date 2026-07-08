@@ -161,7 +161,7 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	rows.append('Voltage Up (mV)    Voltage Down (mV)    Current (uA)')
 
 	for Vup, Vdown, I_source in zip(Vup_list, Vdown_list, I_source_list):
-		rows.append(Vup + '\t' + Vdown + '\t' + I_source)
+		rows.append(f"{float(Vup):6f}" + '\t' + f"{float(Vdown):6f}" + '\t' + f"{float(I_source):6f}")
 
 	file_name = rows[0].lower() + '.iv'
 
