@@ -1,10 +1,18 @@
 """Extracts the correct revision number from every entry in VDI-547 and unique build in VDI-548 and generates new text files"""
 import re
 
-revision_pattern = re.compile(r'(?<!(?<![a-zA-Z0-9])W)R\d(\.\d)?')
-multi_pattern = re.compile(r'R\d(?:\.\d)?')
+revision_pattern = re.compile(r'(?<!(?<![a-zA-Z0-9])W)R\d(\.\d)?') #find unpreceded standalone W and do not match an R if it is preceded by an unpreceded standalone W
+multi_pattern = re.compile(r'R\d(?:\.\d)?') #find R#.# but do not create a separate capture group for the optional .#
 swg_length_pattern = re.compile(r'SWG(\d)')
 swgmd_length_pattern = re.compile(r'SWGMD(\d)')
+twg_length_pattern = re.compile(r'TWG(\d)')
+ewg_length_pattern = re.compile(r'EWG(\d)')
+V_revision_pattern = re.compile(r'V\d$')
+X_revision_pattern = re.compile(r'(?<!(QWE|4HM))X\d$')
+XwVd_revision_pattern = re.compile(r'X\wV\d$')
+Xd__revision_pattern = re.compile(r'(X\d)_\(')
+
+WRdX_exception_pattern = re.compile(r'WR\d\d?\.?\d?\d?X\d$')
 
 """The following three lists can be used for troubleshooting"""
 no_match_list = []
@@ -17,36 +25,124 @@ with open('VDI-547 Block Name List.txt', 'r', encoding='utf-8') as file:
     for line in file:
         if line[-1] == "\n":
                 line = line[:-1]
-        count = len(re.findall(revision_pattern, line))
+        R_count = len(re.findall(revision_pattern, line))
+        V_count = len(re.findall(V_revision_pattern, line))
+        X_count = len(re.findall(X_revision_pattern, line))
+        XwVd_count = len(re.findall(XwVd_revision_pattern, line))
+        Xd__count = len(re.findall(Xd__revision_pattern, line))
 
-        if count == 0:
+        if R_count == 0 and V_count == 0 and X_count == 0 and XwVd_count == 0 and Xd__count == 0:
             if "SWG" in line and "SWGMD" not in line:
                 if swg_length_pattern.search(line) is None:
-                    engraving_revision_list.append(line+"\t1R1\n") #1 inch plus R1
+                    engraving_revision_list.append(line+"\t1N\n") #1 inch No revision number
                 elif swg_length_pattern.search(line) is not None:
-                    engraving_revision_list.append(line+"\t"+swg_length_pattern.search(line).group(1)+"R1\n") #length plus R1
+                    engraving_revision_list.append(line+"\t"+swg_length_pattern.search(line).group(1)+"N\n") #length No revision number
             elif "SWGMD" in line:
                 if swgmd_length_pattern.search(line) is None:
-                    engraving_revision_list.append(line+"\t1R1\n") #1 inch plus R1
+                    engraving_revision_list.append(line+"\t1N\n") #1 inch No revision number
                 elif swgmd_length_pattern.search(line) is not None:
-                    engraving_revision_list.append(line+"\t"+swgmd_length_pattern.search(line).group(1)+"R1\n") #length plus R1
+                    engraving_revision_list.append(line+"\t"+swgmd_length_pattern.search(line).group(1)+"N\n") #length plus R1
+            elif "TWG" in line:
+                if twg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1N\n") #1 inch No revision number
+                elif twg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+twg_length_pattern.search(line).group(1)+"N\n") #length plus R1
+            elif "EWG" in line:
+                if ewg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1N\n") #1 inch No revision number
+                elif ewg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+ewg_length_pattern.search(line).group(1)+"N\n") #length plus R1
             else:
                 engraving_revision_list.append(line+"\tN\n")
-        elif count == 1:
-            if "SWG" in line:
+
+        elif R_count == 1:
+            if "SWG" in line and "SWGMD" not in line:
                 if swg_length_pattern.search(line) is None:
                     engraving_revision_list.append(line+"\t1"+re.search(revision_pattern, line).group()+"\n") #1 inch plus Revision number
                 elif swg_length_pattern.search(line) is not None:
                     engraving_revision_list.append(line+"\t"+swg_length_pattern.search(line).group(1)+re.search(revision_pattern, line).group()+"\n") #length plus Revision number
-            elif"SWGMD" in line:
+            elif "SWGMD" in line:
                 if swgmd_length_pattern.search(line) is None:
                     engraving_revision_list.append(line+"\t1"+re.search(revision_pattern, line).group()+"\n") #1 inch plus Revision number
                 elif swgmd_length_pattern.search(line) is not None:
                     engraving_revision_list.append(line+"\t"+swgmd_length_pattern.search(line).group(1)+re.search(revision_pattern, line).group()+"\n") #length plus Revision number
+            elif "TWG" in line:
+                if twg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(revision_pattern, line).group()+"\n") #1 inch plus Revision number
+                elif twg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+twg_length_pattern.search(line).group(1)+re.search(revision_pattern, line).group()+"\n")
+            elif "EWG" in line:
+                if ewg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(revision_pattern, line).group()+"\n") #1 inch plus Revision number
+                elif ewg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+ewg_length_pattern.search(line).group(1)+re.search(revision_pattern, line).group()+"\n")
             else:
                 engraving_revision_list.append(line+"\t"+re.search(revision_pattern, line).group()+"\n")
+
+        elif V_count == 1 and XwVd_count == 0: #this case does not apply to waveguides
+            engraving_revision_list.append(line+"\t"+re.search(V_revision_pattern, line).group()+"\n")
+
+        elif XwVd_count == 1: #this case does not apply to waveguides
+            engraving_revision_list.append(line+"\t"+re.search(XwVd_revision_pattern, line).group()+"\n")
+
+        elif X_count == 1:
+            if WRdX_exception_pattern.search(line) is not None:
+                engraving_revision_list.append(line+"\tN\n")
+            elif "SWG" in line and "SWGMD" not in line:
+                if swg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(X_revision_pattern, line).group()+"\n")
+                elif swg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swg_length_pattern.search(line).group(1)+re.search(X_revision_pattern, line).group()+"\n")
+            elif "SWGMD" in line:
+                if swgmd_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(X_revision_pattern, line).group()+"\n")
+                elif swgmd_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swgmd_length_pattern.search(line).group(1)+re.search(X_revision_pattern, line).group()+"\n")
+            elif "TWG" in line:
+                if twg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(X_revision_pattern, line).group()+"\n")
+                elif twg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+twg_length_pattern.search(line).group(1)+re.search(X_revision_pattern, line).group()+"\n")
+            elif "EWG" in line:
+                if ewg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(X_revision_pattern, line).group()+"\n")
+                elif ewg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+ewg_length_pattern.search(line).group(1)+re.search(X_revision_pattern, line).group()+"\n")
+            else:
+                engraving_revision_list.append(line+"\t"+re.search(X_revision_pattern, line).group()+"\n")
+
+        elif Xd__count == 1:
+            if "SWG" in line and "SWGMD" not in line:
+                if swg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(Xd__revision_pattern, line).group(1)+"\n")
+                elif swg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swg_length_pattern.search(line).group(1)+re.search(Xd__revision_pattern, line).group(1)+"\n")
+            elif "SWGMD" in line:
+                if swgmd_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(Xd__revision_pattern, line).group(1)+"\n")
+                elif swgmd_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+swgmd_length_pattern.search(line).group(1)+re.search(Xd__revision_pattern, line).group(1)+"\n")
+            elif "TWG" in line:
+                if twg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(Xd__revision_pattern, line).group(1)+"\n")
+                elif twg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+twg_length_pattern.search(line).group(1)+re.search(Xd__revision_pattern, line).group(1)+"\n")
+            elif "EWG" in line:
+                if ewg_length_pattern.search(line) is None:
+                    engraving_revision_list.append(line+"\t1"+re.search(Xd__revision_pattern, line).group(1)+"\n")
+                elif ewg_length_pattern.search(line) is not None:
+                    engraving_revision_list.append(line+"\t"+ewg_length_pattern.search(line).group(1)+re.search(Xd__revision_pattern, line).group(1)+"\n")
+            else:
+                engraving_revision_list.append(line+"\t"+re.search(Xd__revision_pattern, line).group(1)+"\n")
+
         else:
             #excluding SWG conditional since no SWG engravings have multiple instances of R occurring
+            print(line)
+            print("R_Count:"+str(R_count))
+            print("V_Count:"+str(V_count))
+            print("X_Count:"+str(X_count))
+            print("XwVd_Count:"+str(XwVd_count))
+            print("Xd__Count:"+str(Xd__count))
             engraving_revision_list.append(line+"\t"+re.findall(multi_pattern, line)[-1]+"\n")
     
 with open('engraving_with_revision.txt', 'w') as file:
