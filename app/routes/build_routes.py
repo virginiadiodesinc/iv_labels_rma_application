@@ -67,3 +67,14 @@ def add_part_rows_from_bom():
 		)
 
 	return "".join(rows)
+
+@build_bp.post("/import_diode_info_from_iv/")
+def import_diode_info_from_iv():
+	all_diode_info = request.form
+	temperature = all_diode_info.get("temperature")
+	if temperature:
+		temperature = round(float(temperature), 2)
+	reverse_voltage = all_diode_info.get("reverse-voltage")
+	if reverse_voltage:
+		reverse_voltage = round(float(reverse_voltage), 2)
+	return render_template("partials/build-page/diode-row.html", temperature=temperature, reverse_voltage=reverse_voltage)

@@ -241,6 +241,12 @@
 	justify-content: space-between;
 }
 
+.diode-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
 .note-row {
 	display: flex;
 	flex-direction: row;
@@ -263,6 +269,10 @@
 	width: 7ch;
 	min-width: 50%;
 	max-width: 60%;
+}
+
+.diode-extra-number-input {
+	width: 7ch;
 }
 
 .feedback-form {
@@ -379,6 +389,12 @@ input[type="date"] {
 	justify-content:space-between;
 }
 
+.custom-lot-input-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
 .full-build-container {
 	flex-grow: 1;
 }
@@ -404,12 +420,12 @@ input[type="date"] {
 }
 
 .scroll-box {
-    border: 1px solid #ccc;
-    max-height: 300px;
-    overflow-y: auto;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    padding: 10px;
+	border: 1px solid #ccc;
+	max-height: 300px;
+	overflow-y: auto;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 10px;
 }
 
 .path-option {

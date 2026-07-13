@@ -4,11 +4,9 @@
 			<label>
 				Part Type:
 				<select 
-					onchange="sortPartsContainer()" 
+					onchange="sortPartsContainer(); toggleDiodeRow(this)" 
 					name="part_type">
 					<option value="NA" {% if part and part['part_type'] == "NA" %}
-							selected
-							{% elif item and item.part_type == "NA" %}
 							selected
 						{% endif %}>NA</option>
 					<option value="MISC" {% if part and part['part_type'] == "MISC" %}
@@ -45,8 +43,6 @@
 						value="{{
 								part['part_name']
 								if part
-								else item.part_name
-								if item and item.part_name
 								else ''
 							}}" 
 						size="10"
@@ -82,8 +78,6 @@
 						value="{{
 								part['part_quantity']
 								if part
-								else item.quantity
-								if item and item.quantity
 								else '1'
 							}}">
 			</label>
@@ -109,6 +103,11 @@
 					<option>G4</option>
 				</select>
 			</label>
+		</div>
+		<div class="diode-row"
+			{% set is_diode = (part and part['part_type'] == "DIODE") %}
+			{% if not is_diode %}style="display:none"{% endif %}>
+			{% include "partials/build-page/diode-row.html" %}
 		</div>
 	</div>
 </div>
