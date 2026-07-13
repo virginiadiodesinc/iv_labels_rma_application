@@ -32,7 +32,10 @@ def populate_block_info():
 	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) != []:
 		block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
 		parts = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
-		return render_template("partials/block-forms/block-and-build-population.html", block=block, parts=parts)
+		lot_lists = {}
+		for part in parts:
+			lot_lists[part["part_name"]] = jb2.get_Lots(part["part_name"])
+		return render_template("partials/block-forms/block-and-build-population.html", block=block, parts=parts, suppress_lot_search=True)
 
 
 @db_bp.post("/save_inspection_info") #add some intelligent return statements

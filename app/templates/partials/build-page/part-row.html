@@ -51,7 +51,7 @@
 							}}" 
 						size="10"
 						hx-get="/search_part_lots/"
-						hx-trigger="revealed, keyup changed delay:300ms"
+						hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
 						hx-target="next .lot-container"
 						hx-include="this"
 						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
@@ -90,7 +90,7 @@
 		</div>
 
 		<div>
-			<label class="not-implemented-yet">
+			<label>
 				Tag:
 				<select
 				name="part-tag"
@@ -107,6 +107,7 @@
 					<option>G2</option>
 					<option>G3</option>
 					<option>G4</option>
+					<option>W</option>
 				</select>
 			</label>
 		</div>

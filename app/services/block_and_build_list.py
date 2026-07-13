@@ -1,5 +1,6 @@
 """Extracts the correct revision number from every entry in VDI-547 and unique build in VDI-548 and generates new text files"""
 import re
+import csv
 
 revision_pattern = re.compile(r'(?<!(?<![a-zA-Z0-9])W)R\d(\.\d)?') #find unpreceded standalone W and do not match an R if it is preceded by an unpreceded standalone W
 multi_pattern = re.compile(r'R\d(?:\.\d)?') #find R#.# but do not create a separate capture group for the optional .#
@@ -226,3 +227,27 @@ with open('VDI-548 Build Name List.txt', 'r', encoding='utf-8') as file:
 with open('unique_builds.txt', 'w') as file:
     for item in unique_build_list:
         file.write(f"{item}")
+
+block_engravings_csv = open('block_engravings.csv', 'w', newline='')
+block_engravings_writer = csv.writer(block_engravings_csv)
+
+with open('engraving_with_revision.txt', 'r', encoding='utf-8') as file:
+    for line in file:
+        if line[-1] == "\n":
+            line = line[:-1]
+        row = line.split("\t")
+        block_engravings_writer.writerow(row)
+
+block_engravings_csv.close()
+
+build_list_csv = open('build_list.csv', 'w', newline='')
+build_list_writer = csv.writer(build_list_csv)
+
+with open('unique_builds.txt', 'r', encoding='utf-8') as file:
+    for line in file:
+        if line[-1] == "\n":
+            line = line[:-1]
+        row = [line]
+        build_list_writer.writerow(row)
+
+build_list_csv.close()

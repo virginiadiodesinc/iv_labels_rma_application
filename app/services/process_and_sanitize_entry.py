@@ -3,13 +3,43 @@ from datetime import date
 from app.db.models import *
 from app.db.database import db_session
 from app.db.queries import *
+import csv
+from pathlib import Path
 
-def validate_block_info(block_engraving, block_serial_number, block_revision): #add regular expressions to limit or flag entries
-	engraving_pass = True
-	sn_pass = True
-	revision_pass = True
-	if (engraving_pass and sn_pass and revision_pass) == True:
+BLOCK_LIST_FILE = Path(__file__).parent / "block_engravings.csv"
+BUILD_LIST_FILE = Path(__file__).parent / "build_list.csv"
+
+def validate_block_info(block_engraving):
+	block_engravings_file = open(BLOCK_LIST_FILE)
+	block_engravings_reader = csv.reader(block_engravings_file)
+	full_csv_list = list(block_engravings_reader)
+
+	engravings_list = []
+	for entry in full_csv_list:
+		engravings_list.append(entry[0])
+
+	if block_engraving.strip() in engravings_list:
+		block_engravings_file.close()
 		return True
+	else:
+		block_engravings_file.close()
+		return False
+	
+def validate_build_info(build_name):
+	build_names_file = open(BUILD_LIST_FILE)
+	build_names_reader = csv.reader(build_names_file)
+	full_csv_list = list(build_names_reader)
+
+	names_list = []
+	for entry in full_csv_list:
+		names_list.append(entry[0])
+
+	if build_name.strip() in names_list:
+		build_names_file.close()
+		return True
+	else:
+		build_names_file.close()
+		return False
 
 def sanitize_and_save_feedback(initials, feedback):
 	data = {

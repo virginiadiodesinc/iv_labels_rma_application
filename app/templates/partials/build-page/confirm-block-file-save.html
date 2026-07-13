@@ -1,0 +1,32 @@
+<div class="modal-overlay">
+    <div class="modal">
+
+        <h2>Confirm Save</h2>
+
+        <p>
+            Entered block engraving does not match any entry on Block Name List.
+        </p>
+
+        <p>
+            If you wish to save the entered block engraving anyway, press save, and this entry will be flagged for review.
+        </p>
+
+        <div class="button-row">
+            <button
+                hx-post="/confirm_block_file_save/"
+                hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info"
+                hx-target="#save-block-popup"
+                hx-swap="innerHTML">
+                Save
+            </button>
+
+            <button
+                hx-post="/cancel_block_file_save/"
+                hx-target="#save-block-popup"
+                hx-swap="innerHTML">
+                Cancel
+            </button>
+        </div>
+
+    </div>
+</div>

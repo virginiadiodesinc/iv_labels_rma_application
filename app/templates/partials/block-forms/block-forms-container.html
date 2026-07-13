@@ -4,8 +4,11 @@
 {% include 'partials/block-forms/pb2.html' %}
 
 <div>
-	<button hx-post="/save_block_file" 
-			hx-swap="none"
+	<button hx-post="/attempt_save_block_file/"
+			hx-target="#save-block-popup" 
+			hx-swap="innerHTML"
 			hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info">
 			Save Block File</button>
 </div>
+
+<div id="save-block-popup"></div>

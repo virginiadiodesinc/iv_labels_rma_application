@@ -1,27 +1,38 @@
 <div class="modal-overlay">
     <div class="modal">
 
-        <h2>Confirm Save</h2>
+        {% if build_name_match == False %}
+            <p>
+                Entered build name does not match any entry on Build Name List.
+            </p>
 
-        <p>
-            The following part quantities differ from those on the BOM:
-        </p>
+            <p>
+                If you wish to save the entered build name anyway, press Save,
+                this entry will be flagged for review.
+            </p>
+        {% endif %}
 
-        <table>
-            <tr>
-                <th>Part</th>
-                <th>Current</th>
-                <th>Stored</th>
-            </tr>
+        {% if differences %}
+            <p>
+                The following part quantities differ from those on the BOM:
+            </p>
 
-            {% for name, form_quantity, BOM_quantity in differences %}
-            <tr>
-                <td>{{ name }}</td>
-                <td>{{ form_quantity }}</td>
-                <td>{{ BOM_quantity }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+            <table>
+                <tr>
+                    <th>Part</th>
+                    <th>Current</th>
+                    <th>On BOM</th>
+                </tr>
+
+                {% for name, form_quantity, BOM_quantity in differences %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ form_quantity }}</td>
+                    <td>{{ BOM_quantity }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
 
         <div class="button-row">
             <button
