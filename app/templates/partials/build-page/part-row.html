@@ -4,7 +4,7 @@
 			<label>
 				Part Type:
 				<select 
-					onchange="sortPartsContainer(); toggleDiodeRow(this)" 
+					onchange="sortPartsContainer(); toggleDiodeRow(this); togglePcbRow(this)" 
 					name="part_type">
 					<option value="NA" {% if part and part['part_type'] == "NA" %}
 							selected
@@ -108,6 +108,11 @@
 			{% set is_diode = (part and part['part_type'] == "DIODE") %}
 			{% if not is_diode %}style="display:none"{% endif %}>
 			{% include "partials/build-page/diode-row.html" %}
+		</div>
+		<div class="pcb-row"
+			{% set is_pcb = (part and part['part_type'] == "PCB") %}
+			{% if not is_pcb %}style="display:none"{% endif %}>
+			{% include "partials/build-page/pcb-row.html" %}
 		</div>
 	</div>
 </div>

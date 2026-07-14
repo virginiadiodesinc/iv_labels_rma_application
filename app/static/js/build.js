@@ -52,3 +52,17 @@ function toggleDiodeRow(selectedElem) {
 		elem.disabled = !isDiode;
 	});
 }
+
+function togglePcbRow(selectedElem) {
+	const partRow = selectedElem.closest('.part-row');
+	const pcbRow = partRow.querySelector('.pcb-row');
+	if (!pcbRow) return;
+
+	const isPcb = selectedElem.value === 'PCB';
+	pcbRow.style.display = isPcb ? '' : 'none';
+
+	// prevent hidden diode fields from being submitted
+	pcbRow.querySelectorAll('input, select, textarea').forEach(elem => {
+		elem.disabled = !isPcb;
+	});
+}
