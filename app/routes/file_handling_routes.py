@@ -12,6 +12,7 @@ from app import config
 from app.services.date_converter import *
 from app.services.process_and_sanitize_entry import *
 from app.db import JB2_queries as jb2
+from app.services import part_lot_separator as pls
 import re
 
 file_bp = Blueprint("file", __name__)
@@ -53,56 +54,42 @@ def populate_info_from_build_file():
 			build_dict = build_converter.convert_build_file(build_file)
 
 		part_rows = []
-		diode_1_split = build_dict.get("diode_1", "").upper().split("_LOT")
-		diode_1_name = diode_1_split[0].strip()
+
+		diode_1_full_text = build_dict.get("diode_1", "")
+		diode_1_name, diode_1_lot, diode_1_extra = pls.separate_part_and_lot(diode_1_full_text)
 		diode_1_quantity = build_dict.get("diode_1_chip_count")
-		diode_1_lot = diode_1_split[1].strip() if len(diode_1_split) > 1 else ""
-		diode_1_full_name = build_dict.get("diode_1", "").upper()
 
-		circuit_1_split = build_dict.get("circuit_1", "").upper().split("_LOT")
-		circuit_1_name = circuit_1_split[0].strip()
-		circuit_1_lot = circuit_1_split[1].strip() if len(circuit_1_split) > 1 else ""
-		circuit_1_full_name = build_dict.get("circuit_1", "").upper()
+		circuit_1_full_text = build_dict.get("circuit_1", "")
+		circuit_1_name, circuit_1_lot, circuit_1_extra = pls.separate_part_and_lot(circuit_1_full_text)
 
+		filter_1_full_text = build_dict.get("filter_1", "")
+		filter_1_name, filter_1_lot, filter_1_extra = pls.separate_part_and_lot(filter_1_full_text)
 
-		diode_2_split = build_dict.get("diode_2", "").upper().split("_LOT")
-		diode_2_name = diode_2_split[0].strip()
+		diode_2_full_text = build_dict.get("diode_2", "")
+		diode_2_name, diode_2_lot, diode_2_extra = pls.separate_part_and_lot(diode_2_full_text)
 		diode_2_quantity = build_dict.get("diode_2_chip_count")
-		diode_2_lot = diode_2_split[1].strip() if len(diode_2_split) > 1 else ""
-		diode_2_full_name = build_dict.get("diode_2", "").upper()
 
-		circuit_2_split = build_dict.get("circuit_2", "").upper().split("_LOT")
-		circuit_2_name = circuit_2_split[0].strip()
-		circuit_2_lot = circuit_2_split[1].strip() if len(circuit_2_split) > 1 else ""
-		circuit_2_full_name = build_dict.get("circuit_2", "").upper()
+		circuit_2_full_text = build_dict.get("circuit_2", "")
+		circuit_2_name, circuit_2_lot, circuit_2_extra = pls.separate_part_and_lot(circuit_2_full_text)
 
-		pcb_info_split = build_dict.get("pcb_info", "").upper().split("_LOT")
-		pcb_info_name = pcb_info_split[0].strip()
-		pcb_info_lot = pcb_info_split[1].strip() if len(pcb_info_split) > 1 else ""
-		pcb_info_full_name = build_dict.get("pcb_info", "").upper()
+		filter_2_full_text = build_dict.get("filter_2", "")
+		filter_2_name, filter_2_lot, filter_2_extra = pls.separate_part_and_lot(filter_2_full_text)
 
-		filter_1_split = build_dict.get("filter_1", "").upper().split("_LOT")
-		filter_1_name = filter_1_split[0].strip()
-		filter_1_lot = filter_1_split[1].strip() if len(filter_1_split) > 1 else ""
-		filter_1_full_name = build_dict.get("filter_1", "").upper()
-
-		filter_2_split = build_dict.get("filter_2", "").upper().split("_LOT")
-		filter_2_name = filter_2_split[0].strip()
-		filter_2_lot = filter_2_split[1].strip() if len(filter_2_split) > 1 else ""
-		filter_2_full_name = build_dict.get("filter_2", "").upper()
+		pcb_full_text = build_dict.get("pcb_info", "")
+		pcb_name, pcb_lot, pcb_extra = pls.separate_part_and_lot(pcb_full_text)
 
 		mmic_name = build_dict.get("mmic_name", "")
 		mmic_lot = build_dict.get("mmic_lot", "")
 
 
 		part_rows = [
-			{"part_name": diode_1_full_name, "part_quantity": diode_1_quantity, "part_type": "DIODE", "part_lot": diode_1_lot},
-			{"part_name": circuit_1_full_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_1_lot},
-			{"part_name": diode_2_full_name, "part_quantity": diode_2_quantity, "part_type": "DIODE", "part_lot": diode_2_lot},
-			{"part_name": circuit_2_full_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_2_lot},
-			{"part_name": pcb_info_full_name, "part_quantity": 1, "part_type": "PCB", "part_lot": pcb_info_lot},
-			{"part_name": filter_1_full_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_1_lot},
-			{"part_name": filter_2_full_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_2_lot},
+			{"part_name": diode_1_name, "part_quantity": diode_1_quantity, "part_type": "DIODE", "part_lot": diode_1_lot},
+			{"part_name": circuit_1_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_1_lot},
+			{"part_name": diode_2_name, "part_quantity": diode_2_quantity, "part_type": "DIODE", "part_lot": diode_2_lot},
+			{"part_name": circuit_2_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_2_lot},
+			{"part_name": pcb_name, "part_quantity": 1, "part_type": "PCB", "part_lot": pcb_lot},
+			{"part_name": filter_1_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_1_lot},
+			{"part_name": filter_2_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_2_lot},
 			{"part_name": mmic_name, "part_quantity": 1, "part_type": "MMIC", "part_lot": mmic_lot}
 		]
 

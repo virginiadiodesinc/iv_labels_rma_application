@@ -25,6 +25,10 @@ def separate_part_and_lot(part_and_lot_text):
 	extra = ""
 	split_text = []
 
+	# IF EMPTY STRING (OR JUST WHITESPACE)
+	if len(part_and_lot_text.split()) == 0:
+		return part, lot, extra
+
 	# TRY TO SPLIT VIA WORD 'LOT'
 	if "LOT" in part_and_lot_text:
 		split_text = part_and_lot_text.split('LOT')
