@@ -49,8 +49,9 @@
 						hx-get="/search_part_lots/"
 						hx-trigger="revealed, keyup changed delay:300ms"
 						hx-target="next .lot-container"
-						hx-include="this"
+						hx-include="closest .part-row"
 						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ part['part_lot'] if part else '' }}">
 			</label>
 		</div>
 		<div class="delete-row-button-container">

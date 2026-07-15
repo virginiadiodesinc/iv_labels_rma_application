@@ -195,6 +195,13 @@
 				hx-target="this">
 				Run Polarity Test
 		</button>
+		<button id="export-iv-assembly-button"
+				hx-post="/add_iv_assembly_to_build_parts/"
+				hx-include="#iv-assembly-information-form"
+				hx-swap="beforeend"
+				hx-target="#actual-parts-container">
+				Add IV Assembly to Build Parts
+		</button>
 	</div>
 </div>
 

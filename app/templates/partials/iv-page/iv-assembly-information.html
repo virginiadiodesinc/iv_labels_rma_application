@@ -40,8 +40,9 @@
 							hx-get="/search_part_lots/"
 							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
-							hx-include="this"
+							hx-include="closest .iv-diode-information-line"
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['diode_lot'] if part else '' }}">
 			</label>
 			<div class="lot-container">
 				{% set current_lot = iv_data.diode_lot
@@ -62,8 +63,9 @@
 							hx-get="/search_part_lots/"
 							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
-							hx-include="this"
+							hx-include="closest .iv-circuit-information-line"
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['circuit_lot'] if part else '' }}">
 			</label>
 			<div class="lot-container">
 				{% set current_lot = iv_data.circuit_lot
