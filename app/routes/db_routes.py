@@ -32,6 +32,7 @@ def populate_block_info():
 	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) != []:
 		block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
 		parts = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
+		"""Need to finish implementing lot population logic for parts fields on build page"""
 		lot_lists = {}
 		for part in parts:
 			lot_lists[part["part_name"]] = jb2.get_Lots(part["part_name"])
