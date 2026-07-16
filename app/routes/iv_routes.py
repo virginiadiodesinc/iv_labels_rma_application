@@ -1,4 +1,3 @@
-
 from flask import Blueprint, request, render_template
 from app.services.keithley_236_functions import SMU_K236, Fake_SMU, get_SMU
 from app.services import postprocess as pp
@@ -9,18 +8,11 @@ iv_bp = Blueprint("iv", __name__)
 
 @iv_bp.post("/take_iv/")
 def take_iv():
-	"""Takes an IV using the connected Keithley SMU
-
-	This function attempts to performs an IV sweep using the connected Keithley SMU.
-	If no Keithley is connected, it will notify the user of this. Otherwise, it will run a sweep
-	with the commands sent via whatever is noted in the GUI.
-
-	@return run-iv-response/no-keithley-connected-error Return value of type (template partial)
-	"""
 	SMU_controls = request.form
+	heat_test = request.form.get("heat_test") == "true"
 
 	SMU = get_SMU()
-	
+
 	translated_settings = {
 		# BASIC SETTINGS
 		"compliance_voltage": float(SMU_controls.get("compliance-voltage")),
@@ -86,7 +78,18 @@ def take_iv():
 			"polarity": translated_settings["polarity"],
 			"points_per_decade": translated_settings["points_per_decade"]
 		}
-		
+
+		temperature_list = []
+		heat_current_list = []
+		heat_voltage_list = []
+		if heat_test:
+			heat_current_string, heat_voltage_string = SMU.takeHeatTest()
+			heat_current_list = heat_current_string.split(',')
+			heat_voltage_list = heat_voltage_string.split(',')
+
+			temperature_list = process.calc_heat_parameters(heat_current_list, heat_voltage_list, float(iv_dict["ideality"]))
+			iv_dict["temperature"] = temperature_list[0]
+
 		source_values = process_dict['I (uA)']
 		source_values = [str(abs(float(value))) for value in source_values]
 
@@ -104,7 +107,7 @@ def take_iv():
 
 		fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
 		fig.update_traces(mode='lines+markers')
-		
+
 		iv_curve = {} 
 		iv_curve["figure"] = fig.to_html(full_html=False)
 		iv_curve["iv_source_values"] = ",".join(source_values)
@@ -114,20 +117,54 @@ def take_iv():
 		iv_curve["polarity"] = SMU_controls.get("polarity", "")
 		iv_curve["points_per_decade"] = SMU_controls.get("points-per-decade", "")
 
+		if heat_test:
+			iv_curve["heat_current_list"] = ",".join(str(item) for item in heat_current_list)
+			iv_curve["heat_voltage_list"] = ",".join(str(item) for item in heat_voltage_list)
+			iv_curve["temperature_list"] = ",".join(str(item) for item in temperature_list)
+
 		return render_template("partials/iv-page/run-iv-response.html", iv_curve=iv_curve, iv_data=iv_dict)
-	
+
 	except RuntimeError:
 		return render_template("partials/iv-page/no-keithley-connected-error.html")
 
+@iv_bp.post("/take_polarity_sweep/")
+def take_polarity_sweep():
+	SMU_controls = request.form
+
+	SMU = get_SMU()
+
+	translated_settings = {
+		# BASIC SETTINGS
+		"compliance_voltage": float(SMU_controls.get("compliance-voltage")),
+		"polarity": SMU_controls.get("polarity"),
+		"maximum_current": SMU_controls.get("maximum-current") + "mA",
+		"reverse_polarity_start_current": SMU_controls.get("reverse-current"),
+		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance"),
+		# ADVANCED SETTINGS
+		"default_delay": 'on' if SMU_controls.get("default-delay") == "on" else "off",
+		"integration_time": SMU_controls.get("integration-time"),
+		"filter_readings": SMU_controls.get("filter-readings"),
+		"points_per_decade": SMU_controls.get("points-per-decade"),
+		"sweep_delay": float(SMU_controls.get("sweep-delay")) if SMU_controls.get("sweep-delay") else 0,
+		"gpib_address": SMU_controls.get("gpib-address")
+	}
+
+	SMU.update_settings(**translated_settings)
+
+	try:
+		polarity_source_voltage, polarity_measure_current = SMU.takePolaritySweep()
+
+		process = pp.IV_curve([], [], [], Polarity_Sweep_source = polarity_source_voltage, Polarity_Sweep_measure = polarity_measure_current)
+		polarity = process.find_polarity()
+
+		return (f"Polarity: {polarity}")
+
+	except RuntimeError:
+		return ("Polarity: No Keithley Connected")
+
+
 @iv_bp.get("/get_empty_plot")
 def get_empty_plot():
-	"""Gets an empty plot on page load
-	
-	This function simply puts in a placeholder plot on page load before any real IVs are run or loaded.
-
-
-	@return iv-plot-figure Return value of type (template partial)
-	"""
 	df = pd.DataFrame({
 		"Voltage (V)": [],
 		"Current (uA)": []

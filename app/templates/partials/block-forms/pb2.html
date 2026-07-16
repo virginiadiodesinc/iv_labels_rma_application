@@ -10,7 +10,7 @@
 					size="15" 
 					id="pb2-build-name-input"
 					name="pb2-build-name-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					value="{{block.pb2_build_name if block and block.pb2_build_name else ''}}">
 			</td>
 		</tr>
@@ -29,10 +29,10 @@
 			<td>PREBUILD INITIALS</td>
 			<td>
 				<input 
-					size="5" 
+					class="initials-input"
 					id="pb2-initials-input" 
 					name="pb2-initials-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					value="{{block.pb2_initials if block and block.pb2_initials else ''}}">
 			</td>
 		</tr>
@@ -44,7 +44,7 @@
 					size="5" 
 					id="pb2-pass-fail-input" 
 					name="pb2-pass-fail-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					value="{{block.pb2_pass_fail if block and block.pb2_pass_fail else ''}}">
 			</td>
 		</tr>
@@ -73,10 +73,11 @@
 			<td>INSPECTOR</td>
 			<td>
 				<input 
+					class="initials-input"
 					size="5" 
 					id="pb2-inspection-initials-input" 
 					name="pb2-inspection-initials-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					value="{{block.pb2_inspection_initials if block and block.pb2_inspection_initials else ''}}">
 			</td>
 		</tr>
@@ -84,6 +85,7 @@
 </form>
 
 <button
+	class="important-button"
 	hx-post="/save_pb2_info"
 	hx-include="#pb2-info, #block-info"
 	hx-swap="none">

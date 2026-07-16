@@ -1,4 +1,4 @@
-<form id="full-build-form" name="full-build-form">
+<form id="full-build-form" name="full-build-form" class="full-build-form">
 	<table id="full-build-table-header">
 		<tr>
 			<th>FULL BUILD INFO</th>
@@ -13,7 +13,7 @@
 		name="add-empty-row-button"
 		hx-swap-oob="true"
 		hx-get="/add_empty_part_row/"
-		hx-target="#actual-bom-container"
+		hx-target="#actual-parts-container"
 		hx-swap="beforeend"
 		>
 		Add Custom Part
@@ -24,7 +24,7 @@
 		name="add-empty-note-button"
 		hx-swap-oob="true"
 		hx-get="/add_empty_note_row/"
-		hx-target="#actual-bom-container"
+		hx-target="#actual-notes-container"
 		hx-swap="beforeend"
 		>
 		Add Note
@@ -52,21 +52,29 @@
 	</button>
 
 	<button
+		class="important-button"
 		id="save-build-button"
 		name="save-build-button"
-		hx-post="/save_build_file/"
+		hx-post="/attempt_save_build_file/"
 		hx-include="#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info, #block-id"
-		hx-swap="none"
+		hx-target="#save-build-popup"
+		hx-swap="innerHTML"
 		>
 		Save Build File
 	</button>
 	
 	<div id="actual-bom-container" class="actual-bom-list">
-			{% for item in items %}
+		<div id="actual-parts-container">
+			{% for part in parts %}
 				{% include "partials/build-page/part-row.html" %}
 			{% endfor %}
+		</div>
+		<div id="actual-notes-container">
 			{% for note in notes %}
 				{% include "partials/build-page/note-row.html" %}
 			{% endfor %}
+		</div>
 	</div>
 </form>
+
+<div id="save-build-popup"></div>

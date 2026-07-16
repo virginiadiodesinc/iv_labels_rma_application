@@ -14,7 +14,7 @@
 					type="text" 
 					id="block-engraving-input" 
 					name="block-engraving-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					size="25"
 					value="{{block.block_engraving if block and block.block_engraving else ''}}"
 				>
@@ -28,7 +28,7 @@
 					id="block-serial-number-input" 
 					name="block-serial-number-input"
 					size="5"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					value="{{block.block_serial_number if block and block.block_serial_number else ''}}"
 				>
 			</td>
@@ -40,7 +40,7 @@
 					type="text" 
 					id="block-revision-input" 
 					name="block-revision-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					maxlength="2"
 					size="5"
 					value="{{block.block_revision if block and block.block_revision else ''}}"
@@ -51,6 +51,7 @@
 </form>
 
 <button
+	class="important-button"
 	hx-post="/populate_block_info"
 	hx-include="#block-info"
 	hx-target="#block-forms-container"

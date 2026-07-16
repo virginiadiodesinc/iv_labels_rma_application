@@ -50,9 +50,12 @@ def convert_build_file(file):
 	file_name = file_name.replace(".txt", "")
 
 	build_name = file_name.split(os.sep)[-1].split("_")[0].upper()
+	build_serial_number_with_possible_letter = file_name.split(os.sep)[-1].split()[1]
 	build_serial_number = file_name.split(os.sep)[-1].split()[1][:-1]
 	build_rev_letter = file_name.split(os.sep)[-1].split()[1][-1]
+
 	if not build_rev_letter.isalpha():
+		build_serial_number = build_serial_number_with_possible_letter
 		build_rev_letter = "A"
 	else:
 		build_rev_letter = build_rev_letter.upper()
@@ -60,6 +63,8 @@ def convert_build_file(file):
 	build_info["full_build_name"] = build_name
 
 	for index, line in enumerate(lines):
+		if line.isspace() or line == "":
+			continue
 		# FIRST LINE: Block Engraving, PB1 Name (optional)
 		if index == 0:
 			split_line = line.split()

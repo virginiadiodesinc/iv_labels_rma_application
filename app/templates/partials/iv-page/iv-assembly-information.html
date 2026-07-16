@@ -2,31 +2,31 @@
 	<div id="iv-build-info-container" class="iv-build-info-container">
 		<label> Block Engraving
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-engraving"
 					value="{{iv_data.block_name if iv_data and iv_data.block_name else ''}}"
 					>
 		</label>
 		<label> Block Serial Number
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-sn"
-					value="{{iv_data.block_sn if iv_data and iv_data.block_sn else ''}}"
+					value="{{iv_data.build_sn if iv_data and iv_data.build_sn else ''}}"
 					size="7">
-		</label>
-		<label> Build Name
-			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
-					name="iv-build-name"
-					value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
-					>
 		</label>
 		<label> Revision Letter
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-revision"
-					value="{{iv_data.block_revision if iv_data and iv_data.block_revision else ''}}"
+					value="{{iv_data.build_revision if iv_data and iv_data.build_revision else ''}}"
 					size="2">
+		</label>
+		<label> Build Name
+			<input type="text"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+					name="iv-build-name"
+					value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
+					>
 		</label>
 	</div>
 	<div id="iv-part-information-container" class="iv-part-information-container">
@@ -38,12 +38,18 @@
 							id="iv-diode-name"
 							value="{{iv_data.diode if iv_data and iv_data.diode else ''}}"
 							hx-get="/search_part_lots/"
-							hx-trigger="revealed, keyup changed delay:300ms"
+							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
-							hx-include="this"
-							oninput="this.value = this.value.toUpperCase();">
+							hx-include="closest .iv-diode-information-line"
+							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['diode_lot'] if part else '' }}">
 			</label>
 			<div class="lot-container">
+				{% set current_lot = iv_data.diode_lot
+					if iv_data is defined and iv_data.diode_lot
+					else ''
+				%}
+				{% set lot_list = diode_lots_list if lot_list is undefined else '' %}
 				{% include "partials/build-page/lot-input.html" %}
 			</div>
 		</div>
@@ -55,18 +61,24 @@
 							id="iv-circuit-name"
 							value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}"
 							hx-get="/search_part_lots/"
-							hx-trigger="revealed, keyup changed delay:300ms"
+							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
-							hx-include="this"
-							oninput="this.value = this.value.toUpperCase();">
+							hx-include="closest .iv-circuit-information-line"
+							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['circuit_lot'] if part else '' }}">
 			</label>
 			<div class="lot-container">
+				{% set current_lot = iv_data.circuit_lot
+					if iv_data is defined and iv_data.circuit_lot
+					else ''
+				%}
+				{% set lot_list = circuit_lots_list if lot_list is undefined else '' %}
 				{% include "partials/build-page/lot-input.html" %}
 			</div>
 		</div>
 		<label> Assembly #
 			<input type="text"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-assembly-number"
 					value="{{iv_data.assembly_number if iv_data and iv_data.assembly_number else ''}}"
 					>
@@ -83,18 +95,14 @@
 			<select
 			name="part-tag"
 			class="part-tag">
-				<option>N/A</option>
-				<option>1</option>
-				<option>2</option>
-				<option>3</option>
-				<option>A</option>
-				<option>B</option>
-				<option>A1</option>
-				<option>A2</option>
-				<option>G1</option>
-				<option>G2</option>
-				<option>G3</option>
-				<option>G4</option>
+			{% for tag in tags %}
+				<option 
+					value="{{ tag }}"
+					{% if selected_tag == tag %}selected{% endif %}
+				>
+					{{ tag }}
+				</option>
+			{% endfor %}
 			</select>
 		</label>
 	</div>

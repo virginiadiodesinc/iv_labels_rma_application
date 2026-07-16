@@ -15,13 +15,14 @@
 	hx-swap="beforeend"
 	hx-post="/add_part_rows_from_bom_list/"
 	hx-include="#bom-list-form"
-	hx-target="#actual-bom-container">
+	hx-target="#actual-parts-container"
+	_="on click set .bom-part-check.checked to false then set .select-all-checkbox.checked to false">
 	Add BOM part(s)
 </button>
 
 <form id="bom-list-form" name="bom-list-form">
 	<label>Select/Deselect All
-		<input type="checkbox"
+		<input type="checkbox" class="select-all-checkbox"
 		_= "on click set .bom-part-check.checked to my checked">
 	</label>	
 	<details open>

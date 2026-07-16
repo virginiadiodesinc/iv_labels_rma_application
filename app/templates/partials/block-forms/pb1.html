@@ -7,10 +7,10 @@
 			<td>(PRE)BUILD NAME</td>
 			<td>
 				<input 
-					size="15" 
+					class="build-name-input"
 					id="pb1-build-name-input" 
 					name="pb1-build-name-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					value="{{block.pb1_build_name if block and block.pb1_build_name else ''}}">
 			</td>
 		</tr>
@@ -29,10 +29,11 @@
 			<td>PREBUILD INITIALS</td>
 			<td>
 				<input 
+					class="initials-input"
 					size="10" 
 					id="pb1-initials-input" 
 					name="pb1-initials-input"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					value="{{block.pb1_initials if block and block.pb1_initials else ''}}"
 				>
 			</td>
@@ -41,6 +42,7 @@
 </form>
 
 <button
+	class="important-button"
 	hx-post="/save_pb1_info"
 	hx-include="#pb1-info, #block-info"
 	hx-swap="none">

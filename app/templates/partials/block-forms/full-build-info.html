@@ -2,22 +2,24 @@
 	<td>
 		<label for="full-build-name-input">BUILD NAME:</label>
 		<input 
+			class="build-name-input"
 			type="text" 
 			id="full-build-name-input" 
 			name="full-build-name-input" 
 			size="20"
-			oninput="this.value = this.value.toUpperCase();"
+			oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 			value="{{block.full_build_name if block and block.full_build_name else ''}}"
 		>
 	</td>
 	<td>
 		<label for="full-build-initials-input">BUILD INITIALS:</label>
 		<input 
+			class="initials-input"
 			type="text" 
 			id="full-build-initials-input" 
 			name="full-build-initials-input" 
 			size="10"
-			oninput="this.value = this.value.toUpperCase();"
+			oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 			value="{{block.full_build_initials if block and block.full_build_initials else ''}}"
 		>
 	</td>

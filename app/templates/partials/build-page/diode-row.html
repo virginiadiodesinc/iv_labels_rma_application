@@ -1,0 +1,27 @@
+<div class="diode-reverse-voltage-container">
+	<Label>
+		Reverse Voltage (V)
+		<input class="diode-extra-number-input"
+						type="text" 
+						name="diode-row-reverse-voltage-input" 
+						value="{{reverse_voltage if reverse_voltage else 'NA'}}">
+	</Label>
+</div>
+<div class="diode-temperature-container">
+	<Label>
+		Temperature (C)
+		<input class="diode-extra-number-input"
+						type="text" 
+						name="diode-row-reverse-voltage-input" 
+						value="{{temperature if temperature else 'NA'}}">
+	</Label>
+</div>
+<div class="import-values-from-iv-container">
+	<button id="import-special-values-from-iv-button"
+		name="import-special-values-from-iv-button"
+		hx-include="#iv-info"
+		hx-post="/import_diode_info_from_iv/"
+		hx-target="closest .diode-row">
+		Import From Current IV
+	</button>
+</div>

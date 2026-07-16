@@ -20,7 +20,8 @@ def get_iv_page():
 @page_bp.get("/iv_and_build")
 def get_iv_and_build_page():
 	print(default_keithley_settings)
-	return render_template("iv-and-build-page.html", current_settings=default_keithley_settings)
+	tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
+	return render_template("iv-and-build-page.html", current_settings=default_keithley_settings, tags=tag_list)
 
 @page_bp.get("/feedback")
 def get_feedback_page():

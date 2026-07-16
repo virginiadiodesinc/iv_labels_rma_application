@@ -24,7 +24,7 @@ def clear_build_parts():
 
 	@return clear-build-parts-response Return value of type (template partial)
 	"""
-	return render_template("partials/block-forms/clear-build-parts-response.html", items=[], notes=[])
+	return render_template("partials/block-forms/clear-build-parts-response.html", parts=[], notes=[])
 
 @build_bp.get("/add_empty_part_row/")
 def add_empty_part_row():
@@ -65,4 +65,49 @@ def add_part_rows_from_bom():
 		rows.append(
 			render_template("partials/build-page/part-row.html", part={"part_name": part_name, "part_quantity": part_quantity, "part_type": part_type, "part_lot": ""})
 		)
+
 	return "".join(rows)
+
+@build_bp.post("/import_diode_info_from_iv/")
+def import_diode_info_from_iv():
+	all_diode_info = request.form
+	temperature = all_diode_info.get("temperature")
+	if temperature:
+		temperature = round(float(temperature), 2)
+	reverse_voltage = all_diode_info.get("reverse-voltage")
+	if reverse_voltage:
+		reverse_voltage = round(float(reverse_voltage), 2)
+	return render_template("partials/build-page/diode-row.html", temperature=temperature, reverse_voltage=reverse_voltage)
+
+@build_bp.post("/add_iv_assembly_to_build_parts/")
+def add_iv_assembly_to_build_parts():
+	iv_assembly_info = request.form
+	parts_list = iv_assembly_info.getlist("part")
+	lots_list = iv_assembly_info.getlist("lot-select")
+	custom_lots_list = iv_assembly_info.getlist("custom-lot-input")
+
+	custom_index = 0
+	for index, lot in enumerate(lots_list):
+		if lot == "Other":
+			lots_list[index] = custom_lots_list[custom_index]
+			custom_index += 1
+
+	diode_name = parts_list[0]
+	diode_lot = lots_list[0]
+
+	circuit_name = parts_list[1]
+	circuit_lot = lots_list[1]
+
+	diode = {"part_name": diode_name, "part_quantity": 1, "part_type": "DIODE", "part_lot": diode_lot}
+	circuit = {"part_name": circuit_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_lot}
+
+
+	rows = []
+	rows.append(
+			render_template("partials/build-page/part-row.html", part=diode)
+		)
+	rows.append(
+			render_template("partials/build-page/part-row.html", part=circuit)
+		)
+	return "".join(rows)
+	

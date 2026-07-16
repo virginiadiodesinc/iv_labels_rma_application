@@ -1,122 +1,119 @@
 <div class="part-row">
-	<div>
-		<label>
-			Part Type:
-			<select 
+	<div class="part-row-line-1">
+		<div>
+			<label>
+				Part Type:
+				<select 
+					onchange="sortPartsContainer(); toggleDiodeRow(this); togglePcbRow(this)" 
 					name="part_type">
-				<option value="N/A" {% if part and part['part_type'] == "N/A" %}
-						selected
-						{% elif item and item.part_type == "N/A" %}
-						selected
-					{% endif %}>N/A</option>
-				<option value="MISC" {% if part and part['part_type'] == "MISC" %}
-						selected
-						{% elif item and item.part_type == "MISC" %}
-						selected
-					{% endif %}>MISC</option>
-				<option value="DIODE" {% if part and part['part_type'] == "DIODE" %}
-						selected
-						{% elif item and item.part_type == "DIODE" %}
-						selected
-					{% endif %}>DIODE</option>
-				<option value="PCB" {% if part and part['part_type'] == "PCB" %}
-						selected
-						{% elif item and item.part_type == "PCB" %}
-						selected
-					{% endif %}>PCB</option>
-				<option value="CONNECTOR" {% if part and part['part_type'] == "CONNECTOR" %}
-						selected
-						{% elif item and item.part_type == "CONNECTOR" %}
-						selected
-					{% endif %}>CONNECTOR</option>
-				<option value="CIRCUIT" {% if part and part['part_type'] == "CIRCUIT" %}
-						selected
-						{% elif item and item.part_type == "CIRCUIT" %}
-						selected
-					{% endif %}>CIRCUIT</option>
-				<option value="MMIC" {% if part and part['part_type'] == "MMIC" %}
-						selected
-						{% elif item and item.part_type == "MMIC" %}
-						selected
-					{% endif %}>MMIC</option>
-				<option value="FILTER" {% if part and part['part_type'] == "FILTER" %}
-						selected
-						{% elif item and item.part_type == "FILTER" %}
-						selected
-					{% endif %}>FILTER</option>
-			</select>
-		</label>
+					<option value="NA" {% if part and part['part_type'] == "NA" %}
+							selected
+						{% endif %}>NA</option>
+					<option value="MISC" {% if part and part['part_type'] == "MISC" %}
+							selected
+						{% endif %}>MISC</option>
+					<option value="DIODE" {% if part and part['part_type'] == "DIODE" %}
+							selected
+						{% endif %}>DIODE</option>
+					<option value="PCB" {% if part and part['part_type'] == "PCB" %}
+							selected
+						{% endif %}>PCB</option>
+					<option value="CONNECTOR" {% if part and part['part_type'] == "CONNECTOR" %}
+							selected
+						{% endif %}>CONNECTOR</option>
+					<option value="CIRCUIT" {% if part and part['part_type'] == "CIRCUIT" %}
+							selected
+						{% endif %}>CIRCUIT</option>
+					<option value="MMIC" {% if part and part['part_type'] == "MMIC" %}
+							selected
+						{% endif %}>MMIC</option>
+					<option value="FILTER" {% if part and part['part_type'] == "FILTER" %}
+							selected
+						{% endif %}>FILTER</option>
+				</select>
+			</label>
+		</div>
+		<div>
+			<label>
+				Part Name:
+				<input 
+						class="part-row-part-name"
+						type="text" 
+						name="part" 
+						value="{{
+								part['part_name']
+								if part
+								else ''
+							}}" 
+						size="10"
+						hx-get="/search_part_lots/"
+						hx-trigger="revealed, keyup changed delay:300ms"
+						hx-target="next .lot-container"
+						hx-include="closest .part-row"
+						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ part['part_lot'] if part else '' }}">
+			</label>
+		</div>
+		<div class="delete-row-button-container">
+			<button
+				type="button"
+				onclick="this.closest('.part-row').remove()"
+				class="delete-row-button">
+				X
+			</button>
+		</div>
 	</div>
-	<div>
-		<label>
-			Part Name:
-			<input type="text" 
-					name="part" 
-					value="{{
-							part['part_name']
-    						if part
-							else item.part_name
-							if item and item.part_name
-							else ''
-						}}" 
-					size="30"
-					hx-get="/search_part_lots/"
-					hx-trigger="revealed, keyup changed delay:300ms"
-					hx-target="next .lot-container"
-					hx-include="this"
-					oninput="this.value = this.value.toUpperCase();">
-		</label>
-	</div>
-	<div class="lot-container">
-		{% if part or (build and build.part_name)%}
-			{% include "partials/build-page/lot-input.html" %}
-		{% endif %}
-	</div>
+	<div class="part-row-line-2">
+		<div class="lot-container">
+			{% if part or (build and build.part_name)%}
+				{% include "partials/build-page/lot-input.html" %}
+			{% endif %}
+		</div>
 
-	<div>
-		<label>
-			Qty:
-			<input class="quantity"
-					type="number" 
-					name="quantity" 
-					value="{{
-							part['part_quantity']
-							if part
-							else item.quantity
-							if item and item.quantity
-							else '1'
-						}}">
-		</label>
-	</div>
+		<div>
+			<label>
+				Qty:
+				<input class="part-row-part-quantity"
+						type="number" 
+						name="quantity" 
+						value="{{
+								part['part_quantity']
+								if part
+								else '1'
+							}}">
+			</label>
+		</div>
 
-	<div>
-		<label class="not-implemented-yet">
-			Tag:
-			<select
-			name="part-tag"
-			class="part-tag">
-				<option>N/A</option>
-				<option>1</option>
-				<option>2</option>
-				<option>3</option>
-				<option>A</option>
-				<option>B</option>
-				<option>A1</option>
-				<option>A2</option>
-				<option>G1</option>
-				<option>G2</option>
-				<option>G3</option>
-				<option>G4</option>
-			</select>
-		</label>
-	</div>
-	
-	<div class="delete-row-button-container">
-		<button
-			type="button"
-			onclick="this.closest('.part-row').remove()"
-			class="delete-row-button">
-			X
-		</button>
+		<div>
+			<label class="not-implemented-yet">
+				Tag:
+				<select
+				name="part-tag"
+				class="part-tag">
+					<option>NA</option>
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>A</option>
+					<option>B</option>
+					<option>A1</option>
+					<option>A2</option>
+					<option>G1</option>
+					<option>G2</option>
+					<option>G3</option>
+					<option>G4</option>
+				</select>
+			</label>
+		</div>
+		<div class="diode-row"
+			{% set is_diode = (part and part['part_type'] == "DIODE") %}
+			{% if not is_diode %}style="display:none"{% endif %}>
+			{% include "partials/build-page/diode-row.html" %}
+		</div>
+		<div class="pcb-row"
+			{% set is_pcb = (part and part['part_type'] == "PCB") %}
+			{% if not is_pcb %}style="display:none"{% endif %}>
+			{% include "partials/build-page/pcb-row.html" %}
+		</div>
 	</div>
 </div>

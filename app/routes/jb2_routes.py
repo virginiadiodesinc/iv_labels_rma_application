@@ -62,6 +62,8 @@ def search_part_lots():
 	@return lot-input Return value of type (template partial)
 	"""
 	part = request.args.get("part")
+	lot = request.args.get("lot", "")
 	lot_list = jb2.get_Lots(part)
 
-	return render_template("partials/build-page/lot-input.html", lot_list=lot_list)
+
+	return render_template("partials/build-page/lot-input.html", lot_list=lot_list, current_lot=lot)

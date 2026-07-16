@@ -3,11 +3,12 @@
 		hx-post="/upload_build_file/"
 		hx-target="#build-file-upload-form"
 		hx-swap="innerHTML">
-		Upload Build File
+		Choose Build File
 	</button>
 	<text name="build-file-upload-text" id="build-file-upload-text">{{file_path if file_path else 'No file selected'}}</text>
 	<input type="hidden" name="build-file-path" id="build-file-path" value="{{file_path if file_path else ''}}">
 	<button 
+		class="important-button"
 		type="submit"
 		hx-post="/populate_info_from_build_file/"
 		hx-swap="none"

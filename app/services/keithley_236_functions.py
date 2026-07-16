@@ -1,7 +1,6 @@
 import time
 import pyvisa
 
-
 # FUNCTION TO CHECK FOR REAL OR FAKE KEITHLEY
 def get_SMU():
 	"""Gets either a real SMU or a fake SMU
@@ -22,6 +21,8 @@ class Fake_SMU():
 	def update_settings(self, **kwargs):
 		return kwargs
 	def takeIV(self):
+		raise RuntimeError("No Keithley connected")
+	def takePolaritySweep(self):
 		raise RuntimeError("No Keithley connected")
 
 class SMU_K236():
@@ -61,9 +62,6 @@ class SMU_K236():
 		self.sign_reverse = '-' #default polarity negative
 		self.Q_command_reverse = 'Q2,'+self.sign_reverse+self.Imin_reverse+','+self.sign_reverse+'1E-3'+',0,0,0'
 
-		self.instrument_delay = 0.1
-		self.default_sweep_delay = .45
-
 	def connect(self):
 		try:
 			rm = pyvisa.ResourceManager()
@@ -84,7 +82,6 @@ class SMU_K236():
 		None.
 		"""
 		self.inst.write('J0X')
-		time.sleep(self.instrument_delay)
 
 	# BASIC SETTINGS
 
@@ -101,7 +98,6 @@ class SMU_K236():
 			self.W_command = 'W1'
 		elif toggle == 'off':
 			self.W_command = 'W0'
-
 
 	def set_filter(self, count):
 		"""
@@ -141,7 +137,6 @@ class SMU_K236():
 		if polarity == '+':
 			self.sign = ''
 			self.Q_command = 'Q2,'+self.sign+self.Imin+','+self.sign+self.Imax+','+self.points+',0,'+self.user_sweep_delay
-
 
 		elif polarity == '-':
 			self.sign = '-'
@@ -240,32 +235,24 @@ class SMU_K236():
 		self.reset() 
 
 		self.inst.write('F0,1X') #Sources voltage, measures current (sweep)
-		time.sleep(self.instrument_delay)
 
 		print(self.L_command_polarity)
 		self.inst.write(self.L_command_polarity+'X')
-		time.sleep(self.instrument_delay)
 
 		print(self.Q_command_polarity)
 		self.inst.write(self.Q_command_polarity+'X')
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(self.instrument_delay)
-	
+
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(1)
+		self.wait_for_sweep_done()
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(self.instrument_delay)
 
 		source_values = self.inst.query("G1,2,2X") #Voltage values
-		time.sleep(self.instrument_delay)
 		measure_values = self.inst.query("G4,2,2X") #Current values
-		time.sleep(self.instrument_delay)
 		
 		return source_values, measure_values
 	
@@ -306,7 +293,6 @@ class SMU_K236():
 		self.V_compliance_reverse = str(Vmax)
 		self.L_command_reverse = 'L'+self.V_compliance_reverse+',0'
 
-
 	# ADVANCED SETTINGS
 
 	def set_user_sweep_delay(self, sweep_delay):
@@ -327,10 +313,8 @@ class SMU_K236():
 			self.user_sweep_delay = '1000'
 			self.Q_command = 'Q2,'+self.sign+self.Imin+','+self.sign+self.Imax+','+self.points+',0,'+self.user_sweep_delay
 
-
 	def set_gpib_address(self, address):
 		self.address = address
-
 
 	def set_points_per_decade(self, points_per_decade):
 		"""
@@ -357,7 +341,6 @@ class SMU_K236():
 			self.points_per_decade = 50
 			self.Q_command = 'Q2,'+self.sign+self.Imin+','+self.sign+self.Imax+','+self.points+',0,'+self.user_sweep_delay
 
-
 	def set_integration_time(self, option):
 		"""
 		Set integration time: 60Hz, Medium, Fast
@@ -368,14 +351,15 @@ class SMU_K236():
 		"""
 		if option == '60Hz':
 			self.S_command = 'S2' #16.67ms
+			self.integration_time = 0.01667
 		elif option == 'Medium':
 			self.S_command = 'S1' #4ms
+			self.integration_time = 0.04
 		elif option == 'Fast':
 			self.S_command = 'S0' #416usec
-
+			self.integration_time = 0.000416
 
 	# UPDATE ALL SETTINGS
-
 	def update_settings(self, 
 					 # BASIC SETTINGS
 						compliance_voltage = 4.0, polarity = '+', maximum_current = '1mA', reverse_polarity_start_current = 10.0, reverse_compliance_voltage = 100.0,
@@ -395,7 +379,6 @@ class SMU_K236():
 		self.set_integration_time(integration_time)
 		self.set_points_per_decade(points_per_decade)
 		self.set_gpib_address(gpib_address)
-
 
 		settings_dict = {
 			# BASIC SETTINGS
@@ -417,7 +400,6 @@ class SMU_K236():
 		return settings_dict
 	
 	# SWEEPS
-	
 	def takeIV(self):
 		"""
 		SMU 236 IV Sequence
@@ -437,51 +419,42 @@ class SMU_K236():
 		self.reset()
 
 		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
-		time.sleep(self.instrument_delay)
 
 		self.inst.write(self.W_command+':'+self.S_command+':'+self.P_command+':'+self.L_command+'X')
-		time.sleep(self.instrument_delay)
 
 		self.inst.write(self.Q_command+'X')
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(sweep_delay) # Variable based on the the total number of points and delay time
+		self.wait_for_sweep_done()
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(self.instrument_delay)
 
 		source_values_up = self.inst.query("G1,2,2X") #Current values
-		time.sleep(self.instrument_delay)
 		measure_values_up = self.inst.query("G4,2,2X") #Voltage values
-		time.sleep(self.instrument_delay)
 
 		self.Q_command = 'Q2,'+self.sign+self.Imax+','+self.sign+self.Imin+','+self.points+',0,'+self.user_sweep_delay #prepare down sweep
 
 		self.inst.write(self.Q_command+'X')
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(sweep_delay) # Variable based on the the total number of points and delay time
+		self.wait_for_sweep_done()
+
+		# print("HEX: ", hex(status_byte))
+		# print("NORMAL: ", status_byte)
+		# print("BINARY: ", bin(status_byte))
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(self.instrument_delay)
 
 		#source_values_down = self.inst.query("G1,2,2X") #Current values, these are identical to source_values_up but in reverse, so this is redundant
-		#time.sleep(self.instrument_delay)
 		measure_values_down = self.inst.query("G4,2,2X") #Voltage values
-		time.sleep(self.instrument_delay)
 
 		self.Q_command = 'Q2,'+self.sign+self.Imin+','+self.sign+self.Imax+','+self.points+',0,'+self.user_sweep_delay #return to up sweep
 
@@ -491,6 +464,62 @@ class SMU_K236():
 		
 		return source_values_up, measure_values_up, measure_values_down
 	
+	def takeHeatTest(self):
+		"""
+		SMU 236 Heat Test
+
+		Returns
+		-------
+		source_values: the current values sourced for the heat test
+		measure_values: the voltage values measured for the heat test
+		"""
+
+		self.reset() #J0X
+
+		"""
+		F1,1 source current measure voltage
+		O0 local sense for V-source feedback and measurement
+		P0 filter disabled
+		Z0 disable suppression
+		S0 integration time fast
+		W0 disable default delay
+		B0.0E+0,0,0 bias level zero, range zero, delay zero
+		L6.0E+0,2 set voltage compliance to 6V and source current range to 10nA
+		X execute
+		M0, sum of zero binary bits and delay/idle period conditions for service request
+		X execute
+		M2, sum of two binary bits and delay/idle period conditions for service request
+		X execute
+		"""
+		self.inst.write('F1,1O0P0Z0S0W0B0.0E+0,0,0L6.0E+0,2XM0,XM2,X') 
+
+		self.inst.write('U4X') #send measurement parameters and execute
+
+		self.inst.write('B0.0E+0,,Q0,' + self.sign + '1.0E-4,9,0,10X') #Bias level zero, range zero, delay zero; Fixed level sweep at +/-100uA, 100mA range, 0mS delay, 10 cycles and execute
+
+		self.inst.write('U4X') #send measurement parameters and execute
+
+		self.inst.write('B0.0E+0,,Q6,' + self.sign + '5.0E-2,9,0,300X') #Bias level zero, range zero, delay zero; Append fixed level sweep at +/-50mA, 100mA range, 0mS delay, 300 cycles and execute
+
+		self.inst.write('U4X') #send measurement parameters and execute
+
+		self.inst.write('B0.0E+0,,Q6,' + self.sign + '1.0E-4,9,0,100X') #Bias level zero, range zero, delay zero; Append fixed level sweep at +/-100uA, 100mA range, 0mS delay, 100 cycles and execute
+
+		self.inst.write('N1X') #Operate mode
+
+		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
+
+		self.inst.write('H0X') #Execute sweep
+		self.wait_for_sweep_done()
+
+		self.inst.write('U4X') #send measurement parameters and execute
+
+		source_values = self.inst.query("G1,2,2X") #Current values
+		measure_values = self.inst.query("G4,2,2X") #Voltage values
+
+		heat_data = self.inst.query('G15,2,2U8X') #Include all items in string, ASCII data no prefix no suffix, all lines of sweep data per talk; send defined sweep size and execute
+
+		return source_values, measure_values
 
 	def takeReverseBreakdown(self):
 		"""
@@ -504,34 +533,42 @@ class SMU_K236():
 		self.reset()
 
 		self.inst.write('F1,1X') #Sources current, measures voltage (sweep)
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('S1X') #Integration time medium
-		time.sleep(self.instrument_delay)
 
 		print(self.L_command_reverse)
 		self.inst.write(self.L_command_reverse+'X')
-		time.sleep(self.instrument_delay)
 
 		print(self.Q_command_reverse)
 		self.inst.write(self.Q_command_reverse+'X')
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('N1X') #Operate mode
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('M2,0X') #Generate service request when sweep is finished and instrument is idle
-		time.sleep(self.instrument_delay)
 
 		self.inst.write('H0X') #Execute sweep
-		time.sleep(self.default_sweep_delay) #Should probably be variable and depend on the the total number of points and delay time
+		self.wait_for_sweep_done()
 
 		self.inst.write('N0X') #Standby mode
-		time.sleep(self.instrument_delay)
 
 		source_values = self.inst.query("G1,2,2X") #Current values
-		time.sleep(self.instrument_delay)
 		measure_values = self.inst.query("G4,2,2X") #Voltage values
-		time.sleep(self.instrument_delay)
 
 		return source_values, measure_values
+
+	# WAIT FUNCTION 
+	def wait_for_sweep_done(self, timeout=10, poll_interval=0.02):
+		"""
+		SMU 236 Wait for Sweep/SRQ Polling Function
+
+		Returns
+		-------
+		"""
+		start = time.time()
+		while True:
+			status_byte = self.inst.read_stb()
+			if status_byte & 0x02: # Sweep Done bit
+				return status_byte
+			if time.time() - start > timeout:
+				raise TimeoutError("Sweep did not complete in time")
+			time.sleep(poll_interval)

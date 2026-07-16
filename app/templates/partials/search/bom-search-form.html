@@ -8,13 +8,15 @@
 				<label for="component-name">BUILD NAME:</label>
 				<input
 					type="text"
+					class="build-name-input"
 					id="component-name" 
 					name="component-name" 
 					hx-get="/search_jb2_components/"
 					hx-target="#search-results"
 					hx-trigger="keyup changed delay:500ms"
 					list="search-results"
-					oninput="this.value = this.value.toUpperCase();"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+					value="{{ populated_build_name if populated_build_name else '' }}"
 				>
 			</td>
 		</tr>
