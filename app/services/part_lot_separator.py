@@ -75,6 +75,14 @@ def separate_serial_number_and_revision(serial_number_and_revision_text):
 
 	return serial_number, revision
 
+def custom_lot_handler(parts_list, lots_list, custom_lots_list):
+	custom_index = 0
+	for index, lot in enumerate(lots_list):
+		if lot == "Other":
+			lots_list[index] = custom_lots_list[custom_index]
+			custom_index += 1
+	return lots_list
+
 def main():
 	random_part_list = [
 	"A4APED11.5FGXXX_LOT1111",
