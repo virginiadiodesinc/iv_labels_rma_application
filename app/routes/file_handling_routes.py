@@ -263,8 +263,8 @@ def upload_build_file():
 		
 	return render_template("partials/block-forms/build-file-upload.html", file_path=path[0])
 
-@file_bp.post("/save_block_file/")
-def save_block_file():
+@file_bp.post("/attempt_save_block_file/")
+def attempt_save_block_file():
 	"""Saves the data from the relevant input fields to a (LabView Style) block file 
 	
 	This function saves the data from the block input fields (inspection, PB1, PB2) to 
@@ -276,7 +276,96 @@ def save_block_file():
 	"""
 	block_data = request.form
 
+	if validate_block_info(block_data.get("block-engraving-input", "")) == True:
+		block_rev = block_data.get("block-revision-input", "") if block_data.get("block-revision-input", "") != "A" else ""
+		block_dict = {
+			"block_engraving": block_data.get("block-engraving-input", ""),
+			"block_sn": block_data.get("block-serial-number-input", "") + block_rev,
+			"inspection_date": iso_date_to_labview(block_data.get("inspection-date-input", "")),
+			"inspection_initials": block_data.get("inspection-initials-input", ""),
+			"PB1_name": block_data.get("pb1-build-name-input", ""),
+			"PB1_date": iso_date_to_labview(block_data.get("pb1-date-input", "")),
+			"PB1_initials": block_data.get("pb1-initials-input", ""),
+			"PB2_name": block_data.get("pb2-build-name-input", ""),
+			"PB2_date": iso_date_to_labview(block_data.get("pb2-date-input", "")),
+			"PB2_initials": block_data.get("pb2-initials-input", ""),
+			#"PB2_passfail": block_data.get("pb2-pass-fail-input", ""),
+			#"PB2_bond_wire_pads": block_data.get("pb2-bond-pads-count-input", ""),
+			#"PB2_components": block_data.get("pb2-components-count-input", ""),
+			"PB2_inspection": block_data.get("pb2-inspection-initials-input", "")
+		}
+		
+		file_name, content_rows = write_block_file(block_dict)
+		
+		path = webview.windows[0].create_file_dialog(
+			webview.FileDialog.SAVE,
+			save_filename=file_name,
+			directory=block_file_directory
+			)
+		
+		if path is None: #Someone closed out the save dialog box without actually saving the file
+			return "", 200
+		
+		else:
+			if path and path[0] and path[0].endswith(".txt"):
+				with open(path[0], "w") as file:
+					for index, line in enumerate(content_rows):
+						file.write(line)
+						if index < len(content_rows) - 1:
+							file.write("\n")
+			
+			if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
+				
+				result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
+				
+				updates = {
+					"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else result.inspection_date,
+					"inspection_initials": block_data.get("inspection-initials-input", "").strip() if (block_data.get("inspection-initials-input", "") != "") else result.inspection_initials,
+					"pb1_build_name": block_data.get("pb1-build-name-input", "").strip() if (block_data.get("pb1-build-name-input", "") != "") else result.pb1_build_name,
+					"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else result.pb1_date,
+					"pb1_initials": block_data.get("pb1-initials-input", "").strip() if (block_data.get("pb1-initials-input", "") != "") else result.pb1_initials,
+					"pb2_build_name": block_data.get("pb2-build-name-input", "").strip() if (block_data.get("pb2-build-name-input", "") != "") else result.pb2_build_name,
+					"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else result.pb2_date,
+					"pb2_initials": block_data.get("pb2-initials-input", "").strip() if (block_data.get("pb2-initials-input", "") != "") else result.pb2_initials,
+					"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip() if (block_data.get("pb2-inspection-initials-input", "") != "") else result.pb2_inspection
+				}
+
+				block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip()
+				
+				update_table_entry(db_session, Build_Info, block_id, **updates)
+
+				return "Block file written", 204
+			
+			elif retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) == []:
+				
+				new_entry = {
+					"block_id": block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip(),
+					"block_engraving": block_dict["block_engraving"].strip(),
+					"block_serial_number": block_data.get("block-serial-number-input", "").strip(),
+					"block_revision": block_data.get("block-revision-input", "").strip(),
+					"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else None,
+					"inspection_initials": block_data.get("inspection-initials-input", "").strip(),
+					"pb1_build_name": block_data.get("pb1-build-name-input", "").strip(),
+					"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else None,
+					"pb1_initials": block_data.get("pb1-initials-input", "").strip(),
+					"pb2_build_name": block_data.get("pb2-build-name-input", "").strip(),
+					"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else None,
+					"pb2_initials": block_data.get("pb2-initials-input", "").strip(),
+					"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip(),
+					"block_file_path": path[0]
+				}
+				add_table_entry(db_session, Build_Info, **new_entry)
+				return "Block file written", 204
+	else:
+		print("Block engraving does not match any entry on Block Name List.")
+		return render_template("partials/build-page/confirm-block-file-save.html")
+	
+@file_bp.post("/confirm_block_file_save/")
+def confirm_block_file_save():
+	block_data = request.form
+
 	block_rev = block_data.get("block-revision-input", "") if block_data.get("block-revision-input", "") != "A" else ""
+
 	block_dict = {
 		"block_engraving": block_data.get("block-engraving-input", ""),
 		"block_sn": block_data.get("block-serial-number-input", "") + block_rev,
@@ -301,58 +390,66 @@ def save_block_file():
 		save_filename=file_name,
 		directory=block_file_directory
 		)
-
-	if path and path[0] and path[0].endswith(".txt"):
-		with open(path[0], "w") as file:
-			for index, line in enumerate(content_rows):
-				file.write(line)
-				if index < len(content_rows) - 1:
-					file.write("\n")
 	
-	if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
-		
-		result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
-		
-		updates = {
-			"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else result.inspection_date,
-			"inspection_initials": block_data.get("inspection-initials-input", "").strip() if (block_data.get("inspection-initials-input", "") != "") else result.inspection_initials,
-			"pb1_build_name": block_data.get("pb1-build-name-input", "").strip() if (block_data.get("pb1-build-name-input", "") != "") else result.pb1_build_name,
-			"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else result.pb1_date,
-			"pb1_initials": block_data.get("pb1-initials-input", "").strip() if (block_data.get("pb1-initials-input", "") != "") else result.pb1_initials,
-			"pb2_build_name": block_data.get("pb2-build-name-input", "").strip() if (block_data.get("pb2-build-name-input", "") != "") else result.pb2_build_name,
-			"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else result.pb2_date,
-			"pb2_initials": block_data.get("pb2-initials-input", "").strip() if (block_data.get("pb2-initials-input", "") != "") else result.pb2_initials,
-			"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip() if (block_data.get("pb2-inspection-initials-input", "") != "") else result.pb2_inspection
-		}
-
-		block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip()
-		
-		update_table_entry(db_session, Build_Info, block_id, **updates)
-
-		return "Block file written", 204
+	if path is None: #Someone closed out the save dialog box without actually saving the file
+		return "", 200
 	
-	elif validate_block_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")):
+	else:
+		if path and path[0] and path[0].endswith(".txt"):
+			with open(path[0], "w") as file:
+				for index, line in enumerate(content_rows):
+					file.write(line)
+					if index < len(content_rows) - 1:
+						file.write("\n")
 		
-		new_entry = {
-			"block_id": block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip(),
-			"block_engraving": block_dict["block_engraving"].strip(),
-			"block_serial_number": block_data.get("block-serial-number-input", "").strip(),
-			"block_revision": block_data.get("block-revision-input", "").strip(),
-			"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else None,
-			"inspection_initials": block_data.get("inspection-initials-input", "").strip(),
-			"pb1_build_name": block_data.get("pb1-build-name-input", "").strip(),
-			"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else None,
-			"pb1_initials": block_data.get("pb1-initials-input", "").strip(),
-			"pb2_build_name": block_data.get("pb2-build-name-input", "").strip(),
-			"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else None,
-			"pb2_initials": block_data.get("pb2-initials-input", "").strip(),
-			"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip(),
-			"block_file_path": path[0]
-		}
-		add_table_entry(db_session, Build_Info, **new_entry)
-		return "Block file written", 204
-	#Future response goes here if data inputs don't pass sanitization check
-	return "Block file written", 204
+		if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
+			
+			result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
+			
+			updates = {
+				"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else result.inspection_date,
+				"inspection_initials": block_data.get("inspection-initials-input", "").strip() if (block_data.get("inspection-initials-input", "") != "") else result.inspection_initials,
+				"pb1_build_name": block_data.get("pb1-build-name-input", "").strip() if (block_data.get("pb1-build-name-input", "") != "") else result.pb1_build_name,
+				"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else result.pb1_date,
+				"pb1_initials": block_data.get("pb1-initials-input", "").strip() if (block_data.get("pb1-initials-input", "") != "") else result.pb1_initials,
+				"pb2_build_name": block_data.get("pb2-build-name-input", "").strip() if (block_data.get("pb2-build-name-input", "") != "") else result.pb2_build_name,
+				"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else result.pb2_date,
+				"pb2_initials": block_data.get("pb2-initials-input", "").strip() if (block_data.get("pb2-initials-input", "") != "") else result.pb2_initials,
+				"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip() if (block_data.get("pb2-inspection-initials-input", "") != "") else result.pb2_inspection,
+				"flagged": True
+			}
+
+			block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip()
+			
+			update_table_entry(db_session, Build_Info, block_id, **updates)
+
+			return "Block file written", 204
+		
+		elif retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) == []:
+			
+			new_entry = {
+				"block_id": block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip(),
+				"block_engraving": block_dict["block_engraving"].strip(),
+				"block_serial_number": block_data.get("block-serial-number-input", "").strip(),
+				"block_revision": block_data.get("block-revision-input", "").strip(),
+				"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else None,
+				"inspection_initials": block_data.get("inspection-initials-input", "").strip(),
+				"pb1_build_name": block_data.get("pb1-build-name-input", "").strip(),
+				"pb1_date": string_to_python_date(block_data.get("pb1-date-input", "")) if (block_data.get("pb1-date-input", "") != "") else None,
+				"pb1_initials": block_data.get("pb1-initials-input", "").strip(),
+				"pb2_build_name": block_data.get("pb2-build-name-input", "").strip(),
+				"pb2_date": string_to_python_date(block_data.get("pb2-date-input", "")) if (block_data.get("pb2-date-input", "") != "") else None,
+				"pb2_initials": block_data.get("pb2-initials-input", "").strip(),
+				"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip(),
+				"block_file_path": path[0],
+				"flagged": True
+			}
+			add_table_entry(db_session, Build_Info, **new_entry)
+			return "Block file written", 204
+
+@file_bp.post("/cancel_block_file_save/")
+def cancel_block_file_save():
+	return "", 200
 
 @file_bp.post("/attempt_save_build_file/")
 def attempt_save_build_file():
@@ -421,7 +518,9 @@ def attempt_save_build_file():
 			if standard[0] == name:
 				mismatched_quantities_list.append((name, 0, standard[1])) #adds all parts on BOM not listed by user
 
-	if (not nonstandard_part_names_set) and mismatched_quantities_list == []: #if no mismatches are found save to build file and DB
+	build_name_comparator = validate_build_info(build_data.get("full-build-name-input", ""))
+
+	if ((not nonstandard_part_names_set) and mismatched_quantities_list == []) and build_name_comparator == True: #if no mismatches are found save to build file and DB
 		part_types = build_data.getlist("part_type")
 		parts = build_data.getlist("part")
 		lots = build_data.getlist("lot-select")
@@ -546,7 +645,7 @@ def attempt_save_build_file():
 					part_type=part_type,
 					part_lot=lot
 				)
-			print("adding build info to db")
+			#print("adding build info to db")
 			updates = {
 					"build_file_path": path[0],
 					"full_build_name": BOM_for,
@@ -556,8 +655,8 @@ def attempt_save_build_file():
 			update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
 			return "Build file written", 204
 	else:
-		print("Mismatched quantities found")
-		return render_template("partials/build-page/confirm-build-file-save.html", differences=mismatched_quantities_list)
+		print("Mismatches found")
+		return render_template("partials/build-page/confirm-build-file-save.html", differences=mismatched_quantities_list, build_name_match=build_name_comparator)
 
 @file_bp.post("/confirm_build_file_save/")
 def confirm_build_file_save():
@@ -702,6 +801,7 @@ def confirm_build_file_save():
 		
 		updates = {
 				"build_file_path": path[0],
+				"flagged": True,
 				"full_build_name": build_data.get("full-build-name-input", ""),
 				"full_build_initials": build_data.get("full-build-initials-input", ""),
 				"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None

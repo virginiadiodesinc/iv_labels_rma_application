@@ -32,6 +32,8 @@ class Build_Info(Base):
 	# FILE PATHS
 	block_file_path = Column(String)
 	build_file_path = Column(String)
+	# VERIFICATION FLAG
+	flagged = Column(Boolean, nullable=False, default=False)
 
 
 class Build_Parts(Base):
