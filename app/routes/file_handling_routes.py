@@ -84,14 +84,14 @@ def populate_info_from_build_file():
 
 
 		part_rows = [
-			{"part_name": diode_1_name, "part_quantity": diode_1_quantity, "part_type": "DIODE", "part_lot": diode_1_lot},
-			{"part_name": circuit_1_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_1_lot},
-			{"part_name": diode_2_name, "part_quantity": diode_2_quantity, "part_type": "DIODE", "part_lot": diode_2_lot},
-			{"part_name": circuit_2_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_2_lot},
-			{"part_name": pcb_name, "part_quantity": 1, "part_type": "PCB", "part_lot": pcb_lot},
-			{"part_name": filter_1_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_1_lot},
-			{"part_name": filter_2_name, "part_quantity": 1, "part_type": "FILTER", "part_lot": filter_2_lot},
-			{"part_name": mmic_name, "part_quantity": 1, "part_type": "MMIC", "part_lot": mmic_lot}
+			{"part_name": diode_1_name, "quantity": diode_1_quantity, "part_type": "DIODE", "part_lot": diode_1_lot},
+			{"part_name": circuit_1_name, "quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_1_lot},
+			{"part_name": diode_2_name, "quantity": diode_2_quantity, "part_type": "DIODE", "part_lot": diode_2_lot},
+			{"part_name": circuit_2_name, "quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_2_lot},
+			{"part_name": pcb_name, "quantity": 1, "part_type": "PCB", "part_lot": pcb_lot},
+			{"part_name": filter_1_name, "quantity": 1, "part_type": "FILTER", "part_lot": filter_1_lot},
+			{"part_name": filter_2_name, "quantity": 1, "part_type": "FILTER", "part_lot": filter_2_lot},
+			{"part_name": mmic_name, "quantity": 1, "part_type": "MMIC", "part_lot": mmic_lot}
 		]
 
 		note_rows = []
@@ -526,6 +526,7 @@ def attempt_save_build_file():
 		lots = build_data.getlist("lot-select")
 		custom_lots = build_data.getlist("custom-lot-input")
 		quantities = build_data.getlist("quantity")
+		part_tags = build_data.getlist("part-tag")
 		notes = build_data.getlist("note")
 		note_types = build_data.getlist("note_type")
 
@@ -535,7 +536,7 @@ def attempt_save_build_file():
 				lots[index] = custom_lots[custom_index]
 				custom_index += 1
 
-		all_part_information = list(zip(parts, part_types, lots, quantities))
+		all_part_information = list(zip(parts, part_types, lots, quantities, part_tags))
 		all_note_information = list(zip(notes, note_types))
 
 		block_suffix_regex = ""
@@ -635,7 +636,7 @@ def attempt_save_build_file():
 				delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
 			)
 
-			for part, part_type, lot, quantity in all_part_information:
+			for part, part_type, lot, quantity, part_tag in all_part_information:
 				add_table_entry(
 					db_session,
 					Build_Parts,
@@ -643,7 +644,8 @@ def attempt_save_build_file():
 					part_name=part,
 					quantity=int(float(quantity)),
 					part_type=part_type,
-					part_lot=lot
+					part_lot=lot,
+					subassembly_tag=part_tag
 				)
 			#print("adding build info to db")
 			updates = {
@@ -678,6 +680,7 @@ def confirm_build_file_save():
 	lots = build_data.getlist("lot-select")
 	custom_lots = build_data.getlist("custom-lot-input")
 	quantities = build_data.getlist("quantity")
+	part_tags = build_data.getlist("part-tag")
 	notes = build_data.getlist("note")
 	note_types = build_data.getlist("note_type")
 
@@ -687,7 +690,7 @@ def confirm_build_file_save():
 			lots[index] = custom_lots[custom_index]
 			custom_index += 1
 
-	all_part_information = list(zip(parts, part_types, lots, quantities))
+	all_part_information = list(zip(parts, part_types, lots, quantities, part_tags))
 	all_note_information = list(zip(notes, note_types))
 
 	block_suffix_regex = ""
@@ -788,7 +791,7 @@ def confirm_build_file_save():
 			delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
 		)
 
-		for part, part_type, lot, quantity in all_part_information:
+		for part, part_type, lot, quantity, part_tag in all_part_information:
 			add_table_entry(
 				db_session,
 				Build_Parts,
@@ -796,7 +799,8 @@ def confirm_build_file_save():
 				part_name=part,
 				quantity=int(float(quantity)),
 				part_type=part_type,
-				part_lot=lot
+				part_lot=lot,
+				subassembly_tag=part_tag
 			)
 		
 		updates = {

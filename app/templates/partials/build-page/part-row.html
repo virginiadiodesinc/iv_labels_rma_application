@@ -6,28 +6,28 @@
 				<select 
 					onchange="sortPartsContainer(); toggleDiodeRow(this); togglePcbRow(this)" 
 					name="part_type">
-					<option value="NA" {% if part and part['part_type'] == "NA" %}
+					<option value="NA" {% if part and part.part_type == "NA" %}
 							selected
 						{% endif %}>NA</option>
-					<option value="MISC" {% if part and part['part_type'] == "MISC" %}
+					<option value="MISC" {% if part and part.part_type == "MISC" %}
 							selected
 						{% endif %}>MISC</option>
-					<option value="DIODE" {% if part and part['part_type'] == "DIODE" %}
+					<option value="DIODE" {% if part and part.part_type == "DIODE" %}
 							selected
 						{% endif %}>DIODE</option>
-					<option value="PCB" {% if part and part['part_type'] == "PCB" %}
+					<option value="PCB" {% if part and part.part_type == "PCB" %}
 							selected
 						{% endif %}>PCB</option>
-					<option value="CONNECTOR" {% if part and part['part_type'] == "CONNECTOR" %}
+					<option value="CONNECTOR" {% if part and part.part_type == "CONNECTOR" %}
 							selected
 						{% endif %}>CONNECTOR</option>
-					<option value="CIRCUIT" {% if part and part['part_type'] == "CIRCUIT" %}
+					<option value="CIRCUIT" {% if part and part.part_type == "CIRCUIT" %}
 							selected
 						{% endif %}>CIRCUIT</option>
-					<option value="MMIC" {% if part and part['part_type'] == "MMIC" %}
+					<option value="MMIC" {% if part and part.part_type == "MMIC" %}
 							selected
 						{% endif %}>MMIC</option>
-					<option value="FILTER" {% if part and part['part_type'] == "FILTER" %}
+					<option value="FILTER" {% if part and part.part_type == "FILTER" %}
 							selected
 						{% endif %}>FILTER</option>
 				</select>
@@ -41,17 +41,17 @@
 						type="text" 
 						name="part" 
 						value="{{
-								part['part_name']
+								part.part_name
 								if part
 								else ''
 							}}" 
 						size="10"
 						hx-get="/search_part_lots/"
-						hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
+						hx-trigger="revealed, keyup changed delay:300ms"
 						hx-target="next .lot-container"
 						hx-include="closest .part-row"
 						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
-				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ part['part_lot'] if part else '' }}">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ part.part_lot if part else '' }}">
 			</label>
 		</div>
 		<div class="delete-row-button-container">
@@ -76,11 +76,7 @@
 				<input class="part-row-part-quantity"
 						type="number" 
 						name="quantity" 
-						value="{{
-								part['part_quantity']
-								if part
-								else '1'
-							}}">
+						value="{{ part.quantity | int if part and part.quantity is not none else '1' }}">
 			</label>
 		</div>
 
@@ -90,29 +86,19 @@
 				<select
 				name="part-tag"
 				class="part-tag">
-					<option>NA</option>
-					<option>1</option>
-					<option>2</option>
-					<option>3</option>
-					<option>A</option>
-					<option>B</option>
-					<option>A1</option>
-					<option>A2</option>
-					<option>G1</option>
-					<option>G2</option>
-					<option>G3</option>
-					<option>G4</option>
-					<option>W</option>
+					{% for tag in ['NA', '1', '2', '3', 'A', 'B', 'A1', 'A2', 'G1', 'G2', 'G3', 'G4', 'W'] %}
+					<option {% if part and part.subassembly_tag == tag %}selected{% endif %}>{{ tag }}</option>
+					{% endfor %}
 				</select>
 			</label>
 		</div>
 		<div class="diode-row"
-			{% set is_diode = (part and part['part_type'] == "DIODE") %}
+			{% set is_diode = (part and part.part_type == "DIODE") %}
 			{% if not is_diode %}style="display:none"{% endif %}>
 			{% include "partials/build-page/diode-row.html" %}
 		</div>
 		<div class="pcb-row"
-			{% set is_pcb = (part and part['part_type'] == "PCB") %}
+			{% set is_pcb = (part and part.part_type == "PCB") %}
 			{% if not is_pcb %}style="display:none"{% endif %}>
 			{% include "partials/build-page/pcb-row.html" %}
 		</div>

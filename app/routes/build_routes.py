@@ -63,7 +63,7 @@ def add_part_rows_from_bom():
 		part_quantity = request.form.get(f"bom_part_quantity_{index}")
 		part_type = request.form.get(f"bom_part_type_{index}")
 		rows.append(
-			render_template("partials/build-page/part-row.html", part={"part_name": part_name, "part_quantity": part_quantity, "part_type": part_type, "part_lot": ""})
+			render_template("partials/build-page/part-row.html", part={"part_name": part_name, "quantity": part_quantity, "part_type": part_type, "part_lot": ""})
 		)
 
 	return "".join(rows)
@@ -98,8 +98,8 @@ def add_iv_assembly_to_build_parts():
 	circuit_name = parts_list[1]
 	circuit_lot = lots_list[1]
 
-	diode = {"part_name": diode_name, "part_quantity": 1, "part_type": "DIODE", "part_lot": diode_lot}
-	circuit = {"part_name": circuit_name, "part_quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_lot}
+	diode = {"part_name": diode_name, "quantity": 1, "part_type": "DIODE", "part_lot": diode_lot}
+	circuit = {"part_name": circuit_name, "quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_lot}
 
 
 	rows = []

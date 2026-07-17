@@ -44,8 +44,8 @@ class Build_Parts(Base):
 	quantity = Column(Integer, nullable=False)
 	part_type = Column(String, nullable=False)
 	part_lot = Column(String, nullable=False)
+	subassembly_tag = Column(String)
 	#weight = Column(Float, nullable=False) not yet implemented
-	#subassembly_tag = Column(String) not yet implemented
 
 class Polarity(enum.Enum):
 	POSITIVE = "positive"
