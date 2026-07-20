@@ -124,6 +124,16 @@ def populate_info_from_iv_file():
 		with open(uploaded_file_path, "r") as iv_file:
 			iv_dict = iv_converter.convert_iv_file(iv_file)
 
+		#print(iv_dict)
+
+		diode_name, diode_lot, diode_extra = pls.separate_part_and_lot(iv_dict["diode"])
+		circuit_name, circuit_lot, circuit_extra = pls.separate_part_and_lot(iv_dict["circuit"])
+
+		iv_dict["diode"] = diode_name
+		iv_dict["diode_lot"] = diode_lot
+		iv_dict["circuit"] = circuit_name
+		iv_dict["circuit_lot"] = circuit_lot
+
 		source_values = [float(value) for value in iv_dict["current"]]
 		voltage_values_tuples = zip([float(value) for value in iv_dict["voltage_up"]], [float(value) for value in iv_dict["voltage_down"]])
 		average_voltage_values = [(float(up) + float(down)) / 2 for up, down in voltage_values_tuples]
@@ -193,7 +203,10 @@ def populate_info_from_iv_file():
 
 		tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
 
-		return render_template("partials/iv-page/iv-file-population-response.html", iv_data=full_iv_dict, iv_curve=iv_curve, tags=tag_list, selected_tag="NA")
+		diode_lots_list = jb2.get_Lots(full_iv_dict["diode"])
+		circuit_lots_list = jb2.get_Lots(full_iv_dict["circuit"])
+
+		return render_template("partials/iv-page/iv-file-population-response.html", iv_data=full_iv_dict, iv_curve=iv_curve, tags=tag_list, selected_tag="NA", diode_lots_list=diode_lots_list, circuit_lots_list=circuit_lots_list, suppress_lot_search=True)
 	
 	return "No file uploaded", 204
 
