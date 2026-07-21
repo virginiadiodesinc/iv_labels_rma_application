@@ -138,7 +138,7 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	rows.append(info_dict['build_name'] + ' ' +
 				'B' + info_dict['build_sn'] + ' ' +
 				info_dict['diode'] + ' ' +
-				info_dict['circuit'] + ' ' +
+				'Cir' + info_dict['circuit'] + ' ' +
 				'A#' + info_dict['assembly_no'] + ' ' +
 				info_dict['polarity'] + ' ' +
 				info_dict['block_engraving'] + ' ' +
