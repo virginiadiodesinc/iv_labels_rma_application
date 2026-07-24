@@ -26,6 +26,8 @@ def populate_block_info():
 	block_engraving = request.form.get("block-engraving-input", "").strip()
 	block_serial_number = request.form.get("block-serial-number-input", "").strip()
 	block_revision = request.form.get("block-revision-input", "").strip()
+	if block_revision == "":
+		block_revision = "A"
 	block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
 	parts = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
 	notes = retrieve_notes(block_engraving, block_serial_number, block_revision)
