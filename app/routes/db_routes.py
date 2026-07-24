@@ -26,14 +26,11 @@ def populate_block_info():
 	block_engraving = request.form.get("block-engraving-input", "").strip()
 	block_serial_number = request.form.get("block-serial-number-input", "").strip()
 	block_revision = request.form.get("block-revision-input", "").strip()
-	if retrieve_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) == []:
-		block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
-		return render_template("partials/block-forms/block-and-build-population.html", block=block)
-	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) != [] and retrieve_build_parts(block_engraving, block_serial_number, block_revision) != []:
-		block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
-		parts = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
-		return render_template("partials/block-forms/block-and-build-population.html", block=block, parts=parts)
-
+	block = retrieve_build_info(block_engraving, block_serial_number, block_revision)[0]
+	parts = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
+	notes = retrieve_notes(block_engraving, block_serial_number, block_revision)
+	return render_template("partials/block-forms/block-and-build-population.html", block=block, parts=parts, notes=notes)
+	
 
 @db_bp.post("/save_inspection_info") #add some intelligent return statements
 def save_inspection_info():

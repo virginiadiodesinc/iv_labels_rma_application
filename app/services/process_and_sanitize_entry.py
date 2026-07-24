@@ -69,3 +69,11 @@ def retrieve_build_parts(block_engraving, block_serial_number, block_revision):
 	result = get_table_entries(db_session, Build_Parts,**filters)
 
 	return result
+
+def retrieve_notes(block_engraving, block_serial_number, block_revision):
+	filters = {
+		"block_id": block_engraving+" "+block_serial_number+" "+block_revision
+	}
+	result = get_table_entries(db_session, Notes, **filters)
+
+	return result

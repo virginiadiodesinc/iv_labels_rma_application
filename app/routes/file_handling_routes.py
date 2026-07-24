@@ -645,9 +645,8 @@ def attempt_save_build_file():
 						if index < len(content_rows) - 1:
 							file.write("\n")
 
-			db_session.execute(
-				delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
-			)
+			db_session.execute(delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A")))
+			db_session.execute(delete(Notes).where(Notes.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A")))	
 
 			for part, part_type, lot, quantity, part_tag in all_part_information:
 				add_table_entry(
@@ -659,6 +658,15 @@ def attempt_save_build_file():
 					part_type=part_type,
 					part_lot=lot,
 					subassembly_tag=part_tag
+				)
+
+			for note, note_type in all_note_information:
+				add_table_entry(
+					db_session,
+					Notes,
+					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+					type=note_type,
+					note=note
 				)
 			#print("adding build info to db")
 			updates = {
@@ -800,9 +808,8 @@ def confirm_build_file_save():
 					if index < len(content_rows) - 1:
 						file.write("\n")
 
-		db_session.execute(
-			delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
-		)
+		db_session.execute(delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A")))
+		db_session.execute(delete(Notes).where(Notes.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A")))
 
 		for part, part_type, lot, quantity, part_tag in all_part_information:
 			add_table_entry(
@@ -815,6 +822,15 @@ def confirm_build_file_save():
 				part_lot=lot,
 				subassembly_tag=part_tag
 			)
+
+		for note, note_type in all_note_information:
+				add_table_entry(
+					db_session,
+					Notes,
+					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+					type=note_type,
+					note=note
+			)	
 		
 		updates = {
 				"build_file_path": path[0],
