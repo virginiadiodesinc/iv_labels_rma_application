@@ -1,14 +1,31 @@
-{% include 'partials/block-forms/block-id.html' %}
-{% include 'partials/block-forms/inspection.html' %}
-{% include 'partials/block-forms/pb1.html' %}
-{% include 'partials/block-forms/pb2.html' %}
+<div class="block-form">
+	{% include 'partials/block-forms/block-id.html' %}
+</div>
+<div class="block-form">
+	{% include 'partials/block-forms/inspection.html' %}
+</div>
+<div class="block-form">
+	{% include 'partials/block-forms/pb1.html' %}
+</div>
+<div class="block-form">
+	{% include 'partials/block-forms/pb2.html' %}
+</div>
 
 <div>
 	<button hx-post="/attempt_save_block_file/"
 			hx-target="#save-block-popup" 
 			hx-swap="innerHTML"
-			hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info">
-			Save Block File</button>
+			hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info"
+			hx-disabled-elt="#block-forms-container button"
+			class="important-button">
+			Save Block File
+	</button>
+	<button hx-get="/clear_block_info/"
+			hx-target="#block-forms-container"
+			hx-swap="innerHTML"
+			class="important-button">
+			Clear Block Info
+	</button>
 </div>
 
 <div id="save-block-popup"></div>

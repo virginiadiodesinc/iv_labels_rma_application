@@ -15,7 +15,7 @@
 					hx-target="#search-results"
 					hx-trigger="keyup changed delay:500ms"
 					list="search-results"
-					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+					oninput="this.value = this.value.toUpperCase();"
 					value="{{ populated_build_name if populated_build_name else '' }}"
 				>
 			</td>

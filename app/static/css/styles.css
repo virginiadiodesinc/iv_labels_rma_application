@@ -5,6 +5,10 @@
 	font-size: small;
 }
 
+.selectable-text {
+	user-select: text;
+}
+
 .not-implemented-yet {
 	color: pink;
 	background-color: red;
@@ -149,6 +153,11 @@
 .iv-gui-controls {
 	grid-row-start: 1;
 	grid-row-end: 2;
+	line-height: 1.8;
+}
+
+.iv-gui-controls details {
+	margin-bottom: 5px;
 }
 
 .iv-curve-information {
@@ -166,11 +175,15 @@
 
 .line-break {
 	flex-basis: 100%;
-	height: 0;
+	height: 10px;
 }
 
 .iv-curve-information table {
 	border: thin solid black;
+}
+
+.iv-control-buttons {
+	margin-bottom: 10px;
 }
 
 .iv-plot-container {
@@ -212,6 +225,10 @@
 	flex-direction: column;
 }
 
+.block-form {
+	margin-bottom: 20px;
+}
+
 .actual-bom-list {
 	width: 100%;
 	display: flex;
@@ -222,6 +239,11 @@
 .actual-bom-list input {
 	max-width: 100%;
 	box-sizing: border-box;
+}
+
+input {
+	border-radius: 5px;
+	border: 1px solid black;
 }
 
 .part-row {
@@ -320,6 +342,7 @@
 .iv-assembly-information-form {
 	display: flex;
 	flex-direction: column;
+	line-height: 1.8;
 }
 
 .iv-diode-information-line {
@@ -369,6 +392,10 @@ button:disabled {
 	color: lightblue
 }
 
+button:enabled:hover {
+	text-decoration: underline;
+}
+
 .part-row-part-name {
 	width: 35ch;
 }
@@ -403,6 +430,10 @@ input[type="date"] {
 
 .full-build-container {
 	flex-grow: 1;
+}
+
+.full-build-table-header {
+	width: 100%;
 }
 
 .modal-overlay {
@@ -442,4 +473,15 @@ input[type="date"] {
 .button-row {
 	display: flex;
 	justify-content: space-between;
+}
+
+th {
+	font-size: large;
+	text-align: center;
+	align-self: center;
+}
+
+.iv-info table {
+	border: 1px solid black;
+	border-radius: 4px;
 }

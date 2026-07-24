@@ -16,6 +16,16 @@ def check_custom_lot():
 	print(selected_lot)
 	return render_template("partials/build-page/custom-lot-input.html", selected_lot=selected_lot)
 
+@build_bp.get("/clear_block_info/")
+def clear_block_info():
+	"""Clears the current block info
+	
+	This function clears/empties the current block info.
+
+	@return block-forms-container.html Return value of type (template partial)
+	"""
+	return render_template("partials/block-forms/block-forms-container.html")
+
 @build_bp.get("/clear_build_parts")
 def clear_build_parts():
 	"""Clears the current list of parts in a build

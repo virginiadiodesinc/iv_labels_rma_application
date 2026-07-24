@@ -6,7 +6,7 @@
 		hx-disabled-elt="this">
 		Choose IV File
 	</button>
-	<text name="iv-file-upload-text" id="iv-file-upload-text">{{file_path if file_path else 'No file selected'}}</text>
+	<text name="iv-file-upload-text" id="iv-file-upload-text" class="selectable-text">{{file_path if file_path else 'No file selected'}}</text>
 	<input type="hidden" name="iv-file-path" id="iv-file-path" value="{{file_path if file_path else ''}}">
 	<button 
 		class="important-button"

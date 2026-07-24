@@ -156,12 +156,14 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	rows.append('Hysteresis Mean (mV) = ' + IV_dict['Hysteresis Mean (mV)'])
 	rows.append('Hysteresis Max (mV) = ' + IV_dict['Hysteresis Max (mV)'])
 	rows.append('Hysteresis Min (mV) = ' + IV_dict['Hysteresis Min (mV)'])
-	rows.append('Reverse Curent (uA): ' + IV_dict['Reverse Current (uA)'])
+	rows.append('Reverse Current (uA): ' + IV_dict['Reverse Current (uA)'])
 	rows.append('Reverse Voltage (V): ' + IV_dict['Reverse Voltage (V)'])
 	rows.append('Voltage Up (mV)    Voltage Down (mV)    Current (uA)')
 
 	for Vup, Vdown, I_source in zip(Vup_list, Vdown_list, I_source_list):
 		rows.append(f"{float(Vup):6f}" + '\t' + f"{float(Vdown):6f}" + '\t' + f"{float(I_source):6f}")
+
+	rows.append('')
 
 	file_name = rows[0].lower() + '.iv'
 

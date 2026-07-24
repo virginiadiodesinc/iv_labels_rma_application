@@ -75,13 +75,13 @@ class IV_curve():
 		if Reverse_Breakdown_source == '':
 			self.I_reverse_breakdown = '0.0'
 		else:
-			self.I_reverse_breakdown = abs(float(Reverse_Breakdown_source.replace('\r', '').replace('\n', '').split(',')[0]))
+			self.I_reverse_breakdown = abs(float(Reverse_Breakdown_source.replace('\r', '').replace('\n', '').split(',')[-1]))
 			#last value of reverse breakdown current list
 
 		if Reverse_Breakdown_measure == '':
 			self.V_reverse_breakdown  = '0.0'
 		else:
-			self.V_reverse_breakdown = abs(float(Reverse_Breakdown_measure.replace('\r', '').replace('\n', '').split(',')[len(Reverse_Breakdown_measure.replace('\r', '').replace('\n', '').split(',')) - 1]))
+			self.V_reverse_breakdown = abs(float(Reverse_Breakdown_measure.replace('\r', '').replace('\n', '').split(',')[-1]))
 			#last value of reverse breakdown voltage list
 
 		self.V_polarity_sweep = Polarity_Sweep_source.replace('\r', '').replace('\n', '').split(',') #haven't written any functions to use this yet
