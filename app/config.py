@@ -4,6 +4,7 @@ iv_file_directory = os.path.abspath('I:/')
 block_file_directory = os.path.abspath('K:/block')
 build_file_directory = os.path.abspath('K:/build')
 heat_data_directory = os.path.abspath('I:/Alpha IV program testing/Heat Data')
+iv_spec_directory = os.path.abspath('V:/Production/Inventory/General/SpecialDiodeMarks')
 
 default_keithley_settings = {
 	# BASIC SETTINGS

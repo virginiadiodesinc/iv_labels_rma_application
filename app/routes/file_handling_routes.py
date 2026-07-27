@@ -13,8 +13,9 @@ from app import config
 from app.services.date_converter import *
 from app.services.process_and_sanitize_entry import *
 from app.db import JB2_queries as jb2
-from app.services import part_lot_separator as pls
+from app.services import string_utilities as su
 import re
+from app.services import diode_spec_search as dss
 
 file_bp = Blueprint("file", __name__)
 
@@ -57,27 +58,27 @@ def populate_info_from_build_file():
 		part_rows = []
 
 		diode_1_full_text = build_dict.get("diode_1", "")
-		diode_1_name, diode_1_lot, diode_1_extra = pls.separate_part_and_lot(diode_1_full_text)
+		diode_1_name, diode_1_lot, diode_1_extra = su.separate_part_and_lot(diode_1_full_text)
 		diode_1_quantity = build_dict.get("diode_1_chip_count")
 
 		circuit_1_full_text = build_dict.get("circuit_1", "")
-		circuit_1_name, circuit_1_lot, circuit_1_extra = pls.separate_part_and_lot(circuit_1_full_text)
+		circuit_1_name, circuit_1_lot, circuit_1_extra = su.separate_part_and_lot(circuit_1_full_text)
 
 		filter_1_full_text = build_dict.get("filter_1", "")
-		filter_1_name, filter_1_lot, filter_1_extra = pls.separate_part_and_lot(filter_1_full_text)
+		filter_1_name, filter_1_lot, filter_1_extra = su.separate_part_and_lot(filter_1_full_text)
 
 		diode_2_full_text = build_dict.get("diode_2", "")
-		diode_2_name, diode_2_lot, diode_2_extra = pls.separate_part_and_lot(diode_2_full_text)
+		diode_2_name, diode_2_lot, diode_2_extra = su.separate_part_and_lot(diode_2_full_text)
 		diode_2_quantity = build_dict.get("diode_2_chip_count")
 
 		circuit_2_full_text = build_dict.get("circuit_2", "")
-		circuit_2_name, circuit_2_lot, circuit_2_extra = pls.separate_part_and_lot(circuit_2_full_text)
+		circuit_2_name, circuit_2_lot, circuit_2_extra = su.separate_part_and_lot(circuit_2_full_text)
 
 		filter_2_full_text = build_dict.get("filter_2", "")
-		filter_2_name, filter_2_lot, filter_2_extra = pls.separate_part_and_lot(filter_2_full_text)
+		filter_2_name, filter_2_lot, filter_2_extra = su.separate_part_and_lot(filter_2_full_text)
 
 		pcb_full_text = build_dict.get("pcb_info", "")
-		pcb_name, pcb_lot, pcb_extra = pls.separate_part_and_lot(pcb_full_text)
+		pcb_name, pcb_lot, pcb_extra = su.separate_part_and_lot(pcb_full_text)
 
 		mmic_name = build_dict.get("mmic_name", "")
 		mmic_lot = build_dict.get("mmic_lot", "")
@@ -126,8 +127,8 @@ def populate_info_from_iv_file():
 
 		#print(iv_dict)
 
-		diode_name, diode_lot, diode_extra = pls.separate_part_and_lot(iv_dict["diode"])
-		circuit_name, circuit_lot, circuit_extra = pls.separate_part_and_lot(iv_dict["circuit"])
+		diode_name, diode_lot, diode_extra = su.separate_part_and_lot(iv_dict["diode"])
+		circuit_name, circuit_lot, circuit_extra = su.separate_part_and_lot(iv_dict["circuit"])
 
 		iv_dict["diode"] = diode_name
 		iv_dict["diode_lot"] = diode_lot
@@ -552,16 +553,8 @@ def attempt_save_build_file():
 		all_part_information = list(zip(parts, part_types, lots, quantities, part_tags))
 		all_note_information = list(zip(notes, note_types))
 
-		block_suffix_regex = ""
-		block_suffix_pattern = r"[^W][R]([\d])"
-		
-		regex_block_suffix_match = re.search(block_suffix_pattern, build_data.get("block-engraving-input", ""))
-		if regex_block_suffix_match:
-			block_suffix_regex = "_R" + regex_block_suffix_match.group(1)
-
 		block_rev = build_data.get("block-revision-input", "") if build_data.get("block-revision-input", "") != "A" else ""
-		block_suffix = "_R" + build_data.get("block-engraving-input", "")[-1] if build_data.get("block-engraving-input", "") else ""
-		build_name = build_data.get("full-build-name-input", "") + block_suffix_regex
+		build_name = build_data.get("full-build-name-input", "")
 
 		block_dict = {
 			"block_engraving": build_data.get("block-engraving-input", ""),
@@ -706,16 +699,8 @@ def confirm_build_file_save():
 	all_part_information = list(zip(parts, part_types, lots, quantities, part_tags))
 	all_note_information = list(zip(notes, note_types))
 
-	block_suffix_regex = ""
-	block_suffix_pattern = r"[^W][R]([\d])"
-	
-	regex_block_suffix_match = re.search(block_suffix_pattern, build_data.get("block-engraving-input", ""))
-	if regex_block_suffix_match:
-		block_suffix_regex = "_R" + regex_block_suffix_match.group(1)
-
 	block_rev = build_data.get("block-revision-input", "") if build_data.get("block-revision-input", "") != "A" else ""
-	block_suffix = "_R" + build_data.get("block-engraving-input", "")[-1] if build_data.get("block-engraving-input", "") else ""
-	build_name = build_data.get("full-build-name-input", "") + block_suffix_regex
+	build_name = build_data.get("full-build-name-input", "")
 
 	block_dict = {
 		"block_engraving": build_data.get("block-engraving-input", ""),
@@ -990,3 +975,37 @@ def save_iv_file():
 	)	
 
 	return "IV file written", 204
+
+@file_bp.post("/get_diode_spec_sheet/")
+def get_diode_spec_sheet():
+	try:
+		iv_assembly_info = request.form
+		parts_list = iv_assembly_info.getlist("part")
+		lots_list = iv_assembly_info.getlist("lot-select")
+		custom_lots_list = iv_assembly_info.getlist("custom-lot-input")
+
+		custom_index = 0
+		for index, lot in enumerate(lots_list):
+			if lot == "Other":
+				lots_list[index] = custom_lots_list[custom_index]
+				custom_index += 1
+
+		diode_name = parts_list[0]
+		diode_lot = lots_list[0]
+
+		if not diode_name or not diode_lot:
+			print("Sorry, something went wrong with pulling the diode spec sheet.")
+			return "Sorry, something went wrong with pulling the diode spec sheet."
+
+		effective_part_number = diode_name if (diode_lot == "Unknown" or diode_lot == "NA") else diode_lot
+		html_table = dss.get_html_table_from_full_part_number(effective_part_number)
+
+		return render_template("partials/iv-page/iv-spec-table.html", html_table=html_table)
+	
+	except:
+		print("Sorry, something went wrong with pulling the diode spec sheet.")
+		return "Sorry, something went wrong with pulling the diode spec sheet."
+
+@file_bp.post("/clear_diode_spec_sheet/")
+def clear_diode_spec_sheet():
+	return render_template("partials/iv-page/iv-spec-table.html")

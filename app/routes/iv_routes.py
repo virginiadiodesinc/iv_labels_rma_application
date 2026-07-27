@@ -124,7 +124,7 @@ def take_iv():
 
 		return render_template("partials/iv-page/run-iv-response.html", iv_curve=iv_curve, iv_data=iv_dict)
 
-	except RuntimeError:
+	except Exception as e:
 		return render_template("partials/iv-page/no-keithley-connected-error.html")
 
 @iv_bp.post("/take_polarity_sweep/")
@@ -159,7 +159,7 @@ def take_polarity_sweep():
 
 		return (f"Polarity: {polarity}")
 
-	except RuntimeError:
+	except Exception as e:
 		return ("Polarity: No Keithley Connected")
 
 

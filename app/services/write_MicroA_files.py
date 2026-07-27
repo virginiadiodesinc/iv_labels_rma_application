@@ -1,4 +1,5 @@
 import statistics
+from app.services import string_utilities as su
 
 def write_block_file(block_dict):
 	"""
@@ -59,6 +60,8 @@ def write_build_file(block_dict, build_dict, build_name):
 	rows = []
 	i = 0
 
+	build_name_with_suffix = su.get_build_name_with_suffix(build_name, block_dict['block_engraving'])
+
 	print(block_dict)
 	print(build_dict)
 
@@ -101,7 +104,7 @@ def write_build_file(block_dict, build_dict, build_name):
 	rows.append(build_dict['notes6'])
 	rows.append(build_dict['filter2'])
 
-	file_name = f'{build_name.lower()}' + ' ' + f'{block_dict["block_sn"].lower()}' + '.txt'
+	file_name = f'{build_name_with_suffix.lower()}' + ' ' + f'{block_dict["block_sn"].lower()}' + '.txt'
 
 	return file_name, rows
 
@@ -132,10 +135,12 @@ def write_IV_file(info_dict, IV_dict, Vup_list, Vdown_list, I_source_list):
 	rows = []
 	i = 0
 
+	build_name_with_suffix = su.get_build_name_with_suffix(info_dict['build_name'], info_dict['block_engraving'])
+
 	print("INFO", info_dict)
 	print("IV INFO", IV_dict)
 
-	rows.append(info_dict['build_name'] + ' ' +
+	rows.append(build_name_with_suffix + ' ' +
 				'B' + info_dict['build_sn'] + ' ' +
 				info_dict['diode'] + ' ' +
 				'Cir' + info_dict['circuit'] + ' ' +

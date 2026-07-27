@@ -189,6 +189,7 @@
 				hx-swap="none">
 				Save IV File
 		</button>
+		<br>
 		<button id="polarity-test-button"
 				hx-post="/take_polarity_sweep/"
 				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
@@ -202,6 +203,14 @@
 				hx-swap="beforeend"
 				hx-target="#actual-parts-container">
 				Add IV Assembly to Build Parts
+		</button>
+		<br>
+		<button id="spec-sheet-lookup-button"
+				hx-post="/get_diode_spec_sheet/"
+				hx-include="#iv-assembly-information-form"
+				hx-swap="innerHTML"
+				hx-target="#iv-spec-table-container">
+				Get Spec Sheet For Diode
 		</button>
 	</div>
 </div>
