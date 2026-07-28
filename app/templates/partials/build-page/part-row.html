@@ -4,7 +4,7 @@
 			<label>
 				Part Type:
 				<select 
-					onchange="sortPartsContainer(); toggleDiodeRow(this); togglePcbRow(this)" 
+					onchange="sortPartsContainer(); toggleDiodeRow(this); togglePcbRow(this); toggleDefaultLotByPartType(this)" 
 					name="part_type">
 					<option value="NA" {% if part and part.part_type == "NA" %}
 							selected

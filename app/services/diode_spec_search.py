@@ -4,11 +4,11 @@ import os
 from app import config
 
 def get_runcode_from_full_part_number(full_part_number):
-    last_index_of_runcode = -1
-
     # minimum length of 2
     if len(full_part_number) < 2:
         return None
+
+    last_index_of_runcode = -1
     
     # if last character is the runcode letter, keep moving
     if full_part_number[-1].isalpha():
@@ -17,16 +17,19 @@ def get_runcode_from_full_part_number(full_part_number):
     # starting from last number of string, move left until it's no longer numbers
     # and all those numbers will be the full runcode
     first_index_of_runcode = last_index_of_runcode
-    while (full_part_number[first_index_of_runcode].isdigit() and abs(first_index_of_runcode) < len(full_part_number)):
+    while (abs(first_index_of_runcode) < len(full_part_number) and full_part_number[first_index_of_runcode].isdigit()):
         first_index_of_runcode = first_index_of_runcode - 1
 
     # convert back to positive integers based on length of the full part number
-    if first_index_of_runcode >= 0:
+    # for the first index, if you actually matched all the way to the beginning of the part number, it's already correct
+    # if you didn't, adjust by 1 because your current index is actually the first non-digit (from the right)
+    if (abs(first_index_of_runcode) < len(full_part_number)):
         first_index_of_runcode = len(full_part_number) + first_index_of_runcode + 1
     last_index_of_runcode = len(full_part_number) + last_index_of_runcode
 
+    print(first_index_of_runcode, last_index_of_runcode)
+
     full_runcode = full_part_number[first_index_of_runcode:last_index_of_runcode + 1]
-    print(full_runcode)
     return full_runcode
 
 def get_file_path_from_runcode(runcode):
@@ -40,7 +43,7 @@ def get_spec_sheet_from_file(spec_file_path):
     excel.Visible = False
 
     #FileName, UpdateLinks, ReadOnly, Format, Password
-    wb = excel.Workbooks.Open(spec_file_path, False, True, None, "vdi")
+    wb = excel.Workbooks.Open(spec_file_path, False, True, None)
     iv_sheet = wb.Sheets("IV Spec")
 
     iv_spec_data = iv_sheet.UsedRange.Value

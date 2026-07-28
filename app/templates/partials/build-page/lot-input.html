@@ -20,11 +20,17 @@
 		Lot:
 		<select 
 			name="lot-select"
+			class="lot-select"
 			hx-post="/check_custom_lot/"
 			hx-trigger="change"
 			hx-target="next .custom-lot-input-container"
 			hx-swap="innerHTML"
 			hx-vals='js:{ "lot-select": this.value }'>
+
+			<option value="Choose"
+				{% if current_lot == "Choose" %}selected{% endif %}>
+				Choose
+			</option>
 
 			<option value="Unknown"
 				{% if current_lot == "Unknown" %}selected{% endif %}>

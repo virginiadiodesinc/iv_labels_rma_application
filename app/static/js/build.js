@@ -66,3 +66,17 @@ function togglePcbRow(selectedElem) {
 		elem.disabled = !isPcb;
 	});
 }
+
+function toggleDefaultLotByPartType(selectedPartType) {
+	const partRow = selectedPartType.closest('.part-row');
+	const lotSelect = partRow.querySelector('.lot-select')
+	console.log(partRow)
+	console.log(lotSelect)
+
+	if (selectedPartType.value === "CONNECTOR") {
+		lotSelect.value = "NA";
+	}
+	else {
+		lotSelect.value = "Choose";
+	}
+}

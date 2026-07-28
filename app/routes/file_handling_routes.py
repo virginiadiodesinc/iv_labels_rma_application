@@ -997,7 +997,7 @@ def get_diode_spec_sheet():
 			print("Sorry, something went wrong with pulling the diode spec sheet.")
 			return "Sorry, something went wrong with pulling the diode spec sheet."
 
-		effective_part_number = diode_name if (diode_lot == "Unknown" or diode_lot == "NA") else diode_lot
+		effective_part_number = diode_name if (diode_lot == "Unknown" or diode_lot == "NA" or diode_lot == "Choose") else diode_lot
 		html_table = dss.get_html_table_from_full_part_number(effective_part_number)
 
 		return render_template("partials/iv-page/iv-spec-table.html", html_table=html_table)
