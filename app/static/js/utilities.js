@@ -74,7 +74,7 @@ function toggleDefaultLotByPartType(selectedPartType) {
 	if (partRow.dataset.hasExistingLot === "true") return;
 	if (!lotSelect) return;
 
-	if (selectedPartType.value === "CONNECTOR" || selectedPartType.value === "MISC") {
+	if (selectedPartType.value === "CONNECTOR") {
 		lotSelect.value = "NA";
 	}
 	else {
