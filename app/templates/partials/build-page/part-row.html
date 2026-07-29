@@ -1,10 +1,9 @@
-<div class="part-row">
+<div class="part-row" data-has-existing-lot="{{ 'true' if part and part.part_lot else 'false' }}">
 	<div class="part-row-line-1">
 		<div>
 			<label>
 				Part Type:
-				<select 
-					onchange="sortPartsContainer(); toggleDiodeRow(this); togglePcbRow(this); toggleDefaultLotByPartType(this)" 
+				<select
 					name="part_type">
 					<option value="NA" {% if part and part.part_type == "NA" %}
 							selected

@@ -70,13 +70,49 @@ function togglePcbRow(selectedElem) {
 function toggleDefaultLotByPartType(selectedPartType) {
 	const partRow = selectedPartType.closest('.part-row');
 	const lotSelect = partRow.querySelector('.lot-select')
-	console.log(partRow)
-	console.log(lotSelect)
 
-	if (selectedPartType.value === "CONNECTOR") {
+	if (partRow.dataset.hasExistingLot === "true") return;
+	if (!lotSelect) return;
+
+	if (selectedPartType.value === "CONNECTOR" || selectedPartType.value === "MISC") {
 		lotSelect.value = "NA";
 	}
 	else {
 		lotSelect.value = "Choose";
 	}
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.body.addEventListener("change", (e) => {
+		const select = e.target.closest("select[name='part_type']");
+		if (!select) return;
+		select.closest(".part-row").dataset.hasExistingLot = "false";
+		sortPartsContainer();
+		toggleDiodeRow(select);
+		togglePcbRow(select);
+		toggleDefaultLotByPartType(select);
+	});
+
+	document.body.addEventListener("htmx:afterSettle", (evt) => {
+		const root = evt.target;
+
+		// Case 1: a whole new part-row (or several) landed
+		const partTypeSelects = root.matches?.("select[name='part_type']")
+			? [root]
+			: root.querySelectorAll("select[name='part_type']");
+		partTypeSelects.forEach((select) => {
+			toggleDiodeRow(select);
+			togglePcbRow(select);
+			toggleDefaultLotByPartType(select);
+		});
+
+		// Case 2: just the lot-container was swapped in later (search_part_lots response)
+		if (root.matches?.(".lot-container") || root.closest?.(".lot-container")) {
+			const partRow = root.closest(".part-row");
+			const partTypeSelect = partRow?.querySelector("select[name='part_type']");
+			if (partTypeSelect) toggleDefaultLotByPartType(partTypeSelect);
+		}
+
+		sortPartsContainer();
+	});
+});
