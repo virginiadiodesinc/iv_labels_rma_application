@@ -1,8 +1,9 @@
 from flask import Blueprint, request, render_template
 from app.services.keithley_236_functions import SMU_K236, Fake_SMU, get_SMU
-from app.services import postprocess as pp
 import pandas as pd
 import plotly.express as px
+from app.services import postprocess_static as pps
+import traceback
 
 iv_bp = Blueprint("iv", __name__)
 
@@ -34,97 +35,108 @@ def take_iv():
 	try:
 		source_values, voltage_up_values, voltage_down_values = SMU.takeIV()
 
-		reverse_source = ''
-		reverse_measure = ''
+		static_reverse_source = None
+		static_reverse_measure = None
 		if SMU_controls.get('reverse-breakdown-test') == 'on':
-			reverse_source, reverse_measure = SMU.takeReverseBreakdown()
+			static_reverse_source, static_reverse_measure = SMU.takeReverseBreakdown()
+			static_reverse_source = pps.clean_string_or_list_values(static_reverse_source, conversion_factor=6)
+			static_reverse_measure = pps.clean_string_or_list_values(static_reverse_measure)
 
-		process = pp.IV_curve(source_values, voltage_up_values, voltage_down_values, reverse_source, reverse_measure)
-		process_dict = process.calc_IV_parameters()
+		##############################
+		static_source_values = pps.clean_string_or_list_values(source_values)
+		static_voltage_up_values = pps.clean_string_or_list_values(voltage_up_values)
+		static_voltage_down_values = pps.clean_string_or_list_values(voltage_down_values, reverse_list=True)
 
-		max_current = process_dict["Imax"]
+		process_static_dict = pps.calculate_iv_parameters(static_source_values, static_voltage_up_values, static_voltage_down_values)
 
-		iv_dict ={
-			"rs": process_dict["Rs"],
-			"ideality": process_dict["n (ideality)"],
-			"is": process_dict["Is"],
-			"r_squared_error": process_dict["R^2 Error"],
-			"mean_squared_error": process_dict["Mean Square Error"],
-			"hysteresis_mean": process_dict["Hysteresis Mean (mV)"],
-			"hysteresis_std": process_dict["Hysteresis SD (mV)"],
-			"hysteresis_max": process_dict["Hysteresis Max (mV)"],
-			"hysteresis_min": process_dict["Hysteresis Min (mV)"],
-			"reverse_current": process_dict["Reverse Current (uA)"],
-			"reverse_voltage": process_dict["Reverse Voltage (V)"],
-			"rs_1" : process_dict["Rs_1"],
-			"rs_4pt": process_dict["Rs_4pt"],
-			"rs_3pt": process_dict["Rs 3pt"],
-			"pass_heat": process_dict.get("pass_heat", ""),
-			"temperature": process_dict.get("temperature", ""),
-			"i_max": process_dict['mV @ Imax'],
-			"i_max_10": process_dict['mV @ Imax/10'],
-			"i_max_100": process_dict['mV @ Imax/100'],
-			f"{max_current}mA": process_dict[f'mV @ {max_current}mA'],
-			f"{max_current}00uA": process_dict[f'mV @ {max_current}00uA'],
-			f"{max_current}0uA": process_dict[f'mV @ {max_current}0uA'],
-			f"{max_current}uA": process_dict[f'mV @ {max_current}uA'],
-			f"{max_current}00nA": process_dict[f'mV @ {max_current}00nA'],
-			"dv1": process_dict["dV1"],
-			"dv2": process_dict["dV2"],
-			"dv3": process_dict["dV3"],
-			"dv4": process_dict["dV4"],
-			"dv5": process_dict["dV5"],
-			"max_current": max_current,
+		max_reverse_current = 0
+		max_reverse_voltage = 0
+		if static_reverse_source and static_reverse_measure:
+			max_reverse_current, max_reverse_voltage = pps.get_reverse_breakdown_values(static_reverse_source, static_reverse_measure)
+
+		if heat_test:
+			heat_current_string, heat_voltage_string = SMU.takeHeatTest()
+			heat_current_list = pps.clean_string_or_list_values(heat_current_string)
+			heat_voltage_list = pps.clean_string_or_list_values(heat_voltage_string)
+
+			temperature_list = pps.calculate_heat_parameters(heat_current_list, heat_voltage_list, float(process_static_dict["n (ideality)"]))
+			process_static_dict["temperature"] = temperature_list[0]
+
+		static_max_current = process_static_dict["Imax"]
+
+		static_iv_dict ={
+			"rs": process_static_dict["Rs"],
+			"ideality": process_static_dict["n (ideality)"],
+			"is": process_static_dict["Is"],
+			"r_squared_error": process_static_dict["R^2 Error"],
+			"mean_squared_error": process_static_dict["Mean Square Error"],
+			"hysteresis_mean": process_static_dict["Hysteresis Mean (mV)"],
+			"hysteresis_std": process_static_dict["Hysteresis SD (mV)"],
+			"hysteresis_max": process_static_dict["Hysteresis Max (mV)"],
+			"hysteresis_min": process_static_dict["Hysteresis Min (mV)"],
+			"reverse_current": max_reverse_current,
+			"reverse_voltage": max_reverse_voltage,
+			"rs_1" : process_static_dict["Rs_1"],
+			"rs_4pt": process_static_dict["Rs_4pt"],
+			"rs_3pt": process_static_dict["Rs 3pt"],
+			"pass_heat": process_static_dict.get("pass_heat", ""),
+			"temperature": process_static_dict.get("temperature", ""),
+			"i_max": process_static_dict['mV @ Imax'],
+			"i_max_10": process_static_dict['mV @ Imax/10'],
+			"i_max_100": process_static_dict['mV @ Imax/100'],
+			f"{static_max_current}mA": process_static_dict[f'mV @ {static_max_current}mA'],
+			f"{static_max_current}00uA": process_static_dict[f'mV @ {static_max_current}00uA'],
+			f"{static_max_current}0uA": process_static_dict[f'mV @ {static_max_current}0uA'],
+			f"{static_max_current}uA": process_static_dict[f'mV @ {static_max_current}uA'],
+			f"{static_max_current}00nA": process_static_dict[f'mV @ {static_max_current}00nA'],
+			"dv1": process_static_dict["dV1"],
+			"dv2": process_static_dict["dV2"],
+			"dv3": process_static_dict["dV3"],
+			"dv4": process_static_dict["dV4"],
+			"dv5": process_static_dict["dV5"],
+			"max_current": static_max_current,
 			"polarity": translated_settings["polarity"],
 			"points_per_decade": translated_settings["points_per_decade"]
 		}
 
-		temperature_list = []
-		heat_current_list = []
-		heat_voltage_list = []
-		if heat_test:
-			heat_current_string, heat_voltage_string = SMU.takeHeatTest()
-			heat_current_list = heat_current_string.split(',')
-			heat_voltage_list = heat_voltage_string.split(',')
+		static_source_values = process_static_dict['I (uA)']
+		static_source_values = [str(abs(float(value))) for value in static_source_values]
 
-			temperature_list = process.calc_heat_parameters(heat_current_list, heat_voltage_list, float(iv_dict["ideality"]))
-			iv_dict["temperature"] = temperature_list[0]
+		static_voltage_up_values = process_static_dict['Vup (mV)']
+		static_voltage_down_values = process_static_dict['Vdown (mV)']
+		static_voltage_avg_values = [str(abs(((float(up) + float(down)) / 2) / 1000.0)) for up, down in zip(static_voltage_up_values, static_voltage_down_values)]
 
-		source_values = process_dict['I (uA)']
-		source_values = [str(abs(float(value))) for value in source_values]
+		static_truncated_source_values = ["{:.2f}".format(float(value)) for value in static_source_values]
+		static_truncated_voltage_values = ["{:.2f}".format(float(value)) for value in static_voltage_avg_values]
 
-		voltage_up_values = process_dict['Vup (mV)']
-		voltage_down_values = process_dict['Vdown (mV)']
-		voltage_avg_values = [str(abs(((float(up) + float(down)) / 2) / 1000.0)) for up, down in zip(voltage_up_values, voltage_down_values)]
-
-		truncated_source_values = ["{:.2f}".format(float(value)) for value in source_values]
-		truncated_voltage_values = ["{:.2f}".format(float(value)) for value in voltage_avg_values]
-
-		df = pd.DataFrame({
-			"Current (uA)": truncated_source_values,
-			"Voltage (V)": truncated_voltage_values
+		static_df = pd.DataFrame({
+			"Current (uA)": static_truncated_source_values,
+			"Voltage (V)": static_truncated_voltage_values
 		})
 
-		fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
-		fig.update_traces(mode='lines+markers')
+		static_fig = px.scatter(static_df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
+		static_fig.update_traces(mode='lines+markers')
 
-		iv_curve = {} 
-		iv_curve["figure"] = fig.to_html(full_html=False)
-		iv_curve["iv_source_values"] = ",".join(source_values)
-		iv_curve["iv_measurement_values"] = ",".join(voltage_avg_values)
-		iv_curve["iv_voltage_up"] = ",".join(voltage_up_values)
-		iv_curve["iv_voltage_down"] = ",".join(voltage_down_values)
-		iv_curve["polarity"] = SMU_controls.get("polarity", "")
-		iv_curve["points_per_decade"] = SMU_controls.get("points-per-decade", "")
+		static_iv_curve = {} 
+		static_iv_curve["figure"] = static_fig.to_html(full_html=False)
+		static_iv_curve["iv_source_values"] = ",".join(static_source_values)
+		static_iv_curve["iv_measurement_values"] = ",".join(static_voltage_avg_values)
+		static_iv_curve["iv_voltage_up"] = ",".join(static_voltage_up_values)
+		static_iv_curve["iv_voltage_down"] = ",".join(static_voltage_down_values)
+		static_iv_curve["polarity"] = SMU_controls.get("polarity", "")
+		static_iv_curve["points_per_decade"] = SMU_controls.get("points-per-decade", "")
 
 		if heat_test:
-			iv_curve["heat_current_list"] = ",".join(str(item) for item in heat_current_list)
-			iv_curve["heat_voltage_list"] = ",".join(str(item) for item in heat_voltage_list)
-			iv_curve["temperature_list"] = ",".join(str(item) for item in temperature_list)
+			static_iv_curve["heat_current_list"] = ",".join(str(item) for item in heat_current_list)
+			static_iv_curve["heat_voltage_list"] = ",".join(str(item) for item in heat_voltage_list)
+			static_iv_curve["temperature_list"] = ",".join(str(item) for item in temperature_list)
 
-		return render_template("partials/iv-page/run-iv-response.html", iv_curve=iv_curve, iv_data=iv_dict)
+		##################################################################
+
+		return render_template("partials/iv-page/run-iv-response.html", iv_curve=static_iv_curve, iv_data=static_iv_dict)
 
 	except Exception as e:
+		traceback.print_exc()
 		return render_template("partials/iv-page/no-keithley-connected-error.html")
 
 @iv_bp.post("/take_polarity_sweep/")
@@ -154,12 +166,13 @@ def take_polarity_sweep():
 	try:
 		polarity_source_voltage, polarity_measure_current = SMU.takePolaritySweep()
 
-		process = pp.IV_curve([], [], [], Polarity_Sweep_source = polarity_source_voltage, Polarity_Sweep_measure = polarity_measure_current)
-		polarity = process.find_polarity()
+		polarity_measure_current = pps.clean_string_or_list_values(polarity_measure_current)
+		polarity = pps.get_polarity(polarity_measure_current)
 
 		return (f"Polarity: {polarity}")
 
 	except Exception as e:
+		traceback.print_exc()
 		return ("Polarity: No Keithley Connected")
 
 

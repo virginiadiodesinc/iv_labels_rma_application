@@ -27,6 +27,10 @@
 # 	"voltage_down": ["VOLTAGE_DOWN_POINT_1", "VOLTAGE_DOWN_POINT_2", ...],
 # 	"current": ["CURRENT_POINT_1", "CURRENT_POINT_2", ...]
 # }
+#
+# IMPORTANT INFO: ALL INFORMATION HERE CAN BE RE-CALCULATED USING THE current, voltage_up, voltage_down
+# EXCEPT FOR THESE WHICH ARE GRABBED DIRECTLY FROM THE FILE: 
+# reverse_current, reverse_voltage, polarity, date, time
 
 def convert_iv_file(file):
 	"""Converts an IV file to a pattern which can be used to populate the fields of the forms on the page

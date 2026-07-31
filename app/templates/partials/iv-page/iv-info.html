@@ -182,6 +182,7 @@
 		</tr>
 		<tr>
 			<td>Imax (mA)</td>
+			<td>{{(iv_data.max_current|int) if iv_data and iv_data.max_current is not none else ''}}</td>
 		</tr>
 		<tr>
 			<td>DeltaV4 (mV)</td>
@@ -190,6 +191,9 @@
 		<tr>
 			<td>DeltaV5 (mV)</td>
 			<td>{{(iv_data.dv5|float * 1000)|round(2, 'floor') if iv_data and iv_data.dv5 is not none else ''}}</td>
+		</tr>
+		<tr>
+			<td>Vknee=V@1uA; dV=DeltaV2</td>
 		</tr>
 		<tr>
 			<td>DeltaV1 (mV)</td>
@@ -202,9 +206,6 @@
 		<tr>
 			<td>DeltaV3 (mV)</td>
 			<td>{{(iv_data.dv3|float * 1000)|round(2, 'floor') if iv_data and iv_data.dv3 is not none else ''}}</td>
-		</tr>
-		<tr>
-			<td>Vknee=V@1uA; dV=DeltaV2</td>
 		</tr>
 	</table>
 	<table class="hidden-inputs">

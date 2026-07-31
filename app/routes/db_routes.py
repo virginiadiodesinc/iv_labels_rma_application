@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template
 from app.services.process_and_sanitize_entry import *
 from app.services.date_converter import string_to_python_date
-from app.services import postprocess as pp
+from app.services import postprocess_static as pps
 from app.db import JB2_queries as jb2
 from pathlib import Path
 import plotly.express as px
@@ -177,15 +177,18 @@ def populate_iv_from_db():
 										IV_Points,
 										iv_id=iv_info_dict['iv_id'])
 	print("iv curve info pulled from DB")
-	source_values = iv_curve_points[0].current_ua.split(',')
-	measure_values_up = iv_curve_points[0].voltage_up_mv.split(',')
-	measure_values_down = iv_curve_points[0].voltage_down_mv.split(',')
+
+	source_values = pps.clean_string_or_list_values(iv_curve_points[0].current_ua, conversion_factor=-6)
+	measure_values_up = pps.clean_string_or_list_values(iv_curve_points[0].voltage_up_mv, conversion_factor=-3)
+	measure_values_down = pps.clean_string_or_list_values(iv_curve_points[0].voltage_down_mv, conversion_factor=-3)
+
+	polarity_symbol = "+" if iv_info_dict["polarity"].value == "positive" else "-"
 
 	average_voltage_values = [(float(up) + float(down)) / 2 for up, down in zip(measure_values_up, measure_values_down)]
-	print("starting postprocess")
-	db_iv = pp.IV_curve(source_values, measure_values_up, measure_values_down)
-	process_dict = db_iv.calc_IV_parameters()
-	print("postprocess calculated")
+	process_dict = pps.calculate_iv_parameters(source_values, measure_values_up, measure_values_down)
+	reverse_current = pps.clean_string_or_list_values(str(iv_info_dict["reverse_current"]))
+	reverse_voltage = pps.clean_string_or_list_values(str(iv_info_dict["reverse_voltage"]))
+	reverse_current, reverse_voltage = pps.get_reverse_breakdown_values(reverse_current, reverse_voltage)
 	max_current = process_dict["Imax"]
 
 	clean_process_dict = {
@@ -198,8 +201,8 @@ def populate_iv_from_db():
 		"hysteresis_std": process_dict["Hysteresis SD (mV)"],
 		"hysteresis_max": process_dict["Hysteresis Max (mV)"],
 		"hysteresis_min": process_dict["Hysteresis Min (mV)"],
-		"reverse_current": process_dict["Reverse Current (uA)"],
-		"reverse_voltage": process_dict["Reverse Voltage (V)"],
+		"reverse_current": reverse_current,
+		"reverse_voltage": reverse_voltage,
 		"rs_4pt": process_dict["Rs_4pt"],
 		"rs_3pt": process_dict["Rs 3pt"],
 		"rs_1": process_dict["Rs_1"],
@@ -255,7 +258,7 @@ def populate_iv_from_db():
 	iv_curve["iv_voltage_up"] = ",".join(str(value) for value in measure_values_up)
 	iv_curve["iv_voltage_down"] = ",".join(str(value) for value in measure_values_down)
 	iv_curve["points_per_decade"] = iv_info_dict["points_per_decade"]
-	iv_curve["polarity"] = iv_info_dict["polarity"]
+	iv_curve["polarity"] = polarity_symbol
 
 
 	tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
