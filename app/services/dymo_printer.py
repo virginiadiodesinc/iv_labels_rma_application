@@ -105,9 +105,6 @@ def populate_pb2_label_fields(label_text, form_data: dict):
 	label_text.SetField('BLOCK_SN_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
 	label_text.SetField('BLOCK_DATE_INPUT', form_data.get("pb2-date-input", ""))
 	label_text.SetField('PREBUILD_INIT_INPUT', form_data.get("pb2-initials-input", ""))
-	label_text.SetField('PASS_FAIL_INPUT', form_data.get("pb2-pass-fail-input", ""))
-	label_text.SetField('BOND_WIRE_PADS_INPUT', form_data.get("pb2-bond-pads-count-input", ""))
-	label_text.SetField('COMPONENTS_INPUT', form_data.get("pb2-components-count-input", ""))
 	label_text.SetField('INSPECTOR_INPUT', form_data.get("pb2-inspector-initials-input", ""))
 
 	return label_text

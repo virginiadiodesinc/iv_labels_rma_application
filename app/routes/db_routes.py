@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template
 from app.services.process_and_sanitize_entry import *
 from app.services.date_converter import string_to_python_date
-from app.services import postprocess_static as pps
+from app.services import postprocess as pp
 from app.db import JB2_queries as jb2
 from pathlib import Path
 import plotly.express as px
@@ -178,17 +178,17 @@ def populate_iv_from_db():
 										iv_id=iv_info_dict['iv_id'])
 	print("iv curve info pulled from DB")
 
-	source_values = pps.clean_string_or_list_values(iv_curve_points[0].current_ua, conversion_factor=-6)
-	measure_values_up = pps.clean_string_or_list_values(iv_curve_points[0].voltage_up_mv, conversion_factor=-3)
-	measure_values_down = pps.clean_string_or_list_values(iv_curve_points[0].voltage_down_mv, conversion_factor=-3)
+	source_values = pp.clean_string_or_list_values(iv_curve_points[0].current_ua, conversion_factor=-6)
+	measure_values_up = pp.clean_string_or_list_values(iv_curve_points[0].voltage_up_mv, conversion_factor=-3)
+	measure_values_down = pp.clean_string_or_list_values(iv_curve_points[0].voltage_down_mv, conversion_factor=-3)
 
 	polarity_symbol = "+" if iv_info_dict["polarity"].value == "positive" else "-"
 
 	average_voltage_values = [(float(up) + float(down)) / 2 for up, down in zip(measure_values_up, measure_values_down)]
-	process_dict = pps.calculate_iv_parameters(source_values, measure_values_up, measure_values_down)
-	reverse_current = pps.clean_string_or_list_values(str(iv_info_dict["reverse_current"]))
-	reverse_voltage = pps.clean_string_or_list_values(str(iv_info_dict["reverse_voltage"]))
-	reverse_current, reverse_voltage = pps.get_reverse_breakdown_values(reverse_current, reverse_voltage)
+	process_dict = pp.calculate_iv_parameters(source_values, measure_values_up, measure_values_down)
+	reverse_current = pp.clean_string_or_list_values(str(iv_info_dict["reverse_current"]))
+	reverse_voltage = pp.clean_string_or_list_values(str(iv_info_dict["reverse_voltage"]))
+	reverse_current, reverse_voltage = pp.get_reverse_breakdown_values(reverse_current, reverse_voltage)
 	max_current = process_dict["Imax"]
 
 	clean_process_dict = {

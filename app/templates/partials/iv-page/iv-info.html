@@ -105,14 +105,14 @@
 			<th>Reverse Breakdown</th>
 		</tr>
 		<tr>
-			<td>Set Current</td>
+			<td>Set Current (uA)</td>
 			<td>{{iv_data.reverse_current|float|round(2, 'floor') if iv_data and iv_data.reverse_current is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="reverse-current" value="{{iv_data.reverse_current if iv_data and iv_data.reverse_current is not none else ''}}">
 			</td>
 		</tr>
 		<tr>
-			<td>Reverse Voltage</td>
+			<td>Reverse Voltage (V)</td>
 			<td>{{iv_data.reverse_voltage|float|round(2, 'floor') if iv_data and iv_data.reverse_voltage is not none else ''}}</td>
 			<td>
 				<input type="hidden" name="reverse-voltage" value="{{iv_data.reverse_voltage if iv_data and iv_data.reverse_voltage is not none else ''}}">

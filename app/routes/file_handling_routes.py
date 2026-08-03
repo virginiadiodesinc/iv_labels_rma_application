@@ -15,7 +15,7 @@ from app.db import JB2_queries as jb2
 from app.services import string_utilities as su
 import re
 from app.services import diode_spec_search as dss
-from app.services import postprocess_static as pps
+from app.services import postprocess as pp
 
 file_bp = Blueprint("file", __name__)
 
@@ -155,51 +155,51 @@ def populate_info_from_iv_file():
 		iv_curve["polarity"] = iv_dict["polarity"]
 
 
-		current_list = pps.clean_string_or_list_values(iv_dict["current"], conversion_factor = -6)
-		voltage_up_list = pps.clean_string_or_list_values(iv_dict["voltage_up"], conversion_factor = -3)
-		voltage_down_list = pps.clean_string_or_list_values(iv_dict["voltage_down"], conversion_factor = -3)
+		current_list = pp.clean_string_or_list_values(iv_dict["current"], conversion_factor = -6)
+		voltage_up_list = pp.clean_string_or_list_values(iv_dict["voltage_up"], conversion_factor = -3)
+		voltage_down_list = pp.clean_string_or_list_values(iv_dict["voltage_down"], conversion_factor = -3)
 
-		process_static_dict = pps.calculate_iv_parameters(current_list, voltage_up_list, voltage_down_list)
-		static_reverse_current, static_reverse_voltage = pps.get_reverse_breakdown_values(
-			pps.clean_string_or_list_values(iv_dict['reverse_current']), 
-			pps.clean_string_or_list_values(iv_dict['reverse_voltage']))
+		process_dict = pp.calculate_iv_parameters(current_list, voltage_up_list, voltage_down_list)
+		reverse_current, reverse_voltage = pp.get_reverse_breakdown_values(
+			pp.clean_string_or_list_values(iv_dict['reverse_current']), 
+			pp.clean_string_or_list_values(iv_dict['reverse_voltage']))
 
-		max_current = process_static_dict["Imax"]
+		max_current = process_dict["Imax"]
 
-		clean_process_static_dict = {
-			"rs": process_static_dict["Rs"],
-			"ideality": process_static_dict["n (ideality)"],
-			"is": process_static_dict["Is"],
-			"r_squared_error": process_static_dict["R^2 Error"],
-			"mean_squared_error": process_static_dict["Mean Square Error"],
-			"hysteresis_mean": process_static_dict["Hysteresis Mean (mV)"],
-			"hysteresis_std": process_static_dict["Hysteresis SD (mV)"],
-			"hysteresis_max": process_static_dict["Hysteresis Max (mV)"],
-			"hysteresis_min": process_static_dict["Hysteresis Min (mV)"],
-			"reverse_current": static_reverse_current,
-			"reverse_voltage": static_reverse_voltage,
-			"rs_4pt": process_static_dict["Rs_4pt"],
-			"rs_3pt": process_static_dict["Rs 3pt"],
-			"rs_1": process_static_dict["Rs_1"],
-			"pass_heat": process_static_dict.get("pass_heat", ""),
-			"temperature": process_static_dict.get("temperature", ""),
-			"i_max": process_static_dict['mV @ Imax'],
-			"i_max_10": process_static_dict['mV @ Imax/10'],
-			"i_max_100": process_static_dict['mV @ Imax/100'],
-			f"{max_current}mA": process_static_dict[f'mV @ {max_current}mA'],
-			f"{max_current}00uA": process_static_dict[f'mV @ {max_current}00uA'],
-			f"{max_current}0uA": process_static_dict[f'mV @ {max_current}0uA'],
-			f"{max_current}uA": process_static_dict[f'mV @ {max_current}uA'],
-			f"{max_current}00nA": process_static_dict[f'mV @ {max_current}00nA'],
-			"dv1": process_static_dict["dV1"],
-			"dv2": process_static_dict["dV2"],
-			"dv3": process_static_dict["dV3"],
-			"dv4": process_static_dict["dV4"],
-			"dv5": process_static_dict["dV5"],
+		clean_process_dict = {
+			"rs": process_dict["Rs"],
+			"ideality": process_dict["n (ideality)"],
+			"is": process_dict["Is"],
+			"r_squared_error": process_dict["R^2 Error"],
+			"mean_squared_error": process_dict["Mean Square Error"],
+			"hysteresis_mean": process_dict["Hysteresis Mean (mV)"],
+			"hysteresis_std": process_dict["Hysteresis SD (mV)"],
+			"hysteresis_max": process_dict["Hysteresis Max (mV)"],
+			"hysteresis_min": process_dict["Hysteresis Min (mV)"],
+			"reverse_current": reverse_current,
+			"reverse_voltage": reverse_voltage,
+			"rs_4pt": process_dict["Rs_4pt"],
+			"rs_3pt": process_dict["Rs 3pt"],
+			"rs_1": process_dict["Rs_1"],
+			"pass_heat": process_dict.get("pass_heat", ""),
+			"temperature": process_dict.get("temperature", ""),
+			"i_max": process_dict['mV @ Imax'],
+			"i_max_10": process_dict['mV @ Imax/10'],
+			"i_max_100": process_dict['mV @ Imax/100'],
+			f"{max_current}mA": process_dict[f'mV @ {max_current}mA'],
+			f"{max_current}00uA": process_dict[f'mV @ {max_current}00uA'],
+			f"{max_current}0uA": process_dict[f'mV @ {max_current}0uA'],
+			f"{max_current}uA": process_dict[f'mV @ {max_current}uA'],
+			f"{max_current}00nA": process_dict[f'mV @ {max_current}00nA'],
+			"dv1": process_dict["dV1"],
+			"dv2": process_dict["dV2"],
+			"dv3": process_dict["dV3"],
+			"dv4": process_dict["dV4"],
+			"dv5": process_dict["dV5"],
 			"max_current": max_current
 		}
 
-		full_iv_dict = {**iv_dict, **clean_process_static_dict}
+		full_iv_dict = {**iv_dict, **clean_process_dict}
 
 		tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
 
