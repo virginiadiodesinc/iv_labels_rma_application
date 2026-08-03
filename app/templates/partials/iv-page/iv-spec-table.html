@@ -1,12 +1,13 @@
 <div id="iv-spec-table-container" class="iv-spec-table-container" hx-swap-oob="true">
     {% if html_table %}
-    <details>
+    <details open>
         <summary>Diode Spec Sheet</summary>
         {{ html_table | safe }}
         <button id="spec-sheet-clear-button"
                 hx-post="/clear_diode_spec_sheet/"
                 hx-swap="innerHTML"
-                hx-target="#iv-spec-table-container">
+                hx-target="#iv-spec-table-container"
+                onclick="document.getElementById('spec-sheet-runcode-input').value = ''">
                 Clear Spec Sheet
         </button>
     </details>

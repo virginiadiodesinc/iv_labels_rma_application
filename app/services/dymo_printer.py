@@ -4,6 +4,7 @@ from win32com.client import Dispatch
 import pythoncom
 import xml.etree.ElementTree as ET
 import copy
+from app.services import date_converter as dc
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRINTER_NAME = "DYMO LabelWriter 450 Turbo"
@@ -59,7 +60,7 @@ def populate_inspection_label_fields(label_text, form_data: dict):
 	# inspection-initials: BKB
 	label_text.SetField('BLOCK_ENGRAVING_INPUT', form_data.get("block-engraving-input", ""))
 	label_text.SetField('BLOCK_SN_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
-	label_text.SetField('BLOCK_DATE_INPUT', form_data.get("inspection-date-input", ""))
+	label_text.SetField('BLOCK_DATE_INPUT', dc.iso_date_to_labview(form_data.get("inspection-date-input", "")))
 	label_text.SetField('PREBUILD_INIT_INPUT', form_data.get("inspection-initials-input", ""))
 
 	return label_text
@@ -79,7 +80,7 @@ def populate_pb1_label_fields(label_text, form_data: dict):
 	# pb1-initials: BKB
 	label_text.SetField('BUILD_NAME_INPUT', form_data.get("pb1-build-name-input", ""))
 	label_text.SetField('BLOCK_SN_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
-	label_text.SetField('BLOCK_DATE_INPUT', form_data.get("pb1-date-input", ""))
+	label_text.SetField('BLOCK_DATE_INPUT', dc.iso_date_to_labview(form_data.get("pb1-date-input", "")))
 	label_text.SetField('PREBUILD_INIT_INPUT', form_data.get("pb1-initials-input", ""))
 
 	return label_text
@@ -103,9 +104,9 @@ def populate_pb2_label_fields(label_text, form_data: dict):
 	# pb2-inspector: ELT
 	label_text.SetField('BUILD_NAME_INPUT', form_data.get("pb2-build-name-input", ""))
 	label_text.SetField('BLOCK_SN_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
-	label_text.SetField('BLOCK_DATE_INPUT', form_data.get("pb2-date-input", ""))
+	label_text.SetField('BLOCK_DATE_INPUT', dc.iso_date_to_labview(form_data.get("pb2-date-input", "")))
 	label_text.SetField('PREBUILD_INIT_INPUT', form_data.get("pb2-initials-input", ""))
-	label_text.SetField('INSPECTOR_INPUT', form_data.get("pb2-inspector-initials-input", ""))
+	label_text.SetField('INSPECTOR_INPUT', form_data.get("pb2-inspection-initials-input", ""))
 
 	return label_text
 
@@ -118,6 +119,7 @@ def populate_full_build_label_fields(label_text, form_data: dict):
 	@param form_data the object containing the input fields to be added to the label (dict)
 	@return label_text Return value of type (string)
 	"""
+	# HEADER + 14 LINES (SOME PARTS ARE MULTI-LINE) FOR FIRST LABEL, 16 LINES FOR EVERY LABEL AFTER THAT
 	parts = form_data.getlist("part")
 	lots  = form_data.getlist("lot-select")
 	custom_lots = form_data.getlist("custom-lot-input")
@@ -133,7 +135,7 @@ def populate_full_build_label_fields(label_text, form_data: dict):
 
 	label_text.SetField('BUILD_NAME_INPUT', form_data.get("full-build-name-input", ""))
 	label_text.SetField('BLOCK_SERIAL_NUMBER_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
-	label_text.SetField('BUILD_DATE_INPUT', form_data.get("full-build-date-input", ""))
+	label_text.SetField('BUILD_DATE_INPUT', dc.iso_date_to_labview(form_data.get("full-build-date-input", "")))
 	label_text.SetField('BUILD_INITIALS_INPUT', form_data.get("full-build-initials-input", ""))
 
 	for i in range(len(part_rows)):
@@ -167,11 +169,15 @@ def prepare_full_build_label(label_path: str, form_data: dict):
 
 	xml_tree = ET.fromstring(label_xml)
 
-	# distance between rows is 187.2?
-	# 14.4 per .1 inch?
-	# 187.2 / 14.4 = 13
-	starting_row_y = 561.6  # Y position of the first row
-	row_spacing = 187.2	# Spacing between rows
+	# 14.4 per .01 inch; 1 inch = 1440
+	# row text/input fields have a height of 180; 180 / 14.4 = 12.5 units, .125 inches
+	# full distance between rows is 270; 270 / 14.4 = 18.75 units, .1875 inches; 90 / 14.4 = extra 6.25 units, .625 inches between rows
+	# 720 + row * 270
+	# or 225? / .3125 extra inches
+	# which would be 630 + row * 225
+	
+	starting_row_y = 630  # Y position of the first row
+	row_spacing = 225	# Spacing between rows
 	for i in range(part_row_count):
 		for obj_info in xml_tree.findall(".//ObjectInfo"):	
 			text_obj = obj_info.find("TextObject")

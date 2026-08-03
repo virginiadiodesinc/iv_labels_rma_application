@@ -978,26 +978,9 @@ def save_iv_file():
 @file_bp.post("/get_diode_spec_sheet/")
 def get_diode_spec_sheet():
 	try:
-		iv_assembly_info = request.form
-		parts_list = iv_assembly_info.getlist("part")
-		lots_list = iv_assembly_info.getlist("lot-select")
-		custom_lots_list = iv_assembly_info.getlist("custom-lot-input")
-
-		custom_index = 0
-		for index, lot in enumerate(lots_list):
-			if lot == "Other":
-				lots_list[index] = custom_lots_list[custom_index]
-				custom_index += 1
-
-		diode_name = parts_list[0]
-		diode_lot = lots_list[0]
-
-		if not diode_name or not diode_lot:
-			print("Sorry, something went wrong with pulling the diode spec sheet.")
-			return "Sorry, something went wrong with pulling the diode spec sheet."
-
-		effective_part_number = diode_name if (diode_lot == "Unknown" or diode_lot == "NA" or diode_lot == "Choose") else diode_lot
-		html_table = dss.get_html_table_from_full_part_number(effective_part_number)
+		runcode_form = request.form
+		runcode = runcode_form.get("spec-sheet-runcode-input")
+		html_table = dss.get_html_table_from_runcode(runcode)
 
 		return render_template("partials/iv-page/iv-spec-table.html", html_table=html_table)
 	

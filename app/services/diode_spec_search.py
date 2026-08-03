@@ -27,8 +27,6 @@ def get_runcode_from_full_part_number(full_part_number):
         first_index_of_runcode = len(full_part_number) + first_index_of_runcode + 1
     last_index_of_runcode = len(full_part_number) + last_index_of_runcode
 
-    print(first_index_of_runcode, last_index_of_runcode)
-
     full_runcode = full_part_number[first_index_of_runcode:last_index_of_runcode + 1]
     return full_runcode
 
@@ -73,6 +71,16 @@ def get_html_table_from_full_part_number(full_part_number):
 
     html_table = get_html_table_from_spec_df(spec_df)
     return html_table
+
+def get_html_table_from_runcode(runcode):
+    spec_file_path = get_file_path_from_runcode(runcode)
+    
+    spec_df = get_spec_sheet_from_file(spec_file_path)
+    spec_df = clean_spec_df(spec_df)
+
+    html_table = get_html_table_from_spec_df(spec_df)
+    return html_table
+
 
 # def main():
 #     diode_list = ["G1SP4D4.8F22N223A", "A2APXD9FGXXX_LOT1174", "1273"]
