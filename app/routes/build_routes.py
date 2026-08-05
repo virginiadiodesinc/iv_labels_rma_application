@@ -13,7 +13,6 @@ def check_custom_lot():
 	@return custom-lot-input.html Return value of type (template partial)
 	"""
 	selected_lot = request.form.get("lot-select")
-	print(selected_lot)
 	return render_template("partials/build-page/custom-lot-input.html", selected_lot=selected_lot)
 
 @build_bp.get("/clear_block_info/")

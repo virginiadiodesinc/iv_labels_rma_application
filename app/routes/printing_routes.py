@@ -13,7 +13,7 @@ def print_full_build():
 	@return print_engine Return value of type (callable)
 	"""
 	full_build_info = request.form
-	printer.print_engine("full_build.label", printer.populate_full_build_label_fields, full_build_info, printer.prepare_full_build_label)
+	printer.print_engine("full_build_270.label", printer.populate_full_build_label_fields, full_build_info, printer.prepare_full_build_label)
 	return "", 204
 
 @print_bp.post("/print/inspection_label/")

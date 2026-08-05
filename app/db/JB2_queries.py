@@ -49,14 +49,14 @@ def get_BOM(build_name):
 
     sql_BOM_query =     "SELECT " \
                         "   Materials.SubPartNo, " \
-                        "   Materials.Descrip, " \
+                        "   Estim.ProdCode, " \
                         "   Materials.ItemNo, " \
                         "   Materials.Qty, " \
                         "   Materials.Materials_ID " \
                         "FROM " \
                         "   Materials " \
                         "INNER JOIN Estim " \
-                        "   ON Materials.PartNo = Estim.PartNo " \
+                        "   ON Materials.SubPartNo = Estim.PartNo " \
                         "WHERE " \
                         "   Materials.PartNo LIKE '"+build_name+"';"
 
@@ -112,14 +112,11 @@ def get_BOM(build_name):
 
     for row in cursor.fetchall():
         if 'CDMCOST' not in row[0]:
-            category = re.search(category_pattern, row[1]).group(1)
-            bom_entry = {"part_name": row[0], "part_quantity": row[3], "part_type": category, "part_lot": ""}
+            bom_entry = {"part_name": row[0], "part_quantity": row[3], "part_type": row[1], "part_lot": ""}
             BOM.append(bom_entry)
             #BOM.append([row[0], row[3], category]) #List of parts on BOM, their quantity, and their category
         else:
             continue
-
-    #print(BOM)
 
     return BOM
     
