@@ -270,6 +270,7 @@ input {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	gap: 20px;
 }
 
 .diode-row {
@@ -289,6 +290,12 @@ input {
 	flex-direction: row;
 	justify-content: space-between;
 }
+.note-input-container {
+	flex-grow: 1;
+}
+.note-input {
+	width: 90%;
+}
 
 .delete-row-button-container {
 	justify-self: flex-end;
@@ -303,7 +310,7 @@ input {
 }
 
 .part-row-part-quantity {
-	width: 7ch;
+	width: 5ch;
 	min-width: 50%;
 	max-width: 60%;
 }
@@ -505,6 +512,23 @@ th {
 	margin: 0;
 }
 
-.pcb-sn-input {
-	width: 7ch;
+.pcb-row {
+	flex-grow: 1;
 }
+
+.pcb-modifications-container {
+	width: 100%;
+}
+
+.pcb-modifications-input {
+	width: 85%;
+}
+
+.diode-indium-container {
+	flex-grow: 1;
+}
+
+.diode-indium-input {
+	width: 80%;
+}
+

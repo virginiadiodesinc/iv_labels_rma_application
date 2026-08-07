@@ -7,7 +7,7 @@
 				name="note_type">
 				<option value="GENERIC" {% if note and note['note_type'] == "GENERIC" %}
 						selected
-					{% endif %}>General Note</option>
+					{% endif %}>General</option>
 				<option value="PCB_DEVIATIONS" {% if note and note['note_type'] == "PCB_DEVIATIONS" %}
 						selected
 					{% endif %}>PCB Edits</option>
@@ -16,7 +16,7 @@
 					{% endif %}>Current Test</option>
 				<option value="REWORK_SUMMARY" {% if note and note['note_type'] == "REWORK_SUMMARY" %}
 						selected
-					{% endif %}>Rework Summary</option>
+					{% endif %}>Rework Info</option>
 				<option value="INDIUM" {% if note and note['note_type'] == "INDIUM" %}
 						selected
 					{% endif %}>Indium</option>
@@ -26,10 +26,11 @@
 			</select>
 		</label>
 	</div>
-	<div>
+	<div class="note-input-container">
 		<label>
 			Note:
-			<input type="text" 
+			<input  class="note-input"
+					type="text" 
 					name="note"
 					size="40"
 					value="{{note.text if note and note.text else ''}}">

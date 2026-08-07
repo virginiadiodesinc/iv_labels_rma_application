@@ -1,6 +1,6 @@
 <div class="diode-reverse-voltage-container">
 	<Label>
-		Reverse Voltage (V)
+		VBR (V)
 		<input class="diode-extra-number-input"
 						type="text" 
 						name="diode-row-reverse-voltage-input" 
@@ -9,12 +9,21 @@
 </div>
 <div class="diode-temperature-container">
 	<Label>
-		Temperature (C)
+		Temp (C)
 		<input class="diode-extra-number-input"
 						type="text" 
 						name="diode-row-temperature-input" 
 						value="{{temperature if temperature else 'NA'}}">
 	</Label>
+</div>
+<div class="diode-indium-container">
+	<Label>
+		Indium
+		<input  class="diode-indium-input"
+				type="text" 
+				name="diode-row-indium-input" 
+				value="{{indium if indium else 'NA'}}">
+</Label>
 </div>
 <div class="import-values-from-iv-container">
 	<button id="import-special-values-from-iv-button"

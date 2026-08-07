@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import copy
 from app.services import date_converter as dc
 from pathlib import Path
+from app.services import string_utilities as su
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRINTER_NAME = "DYMO LabelWriter 450 Turbo"
@@ -30,15 +31,22 @@ FULL_BUILD_LAYOUTS = {
 	"full_build_270.label": {
 		"continuation_label": "full_build_270_continued.label",
 		"starting_row_y_first": 720,
-		"starting_row_y_continued": 180,
+		"starting_row_y_continued": 450,
 		"space_between_rows": 270,
 		"max_slots_first_page": 9,
-		"max_slots_continuation_page": 11,
+		"max_slots_continuation_page": 10,
 		"input_y_offset": -20,
 	},
 }
 
 MULTI_LINE_PART_TYPES = {"DIODE", "PCB"}
+LIMITED_CHARACTER_FIELDS = {"INDIUM_INPUT": 18, "NOTE_INPUT": 53, "PCB_MODIFICATIONS_INPUT": 53}
+
+
+def limit_input_characters(input_string, character_limit):
+	if len(input_string) > character_limit:
+		input_string =  input_string[0:(character_limit - 3)] + "..."
+	return input_string
 
 
 def print_engine(label_name: str, label_field_populator: callable, form_data: dict, label_preparer: Optional[Callable] = None):
@@ -88,10 +96,9 @@ def print_engine(label_name: str, label_field_populator: callable, form_data: di
 	finally:
 		label_directory = Path(os.path.join(BASE_DIR, "labels"))
 		all_temp_labels = list(label_directory.glob("*temp*.label"))
-		print(all_temp_labels)
 		
-		for temp_path in all_temp_labels:
-			temp_path.unlink()
+		# for temp_path in all_temp_labels:
+		# 	temp_path.unlink()
 
 		pythoncom.CoUninitialize()
 
@@ -166,12 +173,13 @@ def _parse_full_build_rows(form_data: dict):
 	lots = form_data.getlist("lot-select")
 	custom_lots = form_data.getlist("custom-lot-input")
 	part_types = form_data.getlist("part_type")
+	quantities = form_data.getlist("quantity")
 
 	reverse_voltages = form_data.getlist("diode-row-reverse-voltage-input")
 	temperatures = form_data.getlist("diode-row-temperature-input")
+	indium_list = form_data.getlist("diode-row-indium-input")
 
-	pcb_serial_numbers = form_data.getlist("pcb-sn-input")
-	pcb_deviations = form_data.getlist("pcb-deviations-input")
+	pcb_modifications = form_data.getlist("pcb-modifications-input")
 
 	notes = form_data.getlist("note")
 	note_types = form_data.getlist("note_type")
@@ -188,21 +196,21 @@ def _parse_full_build_rows(form_data: dict):
 	rows = []
 	diode_index = 0
 	pcb_index = 0
-	for part, lot, part_type in zip(parts, resolved_lots, part_types):
-		if part_type == "MISC" or part_type == "CONNECTOR" or part_type == "NA":
+	for part, lot, part_type, quantity in zip(parts, resolved_lots, part_types, quantities):
+		if part_type == "MISC" or part_type == "CONNECTOR" or part_type == "NA" or part_type == "MA PARTS":
 			continue
 
-		row = {"kind": "part", "part": part, "lot": lot, "type": part_type, "slots": 1}
+		row = {"kind": "part", "part": part, "lot": lot, "type": part_type, "quantity": quantity, "slots": 1}
 
 		if part_type == "DIODE":
 			row["reverse_voltage"] = reverse_voltages[diode_index]
 			row["temperature"] = temperatures[diode_index]
+			row["indium"] = indium_list[diode_index]
 			row["slots"] = 2
 			diode_index += 1
 
 		elif part_type == "PCB":
-			row["serial_number"] = pcb_serial_numbers[pcb_index]
-			row["deviations"] = pcb_deviations[pcb_index]
+			row["modifications"] = pcb_modifications[pcb_index]
 			row["slots"] = 2
 			pcb_index += 1
 
@@ -211,9 +219,12 @@ def _parse_full_build_rows(form_data: dict):
 	for note, note_type in zip(notes, note_types):
 		rows.append({"kind": "note", "note": note, "type": note_type, "slots": 1})
 
+	lv_style_build_name = su.get_build_name_with_suffix(form_data.get("full-build-name-input"), form_data.get("block-engraving-input"))
+	lv_style_block_serial_number = form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", "")
+	lv_style_build_name_with_sn_and_rev = lv_style_build_name + " " + lv_style_block_serial_number
+
 	header = {
-		"build_name": form_data.get("full-build-name-input", ""),
-		"block_serial_number": form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""),
+		"build_name": lv_style_build_name_with_sn_and_rev,
 		"build_date": dc.iso_date_to_labview(form_data.get("full-build-date-input", "")),
 		"build_initials": form_data.get("full-build-initials-input", ""),
 	}
@@ -343,7 +354,11 @@ def _render_page(template_path, page_rows, layout, page_suffix):
 					xml_tree, "PCB_ROW_TEMPLATE_", f"ROW_{part_index}_PCB_",
 					row_y + space_between_rows, input_y_offset,
 				)
+			if row["type"] != "MMIC" and row["type"] != "PCB" and row["type"] != "DIODE":
+				_strip_template_objects(xml_tree, [f"ROW_{part_index}_LOT"])
+
 			part_index += 1
+		
 		else:
 			_clone_template_rows(xml_tree, "NOTE_TEMPLATE_", f"NOTE_ROW_{note_index}_", row_y, input_y_offset)
 			note_index += 1
@@ -393,8 +408,10 @@ def prepare_full_build_label(label_path: str, form_data: dict):
 
 		page_label_path = _render_page(template_path, page_rows, layout, f"page{page_number}")
 
+		only_build_name_header = {"build_name": header["build_name"]}
+
 		page_form_data = {
-			"header": header if is_first_page else None,
+			"header": header if is_first_page else only_build_name_header,
 			"rows": page_rows,
 			"page_number": page_number,
 			"total_pages": total_pages,
@@ -421,9 +438,9 @@ def populate_full_build_label_fields(label_text, page_data: dict):
 
 	if header is not None:
 		label_text.SetField('BUILD_NAME_INPUT', header["build_name"])
-		label_text.SetField('BLOCK_SERIAL_NUMBER_INPUT', header["block_serial_number"])
-		label_text.SetField('BUILD_DATE_INPUT', header["build_date"])
-		label_text.SetField('BUILD_INITIALS_INPUT', header["build_initials"])
+		if len(header) > 1:
+			label_text.SetField('BUILD_DATE_INPUT', header["build_date"])
+			label_text.SetField('BUILD_INITIALS_INPUT', header["build_initials"])
 
 	part_index = 0
 	note_index = 0
@@ -431,19 +448,21 @@ def populate_full_build_label_fields(label_text, page_data: dict):
 		if row["kind"] == "part":
 			label_text.SetField(f'ROW_{part_index}_PART_TITLE', row["type"][0:5])
 			label_text.SetField(f'ROW_{part_index}_PART_INPUT', row["part"])
-			label_text.SetField(f'ROW_{part_index}_LOT_INPUT', row["lot"])
+			if row["type"] == "MMIC" or row["type"] == "DIODE" or row["type"] == "PCB":
+				label_text.SetField(f'ROW_{part_index}_LOT_INPUT', row["lot"])
 
 			if row["type"] == "DIODE":
 				label_text.SetField(f'ROW_{part_index}_DIODE_REVERSE_VOLTAGE_INPUT', row["reverse_voltage"])
 				label_text.SetField(f'ROW_{part_index}_DIODE_TEMPERATURE_INPUT', row["temperature"])
+				label_text.SetField(f'ROW_{part_index}_DIODE_INDIUM_INPUT', limit_input_characters(row["indium"], LIMITED_CHARACTER_FIELDS["INDIUM_INPUT"]))
+				label_text.SetField(f'ROW_{part_index}_DIODE_QUANTITY_INPUT', row["quantity"])
 			elif row["type"] == "PCB":
-				label_text.SetField(f'ROW_{part_index}_PCB_SN_INPUT', row["serial_number"])
-				label_text.SetField(f'ROW_{part_index}_PCB_DEVIATION_INPUT', row["deviations"])
+				label_text.SetField(f'ROW_{part_index}_PCB_modification_INPUT', limit_input_characters(row["modifications"], LIMITED_CHARACTER_FIELDS["PCB_MODIFICATIONS_INPUT"]))
 
 			part_index += 1
 		else:
 			label_text.SetField(f'NOTE_ROW_{note_index}_TITLE', row["type"][0:4])
-			label_text.SetField(f'NOTE_ROW_{note_index}_INPUT', row["note"])
+			label_text.SetField(f'NOTE_ROW_{note_index}_INPUT', limit_input_characters(row["note"], LIMITED_CHARACTER_FIELDS["NOTE_INPUT"]))
 			note_index += 1
 
 	return label_text

@@ -27,7 +27,7 @@
 				<Element>
 					<String xml:space="preserve">BUILD NAME</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -111,7 +111,7 @@
 				<Element>
 					<String xml:space="preserve">PART</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -195,7 +195,7 @@
 				<Element>
 					<String xml:space="preserve">LOT</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -279,7 +279,7 @@
 				<Element>
 					<String xml:space="preserve">NOTE</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -345,7 +345,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_REVERSE_VOLTAGE_TITLE</Name>
+			<Name>DIODE_ROW_REVERSE_VOLTAGE_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -363,7 +363,7 @@
 				<Element>
 					<String xml:space="preserve">VBR</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -373,7 +373,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_REVERSE_VOLTAGE_UNDERLINE</Name>
+			<Name>DIODE_ROW_REVERSE_VOLTAGE_UNDERLINE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -401,7 +401,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_REVERSE_VOLTAGE_INPUT</Name>
+			<Name>DIODE_ROW_REVERSE_VOLTAGE_INPUT</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -429,7 +429,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_TEMPERATURE_TITLE</Name>
+			<Name>DIODE_ROW_TEMPERATURE_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -447,7 +447,7 @@
 				<Element>
 					<String xml:space="preserve">TEMP</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -457,7 +457,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_TEMPERATURE_UNDERLINE</Name>
+			<Name>DIODE_ROW_TEMPERATURE_UNDERLINE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -485,7 +485,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_TEMPERATURE_INPUT</Name>
+			<Name>DIODE_ROW_TEMPERATURE_INPUT</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -513,7 +513,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_INDIUM_TITLE</Name>
+			<Name>DIODE_ROW_INDIUM_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -531,7 +531,7 @@
 				<Element>
 					<String xml:space="preserve">INDIUM</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -541,7 +541,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_INDIUM_UNDERLINE</Name>
+			<Name>DIODE_ROW_INDIUM_UNDERLINE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -569,7 +569,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_INDIUM_INPUT</Name>
+			<Name>DIODE_ROW_INDIUM_INPUT</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -597,7 +597,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_QUANTITY_TITLE</Name>
+			<Name>DIODE_ROW_QUANTITY_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -615,7 +615,7 @@
 				<Element>
 					<String xml:space="preserve">QTY</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -625,7 +625,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_QUANTITY_UNDERLINE</Name>
+			<Name>DIODE_ROW_QUANTITY_UNDERLINE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -653,7 +653,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>DIODE_ROW_TEMPLATE_QUANTITY_INPUT</Name>
+			<Name>DIODE_ROW_QUANTITY_INPUT</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -681,7 +681,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_TEMPLATE_MODIFICATION_TITLE</Name>
+			<Name>PCB_ROW_MODIFICATION_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -699,7 +699,7 @@
 				<Element>
 					<String xml:space="preserve">MODS</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -709,7 +709,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_TEMPLATE_MODIFICATION_UNDERLINE</Name>
+			<Name>PCB_ROW_MODIFICATION_UNDERLINE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -737,7 +737,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_TEMPLATE_MODIFICATION_INPUT</Name>
+			<Name>PCB_ROW_MODIFICATION_INPUT</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />

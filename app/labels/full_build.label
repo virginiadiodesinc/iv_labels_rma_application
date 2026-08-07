@@ -93,90 +93,6 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>BLOCK_SERIAL_NUMBER_TITLE</Name>
-			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
-			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
-			<LinkedObjectName />
-			<Rotation>Rotation0</Rotation>
-			<IsMirrored>False</IsMirrored>
-			<IsVariable>False</IsVariable>
-			<GroupID>-1</GroupID>
-			<IsOutlined>False</IsOutlined>
-			<HorizontalAlignment>Left</HorizontalAlignment>
-			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
-			<Verticalized>False</Verticalized>
-			<StyledText>
-				<Element>
-					<String xml:space="preserve">SN</String>
-					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
-						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
-					</Attributes>
-				</Element>
-			</StyledText>
-		</TextObject>
-		<Bounds X="4320" Y="180" Width="216" Height="180" />
-	</ObjectInfo>
-	<ObjectInfo>
-		<TextObject>
-			<Name>BLOCK_SERIAL_NUMBER_UNDERLINE</Name>
-			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
-			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
-			<LinkedObjectName />
-			<Rotation>Rotation0</Rotation>
-			<IsMirrored>False</IsMirrored>
-			<IsVariable>False</IsVariable>
-			<GroupID>-1</GroupID>
-			<IsOutlined>False</IsOutlined>
-			<HorizontalAlignment>Left</HorizontalAlignment>
-			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
-			<Verticalized>False</Verticalized>
-			<StyledText>
-				<Element>
-					<String xml:space="preserve">_______</String>
-					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
-						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
-					</Attributes>
-				</Element>
-			</StyledText>
-		</TextObject>
-		<Bounds X="4536" Y="180" Width="4464" Height="180" />
-	</ObjectInfo>
-	<ObjectInfo>
-		<TextObject>
-			<Name>BLOCK_SERIAL_NUMBER_INPUT</Name>
-			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
-			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
-			<LinkedObjectName />
-			<Rotation>Rotation0</Rotation>
-			<IsMirrored>False</IsMirrored>
-			<IsVariable>False</IsVariable>
-			<GroupID>-1</GroupID>
-			<IsOutlined>False</IsOutlined>
-			<HorizontalAlignment>Left</HorizontalAlignment>
-			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
-			<Verticalized>False</Verticalized>
-			<StyledText>
-				<Element>
-					<String xml:space="preserve">3-001ZZ</String>
-					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
-						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
-					</Attributes>
-				</Element>
-			</StyledText>
-		</TextObject>
-		<Bounds X="4572" Y="180" Width="633.6" Height="180" />
-	</ObjectInfo>
-	<ObjectInfo>
-		<TextObject>
 			<Name>BUILD_INITIALS_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
@@ -557,7 +473,7 @@
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
-					<String xml:space="preserve">_____________________________________________________</String>
+					<String xml:space="preserve">_______________________________________________________</String>
 					<Attributes>
 						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
@@ -765,7 +681,7 @@
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_SN_TITLE</Name>
+			<Name>DIODE_ROW_INDIUM_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -781,7 +697,7 @@
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
-					<String xml:space="preserve">SN</String>
+					<String xml:space="preserve">INDIUM</String>
 					<Attributes>
 						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
@@ -789,11 +705,11 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="360" Y="1305" Width="360" Height="180" />
+		<Bounds X="2700" Y="1080" Width="504" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_SN_UNDERLINE</Name>
+			<Name>DIODE_ROW_INDIUM_UNDERLINE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -809,7 +725,7 @@
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
-					<String xml:space="preserve">_________</String>
+					<String xml:space="preserve">__________________</String>
 					<Attributes>
 						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
@@ -817,11 +733,11 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="612" Y="1305" Width="630" Height="180" />
+		<Bounds X="3240" Y="1080" Width="1440" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_SN_INPUT</Name>
+			<Name>DIODE_ROW_INDIUM_INPUT</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -837,7 +753,7 @@
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
-					<String xml:space="preserve">987654</String>
+					<String xml:space="preserve">Seams and Cover</String>
 					<Attributes>
 						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
@@ -845,11 +761,11 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="648" Y="1305" Width="648" Height="180" />
+		<Bounds X="3276" Y="1080" Width="1440" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_DEVIATION_TITLE</Name>
+			<Name>DIODE_ROW_QUANTITY_TITLE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -865,7 +781,7 @@
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
-					<String xml:space="preserve">DEVS</String>
+					<String xml:space="preserve">QTY</String>
 					<Attributes>
 						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
@@ -873,11 +789,11 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1476" Y="1305" Width="432" Height="180" />
+		<Bounds X="4788" Y="1080" Width="324" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_DEVIATION_UNDERLINE</Name>
+			<Name>DIODE_ROW_QUANTITY_UNDERLINE</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -893,7 +809,7 @@
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
-					<String xml:space="preserve">________________________________________</String>
+					<String xml:space="preserve">___</String>
 					<Attributes>
 						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
@@ -901,11 +817,11 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1908" Y="1305" Width="3492" Height="180" />
+		<Bounds X="5112" Y="1080" Width="324" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
-			<Name>PCB_ROW_DEVIATION_INPUT</Name>
+			<Name>DIODE_ROW_QUANTITY_INPUT</Name>
 			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
 			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
 			<LinkedObjectName />
@@ -921,7 +837,7 @@
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
-					<String xml:space="preserve">R99=100k; R3=14.5k; JW 32-43; Vb=12.0; Vc=13</String>
+					<String xml:space="preserve">99</String>
 					<Attributes>
 						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
@@ -929,6 +845,90 @@
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1980" Y="1305" Width="3492" Height="180" />
+		<Bounds X="5184" Y="1080" Width="324" Height="180" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>PCB_ROW_MODIFICATION_TITLE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Top</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">MODS</String>
+					<Attributes>
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="360" Y="1305" Width="432" Height="180" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>PCB_ROW_MODIFICATION_UNDERLINE</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Bottom</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">_______________________________________________________</String>
+					<Attributes>
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="720" Y="1305" Width="4644" Height="180" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<TextObject>
+			<Name>PCB_ROW_MODIFICATION_INPUT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName />
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<GroupID>-1</GroupID>
+			<IsOutlined>False</IsOutlined>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Middle</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<StyledText>
+				<Element>
+					<String xml:space="preserve">R99=100k; R3=14.5k; JW 32-43; Vb=12.0; Vc=13; R18=75k</String>
+					<Attributes>
+						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
+					</Attributes>
+				</Element>
+			</StyledText>
+		</TextObject>
+		<Bounds X="756" Y="1305" Width="4536" Height="180" />
 	</ObjectInfo>
 </DieCutLabel>
