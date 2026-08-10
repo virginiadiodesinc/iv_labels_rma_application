@@ -276,6 +276,11 @@ def upload_build_file():
 		
 	return render_template("partials/block-forms/build-file-upload.html", file_path=path[0])
 
+@file_bp.post("/trigger_block_file_save")
+def trigger_block_file_save():
+	route = "save_block_file"
+	return render_template("partials/generic/generic-save-dialog.html", route=route)
+
 @file_bp.post("/attempt_save_block_file/")
 def attempt_save_block_file():
 	"""Saves the data from the relevant input fields to a (LabView Style) block file 

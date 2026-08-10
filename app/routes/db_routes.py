@@ -32,13 +32,62 @@ def populate_block_info():
 	parts = retrieve_build_parts(block_engraving, block_serial_number, block_revision)
 	notes = retrieve_notes(block_engraving, block_serial_number, block_revision)
 	return render_template("partials/block-forms/block-and-build-population.html", block=block, parts=parts, notes=notes)
-	
 
-@db_bp.post("/save_inspection_info") #add some intelligent return statements
-def save_inspection_info():
+@db_bp.post("/trigger_inspection_info_save")
+def trigger_inspection_info_save():
+	route = "save_inspection_info"
+	return render_template("partials/generic/generic-save-dialog.html", route=route)
+
+@db_bp.post("/attempt_save_inspection_info")
+def attempt_save_inspection_info():
+	block_data = request.form
+
+	if block_data.get("block-revision-input", "").strip() == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = block_data.get("block-revision-input", "").strip()
+
+	if validate_block_info(block_data.get("block-engraving-input", "")) == True:
+		block_engraving = request.form.get("block-engraving-input", "").strip()
+		block_serial_number = request.form.get("block-serial-number-input", "").strip()
+		block_revision = db_block_rev
+		inspection_date = string_to_python_date(request.form.get("inspection-date-input", "")) if (request.form.get("inspection-date-input", "") != "") else None
+		inspection_initials = request.form.get("inspection-initials-input", "").strip()
+		if retrieve_build_info(block_engraving, block_serial_number, block_revision) != []:
+			updates = {
+				"inspection_date": inspection_date,
+				"inspection_initials": inspection_initials
+			}
+			update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)
+			return "", 200
+		elif retrieve_build_info(block_engraving, block_serial_number, block_revision) == []:
+			new_entry = {
+				"block_id": block_engraving+" "+block_serial_number+" "+block_revision,
+				"block_engraving": block_engraving,
+				"block_serial_number": block_serial_number,
+				"block_revision": block_revision,
+				"inspection_date": inspection_date,
+				"inspection_initials": inspection_initials
+			}
+			#print(new_entry)
+			add_table_entry(db_session, Build_Info, **new_entry)
+			return "", 200
+	else:
+		route = "save_inspection_info"
+		return render_template("partials/build-page/confirm-block-file-save.html", route=route)
+
+@db_bp.post("/confirm_save_inspection_info")
+def confirm_save_inspection_info():
+	block_data = request.form
+	
+	if block_data.get("block-revision-input", "").strip() == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = block_data.get("block-revision-input", "").strip()
+
 	block_engraving = request.form.get("block-engraving-input", "").strip()
 	block_serial_number = request.form.get("block-serial-number-input", "").strip()
-	block_revision = request.form.get("block-revision-input", "").strip()
+	block_revision = db_block_rev
 	inspection_date = string_to_python_date(request.form.get("inspection-date-input", "")) if (request.form.get("inspection-date-input", "") != "") else None
 	inspection_initials = request.form.get("inspection-initials-input", "").strip()
 	if retrieve_build_info(block_engraving, block_serial_number, block_revision) != []:
@@ -47,9 +96,8 @@ def save_inspection_info():
 			"inspection_initials": inspection_initials
 		}
 		update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)
-		
-		return
-	elif validate_block_info(block_engraving, block_serial_number, block_revision):
+		return "", 200
+	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) == []:
 		new_entry = {
 			"block_id": block_engraving+" "+block_serial_number+" "+block_revision,
 			"block_engraving": block_engraving,
@@ -58,19 +106,68 @@ def save_inspection_info():
 			"inspection_date": inspection_date,
 			"inspection_initials": inspection_initials
 		}
-		print(new_entry)
+		#print(new_entry)
 		add_table_entry(db_session, Build_Info, **new_entry)
-		
-		return
-	else:
-		print("Invalid block information entered, no block information has been added.") #Remove this when sanitizing functionality is added.
-		return
+		return "", 200
+
+@db_bp.post("/trigger_pb1_info_save")
+def trigger_pb1_info_save():
+	route = "save_pb1_info"
+	return render_template("partials/generic/generic-save-dialog.html", route=route)
+
+@db_bp.post("/attempt_save_pb1_info")
+def attempt_save_pb1_info():
+	block_data = request.form
 	
-@db_bp.post("/save_pb1_info")
-def save_pb1_info():
+	if block_data.get("block-revision-input", "").strip() == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = block_data.get("block-revision-input", "").strip()
+
+	if validate_block_info(block_data.get("block-engraving-input", "")) == True:	
+		block_engraving = request.form.get("block-engraving-input", "").strip()
+		block_serial_number = request.form.get("block-serial-number-input", "").strip()
+		block_revision = db_block_rev
+		pb1_build_name = request.form.get("pb1-build-name-input", "").strip()
+		pb1_date = string_to_python_date(request.form.get("pb1-date-input", "")) if (request.form.get("pb1-date-input", "") != "") else None
+		pb1_initials = request.form.get("pb1-initials-input", "").strip()
+		if retrieve_build_info(block_engraving, block_serial_number, block_revision) != []:
+			updates = {
+				"pb1_build_name": pb1_build_name,
+				"pb1_date": pb1_date,
+				"pb1_initials": pb1_initials
+			}
+			update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)		
+			return "", 200
+		
+		elif retrieve_build_info(block_engraving, block_serial_number, block_revision) == []:
+			new_entry = {
+				"block_id": block_engraving+" "+block_serial_number+" "+block_revision,
+				"block_engraving": block_engraving,
+				"block_serial_number": block_serial_number,
+				"block_revision": block_revision,
+				"pb1_build_name": pb1_build_name,
+				"pb1_date": pb1_date,
+				"pb1_initials": pb1_initials
+			}
+			add_table_entry(db_session, Build_Info, **new_entry)
+			return "", 200
+	else:
+		route = "save_pb1_info"
+		return render_template("partials/build-page/confirm-block-file-save.html", route=route)
+
+@db_bp.post("/confirm_save_pb1_info")
+def confirm_save_pb1_info():
+	block_data = request.form
+		
+	if block_data.get("block-revision-input", "").strip() == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = block_data.get("block-revision-input", "").strip()
+
 	block_engraving = request.form.get("block-engraving-input", "").strip()
 	block_serial_number = request.form.get("block-serial-number-input", "").strip()
-	block_revision = request.form.get("block-revision-input", "").strip()
+	block_revision = db_block_rev
 	pb1_build_name = request.form.get("pb1-build-name-input", "").strip()
 	pb1_date = string_to_python_date(request.form.get("pb1-date-input", "")) if (request.form.get("pb1-date-input", "") != "") else None
 	pb1_initials = request.form.get("pb1-initials-input", "").strip()
@@ -80,10 +177,10 @@ def save_pb1_info():
 			"pb1_date": pb1_date,
 			"pb1_initials": pb1_initials
 		}
-		update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)
-		
-		return
-	elif validate_block_info(block_engraving, block_serial_number, block_revision):
+		update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)		
+		return "", 200
+	
+	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) == []:
 		new_entry = {
 			"block_id": block_engraving+" "+block_serial_number+" "+block_revision,
 			"block_engraving": block_engraving,
@@ -94,17 +191,69 @@ def save_pb1_info():
 			"pb1_initials": pb1_initials
 		}
 		add_table_entry(db_session, Build_Info, **new_entry)
-		
-		return
-	else:
-		print("Invalid block information entered, no block information has been added.") #Remove this when sanitizing functionality is added.
-		return
+		return "", 200
 
-@db_bp.post("/save_pb2_info")
-def save_pb2_info():
+@db_bp.post("/trigger_pb2_info_save")
+def trigger_pb2_info_save():
+	route = "save_pb2_info"
+	return render_template("partials/generic/generic-save-dialog.html", route=route)
+
+@db_bp.post("/attempt_save_pb2_info")
+def attempt_save_pb2_info():
+	block_data = request.form
+		
+	if block_data.get("block-revision-input", "").strip() == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = block_data.get("block-revision-input", "").strip()
+
+	if validate_block_info(block_data.get("block-engraving-input", "")) == True:
+		block_engraving = request.form.get("block-engraving-input", "").strip()
+		block_serial_number = request.form.get("block-serial-number-input", "").strip()
+		block_revision = db_block_rev
+		pb2_build_name = request.form.get("pb2-build-name-input", "").strip()
+		pb2_date = string_to_python_date(request.form.get("pb2-date-input", "")) if (request.form.get("pb2-date-input", "") != "") else None
+		pb2_initials = request.form.get("pb2-initials-input", "").strip()
+		pb2_inspection_initials = request.form.get("pb2-inspection-initials-input", "").strip()
+		if retrieve_build_info(block_engraving, block_serial_number, block_revision) != []:
+			updates = {
+				"pb2_build_name": pb2_build_name,
+				"pb2_date": pb2_date,
+				"pb2_initials": pb2_initials,
+				"pb2_inspection_initials": pb2_inspection_initials
+			}
+			update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)		
+			return "", 200
+		
+		elif retrieve_build_info(block_engraving, block_serial_number, block_revision) == []:
+			new_entry = {
+				"block_id": block_engraving+" "+block_serial_number+" "+block_revision,
+				"block_engraving": block_engraving,
+				"block_serial_number": block_serial_number,
+				"block_revision": block_revision,
+				"pb2_build_name": pb2_build_name,
+				"pb2_date": pb2_date,
+				"pb2_initials": pb2_initials,
+				"pb2_inspection_initials": pb2_inspection_initials
+			}
+			add_table_entry(db_session, Build_Info, **new_entry)
+			return "", 200
+	else:
+		route = "save_pb2_info"
+		return render_template("partials/build-page/confirm-block-file-save.html", route=route)
+
+@db_bp.post("/confirm_save_pb2_info")
+def confirm_save_pb2_info():
+	block_data = request.form
+			
+	if block_data.get("block-revision-input", "").strip() == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = block_data.get("block-revision-input", "").strip()
+
 	block_engraving = request.form.get("block-engraving-input", "").strip()
 	block_serial_number = request.form.get("block-serial-number-input", "").strip()
-	block_revision = request.form.get("block-revision-input", "").strip()
+	block_revision = db_block_rev
 	pb2_build_name = request.form.get("pb2-build-name-input", "").strip()
 	pb2_date = string_to_python_date(request.form.get("pb2-date-input", "")) if (request.form.get("pb2-date-input", "") != "") else None
 	pb2_initials = request.form.get("pb2-initials-input", "").strip()
@@ -116,10 +265,10 @@ def save_pb2_info():
 			"pb2_initials": pb2_initials,
 			"pb2_inspection_initials": pb2_inspection_initials
 		}
-		update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)
-		
-		return
-	elif validate_block_info(block_engraving, block_serial_number, block_revision):
+		update_table_entry(db_session, Build_Info, block_engraving+" "+block_serial_number+" "+block_revision, **updates)		
+		return "", 200
+	
+	elif retrieve_build_info(block_engraving, block_serial_number, block_revision) == []:
 		new_entry = {
 			"block_id": block_engraving+" "+block_serial_number+" "+block_revision,
 			"block_engraving": block_engraving,
@@ -131,11 +280,7 @@ def save_pb2_info():
 			"pb2_inspection_initials": pb2_inspection_initials
 		}
 		add_table_entry(db_session, Build_Info, **new_entry)
-		
-		return
-	else:
-		print("Invalid block information entered, no block information has been added.") #Remove this when sanitizing functionality is added.
-		return
+		return "", 200
 	
 @db_bp.post("/open_iv_from_db/")
 def open_iv_from_db():
@@ -266,4 +411,8 @@ def populate_iv_from_db():
 	
 @db_bp.post("/cancel_iv_selection/")
 def cancel_iv_selection():
-	return ""
+	return "", 200
+
+@db_bp.post("/cancel_generic_save_dialog/")
+def cancel_generic_save_dialog():
+	return "", 200
