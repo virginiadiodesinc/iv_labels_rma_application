@@ -40,7 +40,7 @@ FULL_BUILD_LAYOUTS = {
 }
 
 MULTI_LINE_PART_TYPES = {"DIODE", "PCB"}
-LIMITED_CHARACTER_FIELDS = {"INDIUM_INPUT": 18, "NOTE_INPUT": 53, "PCB_MODIFICATIONS_INPUT": 53}
+LIMITED_CHARACTER_FIELDS = {"INDIUM_INPUT": 15, "NOTE_INPUT": 50, "PCB_MODIFICATIONS_INPUT": 50}
 PART_TYPES_WITH_LOTS = {"DIODE", "PCB", "MMIC"}
 NON_PRINTED_PART_TYPES = {"BCMESH", "CONNECTOR", "MA PARTS", "MISC", "SP OTHER", "CABLE", "FILTER", "INVENTORY", "PMP"}
 
@@ -99,8 +99,8 @@ def print_engine(label_name: str, label_field_populator: callable, form_data: di
 		label_directory = Path(os.path.join(BASE_DIR, "labels"))
 		all_temp_labels = list(label_directory.glob("*temp*.label"))
 		
-		# for temp_path in all_temp_labels:
-		# 	temp_path.unlink()
+		for temp_path in all_temp_labels:
+			temp_path.unlink()
 
 		pythoncom.CoUninitialize()
 
@@ -448,7 +448,7 @@ def populate_full_build_label_fields(label_text, page_data: dict):
 	note_index = 0
 	for row in rows:
 		if row["kind"] == "part":
-			label_text.SetField(f'ROW_{part_index}_PART_TITLE', row["type"][0:5])
+			label_text.SetField(f'ROW_{part_index}_PART_TITLE', row["type"][0:4])
 			label_text.SetField(f'ROW_{part_index}_PART_INPUT', row["part"])
 
 			if row["type"] in PART_TYPES_WITH_LOTS:

@@ -20,14 +20,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">BUILD NAME</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -48,14 +48,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">_____________________________________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -76,20 +76,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">FAKE BUILD NAME GOES HERE</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="1404" Y="180" Width="2880" Height="180" />
+		<Bounds X="1404" Y="160" Width="2880" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -104,14 +104,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">PART</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -132,20 +132,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">_______________________________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="792" Y="648" Width="2650" Height="180" />
+		<Bounds X="792" Y="648" Width="2866" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -160,20 +160,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">G10APWR12X3IS43.7FDGXXX</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="864" Y="630" Width="2560" Height="180" />
+		<Bounds X="864" Y="630" Width="2747.2" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -188,20 +188,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">LOT</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="3576" Y="630" Width="360" Height="180" />
+		<Bounds X="3672" Y="648" Width="360" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -216,20 +216,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">__________________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="3888" Y="630" Width="1512" Height="180" />
+		<Bounds X="3984" Y="648" Width="1296" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -244,20 +244,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">20250101 &amp; MORE</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="3942" Y="630" Width="1458" Height="180" />
+		<Bounds X="4038" Y="630" Width="1362" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -272,14 +272,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">NOTE</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -300,14 +300,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">_______________________________________________________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -328,14 +328,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">INSERT FAKE NOTE WITH INFO RIGHT HERE</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -356,14 +356,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">VBR</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -384,14 +384,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">_________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -412,14 +412,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">1234.56</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -440,14 +440,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">TEMP</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -468,14 +468,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -496,14 +496,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">6543.21</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -524,20 +524,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">INDIUM</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="2700" Y="1080" Width="504" Height="180" />
+		<Bounds X="2700" Y="1080" Width="576" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -552,14 +552,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">__________________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -580,14 +580,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">Seams and Cover</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -608,14 +608,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">QTY</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -636,14 +636,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">___</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -664,14 +664,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">99</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -692,14 +692,14 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Top</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">MODS</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="True" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
@@ -720,20 +720,20 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Bottom</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">_______________________________________________________</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="720" Y="1305" Width="4644" Height="180" />
+		<Bounds X="792" Y="1305" Width="4608" Height="180" />
 	</ObjectInfo>
 	<ObjectInfo>
 		<TextObject>
@@ -748,19 +748,19 @@
 			<IsOutlined>False</IsOutlined>
 			<HorizontalAlignment>Left</HorizontalAlignment>
 			<VerticalAlignment>Middle</VerticalAlignment>
-			<TextFitMode>ShrinkToFit</TextFitMode>
-			<UseFullFontHeight>True</UseFullFontHeight>
+			<TextFitMode>None</TextFitMode>
+			<UseFullFontHeight>False</UseFullFontHeight>
 			<Verticalized>False</Verticalized>
 			<StyledText>
 				<Element>
 					<String xml:space="preserve">R99=100k; R3=14.5k; JW 32-43; Vb=12.0; Vc=13; R18=75k</String>
 					<Attributes>
-						<Font Family="Consolas" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+						<Font Family="Consolas" Size="8" Bold="False" Italic="False" Underline="False" Strikeout="False" />
 						<ForeColor Alpha="255" Red="0" Green="0" Blue="0" HueScale="100" />
 					</Attributes>
 				</Element>
 			</StyledText>
 		</TextObject>
-		<Bounds X="756" Y="1305" Width="4536" Height="180" />
+		<Bounds X="864" Y="1305" Width="4536" Height="180" />
 	</ObjectInfo>
 </DieCutLabel>
