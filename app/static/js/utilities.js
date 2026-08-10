@@ -1,6 +1,9 @@
-const PART_TYPE_ORDER = ["MMIC", "DIODE", "PCB", "CIRCUIT", "FILTER", "NA", "MISC", "CONNECTOR"];
+const PART_TYPE_ORDER = ["MMIC", "DIODE", "PCB", "CIRCUIT", "FILTER MESH", "VAC",
+						 "MA PARTS", "MISC", "CONNECTOR", "BCMESH", "SP OTHER",
+						"FILTER", "CABLE", "INVENTORY", "PMP", "NA"];
 const NOTE_TYPE_ORDER = ["REWORK_SUMMARY", "CURRENT_TEST", "PCB_DEVIATIONS", "INDIUM", "TEMPERATURE", "GENERIC"];
 const ILLEGAL_FILENAME_CHARACTERS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
+const PART_TYPES_WITH_UNIMPORTANT_LOTS = ["MISC", "CONNECTOR"];
 
 function sortPartsContainer() {
 	const container = document.getElementById("actual-parts-container");

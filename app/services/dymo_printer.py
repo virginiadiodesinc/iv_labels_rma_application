@@ -41,6 +41,8 @@ FULL_BUILD_LAYOUTS = {
 
 MULTI_LINE_PART_TYPES = {"DIODE", "PCB"}
 LIMITED_CHARACTER_FIELDS = {"INDIUM_INPUT": 18, "NOTE_INPUT": 53, "PCB_MODIFICATIONS_INPUT": 53}
+PART_TYPES_WITH_LOTS = {"DIODE", "PCB", "MMIC"}
+NON_PRINTED_PART_TYPES = {"BCMESH", "CONNECTOR", "MA PARTS", "MISC", "SP OTHER", "CABLE", "FILTER", "INVENTORY", "PMP"}
 
 
 def limit_input_characters(input_string, character_limit):
@@ -197,7 +199,7 @@ def _parse_full_build_rows(form_data: dict):
 	diode_index = 0
 	pcb_index = 0
 	for part, lot, part_type, quantity in zip(parts, resolved_lots, part_types, quantities):
-		if part_type == "MISC" or part_type == "CONNECTOR" or part_type == "NA" or part_type == "MA PARTS":
+		if part_type in NON_PRINTED_PART_TYPES:
 			continue
 
 		row = {"kind": "part", "part": part, "lot": lot, "type": part_type, "quantity": quantity, "slots": 1}
@@ -354,7 +356,7 @@ def _render_page(template_path, page_rows, layout, page_suffix):
 					xml_tree, "PCB_ROW_TEMPLATE_", f"ROW_{part_index}_PCB_",
 					row_y + space_between_rows, input_y_offset,
 				)
-			if row["type"] != "MMIC" and row["type"] != "PCB" and row["type"] != "DIODE":
+			if row["type"] not in PART_TYPES_WITH_LOTS:
 				_strip_template_objects(xml_tree, [f"ROW_{part_index}_LOT"])
 
 			part_index += 1
@@ -448,7 +450,8 @@ def populate_full_build_label_fields(label_text, page_data: dict):
 		if row["kind"] == "part":
 			label_text.SetField(f'ROW_{part_index}_PART_TITLE', row["type"][0:5])
 			label_text.SetField(f'ROW_{part_index}_PART_INPUT', row["part"])
-			if row["type"] == "MMIC" or row["type"] == "DIODE" or row["type"] == "PCB":
+
+			if row["type"] in PART_TYPES_WITH_LOTS:
 				label_text.SetField(f'ROW_{part_index}_LOT_INPUT', row["lot"])
 
 			if row["type"] == "DIODE":
