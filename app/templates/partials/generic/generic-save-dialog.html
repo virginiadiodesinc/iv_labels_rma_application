@@ -1,46 +1,41 @@
 <div class="modal-overlay">
     <div class="modal">
-
-        <h2>Confirm Save</h2>
-
         <p>
-            Entered block engraving does not match any entry on Block Name List.
+            Please confirm that you are ready to save your data to the network.
         </p>
-
         <p>
-            If you wish to save the entered block engraving anyway, press save, and this entry will be flagged for review.
+            If data exists for the entered block, serial number, and revision combination, it will be overwritten.
         </p>
-
         <div class="button-row">
 
             {% if route == 'save_inspection_info' %}
-                {% set post_url = '/confirm_save_inspection_info' %}
+                {% set post_url = '/attempt_save_inspection_info' %}
                 {% set include_selector = '#inspection-info, #block-info' %}
             {% elif route == 'save_pb1_info' %}
-                {% set post_url = '/confirm_save_pb1_info' %}
+                {% set post_url = '/attempt_save_pb1_info' %}
                 {% set include_selector = '#pb1-info, #block-info' %}
             {% elif route == 'save_pb2_info' %}
-                {% set post_url = '/confirm_save_pb2_info' %}
+                {% set post_url = '/attempt_save_pb2_info' %}
                 {% set include_selector = '#pb2-info, #block-info' %}
             {% elif route == 'save_block_file' %}
-                {% set post_url = '/confirm_block_file_save/' %}
+                {% set post_url = '/attempt_save_block_file/' %}
                 {% set include_selector = '#block-info, #inspection-info, #pb1-info, #pb2-info' %}
             {% endif %}
+
             <button
                 hx-post="{{ post_url }}"
                 hx-include="{{ include_selector }}"
                 hx-target="#generic_save_popup"
                 hx-swap="innerHTML">
-                Save
+                Confirm
             </button>
 
             <button
-                hx-post="/cancel_block_file_save/"
+                hx-post="/cancel_generic_save_dialog/"
                 hx-target="#generic_save_popup"
                 hx-swap="innerHTML">
                 Cancel
             </button>
         </div>
-
     </div>
 </div>

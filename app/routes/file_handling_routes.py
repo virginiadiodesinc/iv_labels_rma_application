@@ -276,6 +276,11 @@ def upload_build_file():
 		
 	return render_template("partials/block-forms/build-file-upload.html", file_path=path[0])
 
+@file_bp.post("/trigger_block_file_save")
+def trigger_block_file_save():
+	route = "save_block_file"
+	return render_template("partials/generic/generic-save-dialog.html", route=route)
+
 @file_bp.post("/attempt_save_block_file/")
 def attempt_save_block_file():
 	"""Saves the data from the relevant input fields to a (LabView Style) block file 
@@ -291,6 +296,10 @@ def attempt_save_block_file():
 
 	if validate_block_info(block_data.get("block-engraving-input", "")) == True:
 		block_rev = block_data.get("block-revision-input", "") if block_data.get("block-revision-input", "") != "A" else ""
+		if block_rev == "":
+			db_block_rev = "A"
+		else:
+			db_block_rev = block_rev
 		block_dict = {
 			"block_engraving": block_data.get("block-engraving-input", ""),
 			"block_sn": block_data.get("block-serial-number-input", "") + block_rev,
@@ -327,9 +336,9 @@ def attempt_save_block_file():
 						if index < len(content_rows) - 1:
 							file.write("\n")
 			
-			if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
+			if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), db_block_rev) != []:
 				
-				result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
+				result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), db_block_rev)[0]
 				
 				updates = {
 					"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else result.inspection_date,
@@ -343,19 +352,19 @@ def attempt_save_block_file():
 					"pb2_inspection_initials": block_data.get("pb2-inspection-initials-input", "").strip() if (block_data.get("pb2-inspection-initials-input", "") != "") else result.pb2_inspection
 				}
 
-				block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip()
+				block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+db_block_rev
 				
 				update_table_entry(db_session, Build_Info, block_id, **updates)
 
 				return "Block file written", 204
 			
-			elif retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) == []:
+			elif retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), db_block_rev) == []:
 				
 				new_entry = {
 					"block_id": block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip(),
 					"block_engraving": block_dict["block_engraving"].strip(),
 					"block_serial_number": block_data.get("block-serial-number-input", "").strip(),
-					"block_revision": block_data.get("block-revision-input", "").strip(),
+					"block_revision": db_block_rev,
 					"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else None,
 					"inspection_initials": block_data.get("inspection-initials-input", "").strip(),
 					"pb1_build_name": block_data.get("pb1-build-name-input", "").strip(),
@@ -378,6 +387,10 @@ def confirm_block_file_save():
 	block_data = request.form
 
 	block_rev = block_data.get("block-revision-input", "") if block_data.get("block-revision-input", "") != "A" else ""
+	if block_rev == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = block_rev
 
 	block_dict = {
 		"block_engraving": block_data.get("block-engraving-input", ""),
@@ -415,9 +428,9 @@ def confirm_block_file_save():
 					if index < len(content_rows) - 1:
 						file.write("\n")
 		
-		if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) != []:
+		if retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), db_block_rev) != []:
 			
-			result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", ""))[0]
+			result = retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), db_block_rev)[0]
 			
 			updates = {
 				"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else result.inspection_date,
@@ -432,19 +445,19 @@ def confirm_block_file_save():
 				"flagged": True
 			}
 
-			block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip()
+			block_id = block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+db_block_rev
 			
 			update_table_entry(db_session, Build_Info, block_id, **updates)
 
 			return "Block file written", 204
 		
-		elif retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), block_data.get("block-revision-input", "")) == []:
+		elif retrieve_build_info(block_dict["block_engraving"], block_data.get("block-serial-number-input", ""), db_block_rev) == []:
 			
 			new_entry = {
 				"block_id": block_dict["block_engraving"].strip()+" "+block_data.get("block-serial-number-input", "").strip()+" "+block_data.get("block-revision-input", "").strip(),
 				"block_engraving": block_dict["block_engraving"].strip(),
 				"block_serial_number": block_data.get("block-serial-number-input", "").strip(),
-				"block_revision": block_data.get("block-revision-input", "").strip(),
+				"block_revision": db_block_rev,
 				"inspection_date": string_to_python_date(block_data.get("inspection-date-input", "")) if (block_data.get("inspection-date-input", "") != "") else None,
 				"inspection_initials": block_data.get("inspection-initials-input", "").strip(),
 				"pb1_build_name": block_data.get("pb1-build-name-input", "").strip(),
@@ -637,20 +650,33 @@ def attempt_save_build_file():
 						if index < len(content_rows) - 1:
 							file.write("\n")
 
-			db_session.execute(
-				delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
-			)
+			if block_rev == "":
+				db_block_rev = "A"
+			else:
+				db_block_rev = block_rev
+
+			db_session.execute(delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev))
+			db_session.execute(delete(Notes).where(Notes.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev))	
 
 			for part, part_type, lot, quantity, part_tag in all_part_information:
 				add_table_entry(
 					db_session,
 					Build_Parts,
-					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev,
 					part_name=part,
 					quantity=int(float(quantity)),
 					part_type=part_type,
 					part_lot=lot,
 					subassembly_tag=part_tag
+				)
+
+			for note, note_type in all_note_information:
+				add_table_entry(
+					db_session,
+					Notes,
+					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev,
+					type=note_type,
+					note=note
 				)
 			#print("adding build info to db")
 			updates = {
@@ -659,7 +685,7 @@ def attempt_save_build_file():
 					"full_build_initials": build_data.get("full-build-initials-input", ""),
 					"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
 				}
-			update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
+			update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev, **updates)
 			return "Build file written", 204
 	else:
 		print("Mismatches found")
@@ -784,21 +810,34 @@ def confirm_build_file_save():
 					if index < len(content_rows) - 1:
 						file.write("\n")
 
-		db_session.execute(
-			delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"))
-		)
+		if block_rev == "":
+			db_block_rev = "A"
+		else:
+			db_block_rev = block_rev
+
+		db_session.execute(delete(Build_Parts).where(Build_Parts.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev))
+		db_session.execute(delete(Notes).where(Notes.block_id == build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev))
 
 		for part, part_type, lot, quantity, part_tag in all_part_information:
 			add_table_entry(
 				db_session,
 				Build_Parts,
-				block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", "A"),
+				block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev,
 				part_name=part,
 				quantity=int(float(quantity)),
 				part_type=part_type,
 				part_lot=lot,
 				subassembly_tag=part_tag
 			)
+
+		for note, note_type in all_note_information:
+				add_table_entry(
+					db_session,
+					Notes,
+					block_id=build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev,
+					type=note_type,
+					note=note
+			)	
 		
 		updates = {
 				"build_file_path": path[0],
@@ -808,7 +847,7 @@ def confirm_build_file_save():
 				"full_build_date": string_to_python_date(build_data.get("full-build-date-input", "")) if (build_data.get("full-build-date-input", "")) != "" else None
 			}
 		
-		update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+build_data.get("block-revision-input", ""), **updates)
+		update_table_entry(db_session, Build_Info, build_data.get("block-engraving-input", "")+" "+build_data.get("block-serial-number-input", "")+" "+db_block_rev, **updates)
 		
 		return "", 200
 
@@ -826,6 +865,11 @@ def save_iv_file():
 	formatted_time = current_datetime.strftime("%#I:%M %p")
 
 	block_build_full_sn = iv_data.get("iv-block-sn", "X") + iv_data.get("iv-block-revision", "A")
+
+	if iv_data.get("iv-block-revision") == "":
+		db_block_rev = "A"
+	else:
+		db_block_rev = iv_data.get("iv-block-revision")
 
 	full_diode_info = "X"
 	full_circuit_info = "X"
@@ -914,23 +958,20 @@ def save_iv_file():
 					heat_file.write("\n")
 
 	if (iv_data.getlist("custom-lot-input") != []) and len(iv_data.getlist("custom-lot-input")) == 2:
-		print("Both Custom")
 		diode_lot = iv_data.getlist("custom-lot-input")[0]
 		circuit_lot = iv_data.getlist("custom-lot-input")[1]
 	elif (iv_data.getlist("custom-lot-input") != []) and (iv_data.getlist("lot-select")[0] == "Other") and (iv_data.getlist("lot-select")[1] != "Other"):
 		diode_lot = iv_data.getlist("custom-lot-input")[0]
 		circuit_lot = iv_data.getlist("lot-select")[1]
 	elif(iv_data.getlist("custom-lot-input") != []) and (iv_data.getlist("lot-select")[1] == "Other") and (iv_data.getlist("lot-select")[0] != "Other"):
-		print("Circuit Custom")
 		diode_lot = iv_data.getlist("lot-select")[0]
 		circuit_lot = iv_data.getlist("custom-lot-input")[0]
 	else:
-		print("Both Standard")
 		diode_lot = iv_data.getlist("lot-select")[0]
 		circuit_lot = iv_data.getlist("lot-select")[1]
 
 	iv_info_dict = {
-		"build_id": iv_data.get("iv-block-engraving", "")+" "+iv_data.get("iv-block-sn", "")+" "+iv_data.get("iv-block-revision", "A"),
+		"build_id": iv_data.get("iv-block-engraving", "")+" "+iv_data.get("iv-block-sn", "")+" "+db_block_rev,
 		"diode": diode_name,
 		"diode_lot": diode_lot,
 		"circuit": circuit_name,

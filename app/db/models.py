@@ -86,16 +86,19 @@ class IV_Points(Base):
 	current_ua = Column(String, nullable=False)
 
 class Note_Type(enum.Enum):
-	GENERAL = "general"
+	GENERIC = "generic"
+	PCB_DEVIATIONS = "pcb_deviations"
 	CURRENT_TEST = "current_test"
-	PCB_INFORMATION = "pcb_information"
-	REWORK_INFORMATION = "rework_information"
+	REWORK_SUMMARY = "rework_summary"
+	INDIUM = "indium"
+	TEMPERATURE = "temperature"
 
 class Notes(Base):
 	__tablename__ = "notes"
-	build_id = Column(Integer, ForeignKey("build_info.block_id"), nullable=False)
+	block_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
 	note_id = Column(Integer, primary_key=True, autoincrement=True)
 	type = Column(Enum(Note_Type), nullable=False)
+	note = Column(String, nullable=False)
 
 class Feedback(Base):
 	__tablename__ = 'feedback'

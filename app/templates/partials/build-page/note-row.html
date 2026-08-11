@@ -5,35 +5,34 @@
 			<select 
 				onchange="sortNotesContainer()"
 				name="note_type">
-				<option value="GENERIC" {% if note and note['note_type'] == "GENERIC" %}
+				<option value="GENERIC" {% if note and note.type.name == "GENERIC" %}
 						selected
-					{% endif %}>General</option>
-				<option value="PCB_DEVIATIONS" {% if note and note['note_type'] == "PCB_DEVIATIONS" %}
+					{% endif %}>General Note</option>
+				<option value="PCB_DEVIATIONS" {% if note and note.type.name == "PCB_DEVIATIONS" %}
 						selected
 					{% endif %}>PCB Edits</option>
-				<option value="CURRENT_TEST" {% if note and note['note_type'] == "CURRENT_TEST" %}
+				<option value="CURRENT_TEST" {% if note and note.type.name == "CURRENT_TEST" %}
 						selected
 					{% endif %}>Current Test</option>
-				<option value="REWORK_SUMMARY" {% if note and note['note_type'] == "REWORK_SUMMARY" %}
+				<option value="REWORK_SUMMARY" {% if note and note.type.name == "REWORK_SUMMARY" %}
 						selected
-					{% endif %}>Rework Info</option>
-				<option value="INDIUM" {% if note and note['note_type'] == "INDIUM" %}
+					{% endif %}>Rework Summary</option>
+				<option value="INDIUM" {% if note and note.type.name == "INDIUM" %}
 						selected
 					{% endif %}>Indium</option>
-				<option value="TEMPERATURE" {% if note and note['note_type'] == "TEMPERATURE" %}
+				<option value="TEMPERATURE" {% if note and note.type.name == "TEMPERATURE" %}
 						selected
 					{% endif %}>Temperature</option>
 			</select>
 		</label>
 	</div>
-	<div class="note-input-container">
+	<div>
 		<label>
 			Note:
-			<input  class="note-input"
-					type="text" 
+			<input type="text" 
 					name="note"
 					size="40"
-					value="{{note.text if note and note.text else ''}}">
+					value="{{note.note if note and note.note else ''}}">
 		</label>
 	</div>
 	<div class="delete-row-button-container">
