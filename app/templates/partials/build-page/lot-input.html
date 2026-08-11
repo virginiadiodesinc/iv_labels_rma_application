@@ -41,6 +41,13 @@
 				{% if current_lot == "NA" %}selected{% endif %}>
 				NA
 			</option>
+
+			<option value="Other"
+				{% if is_custom_lot %}selected{% endif %}>
+				Other
+			</option>
+
+			{% set lot_list = lot_list if part and part.part_type != "MMIC" else lot_list | reverse %}
 			{% for lot in lot_list %}
 				<option value="{{ lot }}"
 					{% if current_lot == lot %}selected{% endif %}>
@@ -48,10 +55,6 @@
 				</option>
 			{% endfor %}
 
-			<option value="Other"
-				{% if is_custom_lot %}selected{% endif %}>
-				Other
-			</option>
 		</select>	
 	</label>
 	{% set selected_lot = "Other" if is_custom_lot else current_lot %}

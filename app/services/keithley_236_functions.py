@@ -395,8 +395,7 @@ class SMU_K236():
 			"integration_time": integration_time,
 			"filter_readings": filter_readings
 		}
-
-		print(settings_dict)
+		
 		return settings_dict
 	
 	# SWEEPS

@@ -35,7 +35,6 @@ class Build_Info(Base):
 	# VERIFICATION FLAG
 	flagged = Column(Boolean, nullable=False, default=False)
 
-
 class Build_Parts(Base):
 	__tablename__ = "build_parts"
 	instance_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -46,6 +45,11 @@ class Build_Parts(Base):
 	part_lot = Column(String, nullable=False)
 	subassembly_tag = Column(String)
 	#weight = Column(Float, nullable=False) not yet implemented
+	# FIELDS ONLY USED FOR CERTAIN PARTS (PCB AND DIODE, CURRENTLY)
+	reverse_breakdown_voltage = Column(String)
+	temperature = Column(String)
+	indium = Column(String)
+	modifications = Column(String)
 
 class Polarity(enum.Enum):
 	POSITIVE = "positive"
@@ -87,11 +91,8 @@ class IV_Points(Base):
 
 class Note_Type(enum.Enum):
 	GENERIC = "generic"
-	PCB_DEVIATIONS = "pcb_deviations"
 	CURRENT_TEST = "current_test"
 	REWORK_SUMMARY = "rework_summary"
-	INDIUM = "indium"
-	TEMPERATURE = "temperature"
 
 class Notes(Base):
 	__tablename__ = "notes"
@@ -110,3 +111,10 @@ class Feedback(Base):
 	__table_args__ = (
 		CheckConstraint("length(user_initials) = 3", name="initials_length_check"),
 	)
+
+class Yellow_Flags(Base):
+	__tablename__ = 'yellow_flags'
+	block_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
+	flag_list_id = Column(Integer, primary_key=True, autoincrement=True)
+	bom_mistmatch = Column(Boolean)
+	unlisted_block_name = Column(Boolean)

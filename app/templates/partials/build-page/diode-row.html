@@ -4,7 +4,7 @@
 		<input class="diode-extra-number-input"
 						type="text" 
 						name="diode-row-reverse-voltage-input" 
-						value="{{reverse_voltage if reverse_voltage else 'NA'}}">
+						value="{{part.reverse_breakdown_voltage if part and part.reverse_breakdown_voltage else 'NA'}}">
 	</Label>
 </div>
 <div class="diode-temperature-container">
@@ -13,7 +13,7 @@
 		<input class="diode-extra-number-input"
 						type="text" 
 						name="diode-row-temperature-input" 
-						value="{{temperature if temperature else 'NA'}}">
+						value="{{part.temperature if part and part.temperature else 'NA'}}">
 	</Label>
 </div>
 <div class="diode-indium-container">
@@ -22,7 +22,7 @@
 		<input  class="diode-indium-input"
 				type="text" 
 				name="diode-row-indium-input" 
-				value="{{indium if indium else 'NA'}}">
+				value="{{part.indium if part and part.indium else 'NA'}}">
 </Label>
 </div>
 <div class="import-values-from-iv-container">

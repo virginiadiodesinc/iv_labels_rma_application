@@ -4,6 +4,6 @@
 		<input class="pcb-modifications-input"
 						type="text" 
 						name="pcb-modifications-input" 
-						value="{{pcb_modifications if pcb_modifications else 'NA'}}">
+						value="{{part.modifications if part and part.modifications else 'NA'}}">
 	</Label>
 </div>

@@ -29,10 +29,11 @@ def wait_for_server():
 		try:
 			r = requests.get("http://127.0.0.1:5000/iv_and_build")
 			if r.status_code == 200:
-				return
+				return True
 		except:
 			pass
 		time.sleep(0.1)
+	return False
 
 # Start Flask in a thread
 def run_flask():
@@ -42,10 +43,14 @@ def run_flask():
 
 	@return None Return value of type (None).
 	"""
-	start = time.time()
-	app = create_app()
-	print(f"App created in {time.time() - start:.2f}s")
-	app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
+	try:
+		start = time.time()
+		app = create_app()
+		print(f"App created in {time.time() - start:.2f}s")
+		app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
+	except Exception:
+		logging.exception("Flask thread crashed")
+		print("Flask thread crashed - see app.log")
 
 def main():
 	""" Main function
@@ -56,7 +61,11 @@ def main():
 	@return None Return value of type (None).
 	"""
 	threading.Thread(target=run_flask, daemon=True).start()
-	wait_for_server()
+	if not wait_for_server():
+		print("Server never came up - check app.log / console for the crash above.")
+		input("Press Enter to exit...")
+		return
+	
 	# Disable automatic DevTools popup
 	webview.settings['OPEN_DEVTOOLS_IN_DEBUG'] = False
 
