@@ -217,3 +217,30 @@ def write_heat_test_file(iv_file_name, heat_current_list, heat_voltage_list, tem
 	heat_file_name = iv_file_name.replace(".iv", ".txt")
 
 	return heat_file_name, file_rows
+
+def write_block_file_piecemeal(block_file_name, block_dict, info_section):
+	if info_section == "inspection":
+		relevant_lines = [0, 2, 3]
+		return
+	elif info_section == "pb1":
+		relevant_lines = [0, 4, 5]
+		return
+	elif info_section == "pb2":
+		relevant_lines = list(range(6, 13))
+		return
+	return
+
+
+# rows.append(block_dict['block_engraving'] + ' ' + block_dict['PB1_name'])
+# 	rows.append(block_dict['block_sn'] + ' ' + '12' + ' ' + '12')
+# 	rows.append(block_dict['inspection_date'])
+# 	rows.append(block_dict['inspection_initials'])
+# 	rows.append(block_dict['PB1_date'])
+# 	rows.append(block_dict['PB1_initials'] + ';' +
+# 				block_dict['PB2_name'] + ';' +
+# 				block_dict['PB2_date'] + ';' +
+# 				block_dict['PB2_initials'] + ';' +
+# 				" " + ';' +#block_dict['PB2_passfail'] + ';' + We're removing these so we'll need to come up with some way to read old files without breaking the code
+# 				" " + ';' +#block_dict['PB2_bond_wire_pads'] + ';' +
+# 				" " + ';' +#block_dict['PB2_components'] + ';' +
+# 				block_dict['PB2_inspection'])

@@ -1,0 +1,58 @@
+<div class="modal-overlay">
+    <div class="modal">
+        <p>
+            Please confirm that you are ready to save your data to the network.
+        </p>
+        <p>
+            If data exists for the entered block, serial number, and revision combination, it will be overwritten.
+        </p>
+
+        {% if yellow_flags_found %}
+        <p>
+            Please note the following yellow flags have been found:
+        </p>
+        <ul>
+            {% for yellow_flag_bool, yellow_flag_message in yellow_flag_dict.values() %}
+                {% if yellow_flag_bool %}
+                    <li>{{ yellow_flag_message }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <p>
+            If you'd like to edit the related fields, you can cancel, edit, and resubmit.
+        </p>
+        {% endif %}
+
+        {% if route == 'save_inspection_info' %}
+            {% set post_url = '/save_inspection_info/' %}
+            {% set include_selector = '#inspection-info, #block-info' %}
+        {% elif route == 'save_pb1_info' %}
+            {% set post_url = '/save_pb1_info/' %}
+            {% set include_selector = '#pb1-info, #block-info, #inspection-info' %}
+        {% elif route == 'save_pb2_info' %}
+            {% set post_url = '/save_pb2_info/' %}
+            {% set include_selector = '#pb2-info, #block-info, #inspection-info' %}
+        {% elif route == 'save_block_file' %}
+            {% set post_url = '/save_block_file/' %}
+            {% set include_selector = '#block-info, #inspection-info, #pb1-info, #pb2-info' %}
+        {% endif %}
+
+        <div class="button-row">
+            <button
+                hx-post="{{ post_url }}"
+                hx-include="{{ include_selector }}"
+                hx-vals='{"confirmed": "true"}'
+                hx-target="#generic_save_popup"
+                hx-swap="innerHTML">
+                Confirm
+            </button>
+
+            <button
+                hx-post="/cancel_generic_save_dialog/"
+                hx-target="#generic_save_popup"
+                hx-swap="innerHTML">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>

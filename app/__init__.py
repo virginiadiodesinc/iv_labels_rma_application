@@ -22,7 +22,7 @@ def create_app():
 
 	app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-	from app.routes import build_routes, db_routes, file_handling_routes, iv_routes, jb2_routes, page_loading_routes, printing_routes
+	from app.routes import build_routes, db_routes, file_handling_routes, iv_routes, jb2_routes, page_loading_routes, printing_routes, save_routes
 	
 	app.register_blueprint(build_routes.build_bp)
 	app.register_blueprint(db_routes.db_bp)
@@ -31,6 +31,7 @@ def create_app():
 	app.register_blueprint(jb2_routes.jb2_bp)
 	app.register_blueprint(page_loading_routes.page_bp)
 	app.register_blueprint(printing_routes.print_bp)
+	app.register_blueprint(save_routes.save_bp)
 
 	from app.db.database import db_session, engine, Base
 	from sqlalchemy import inspect

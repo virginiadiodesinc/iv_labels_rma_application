@@ -1,10 +1,15 @@
 import os
 
+app_root_directory = os.path.dirname(os.path.abspath(__file__))
+
 iv_file_directory = os.path.abspath('I:/')
 block_file_directory = os.path.abspath('K:/block')
 build_file_directory = os.path.abspath('K:/build')
 heat_data_directory = os.path.abspath('I:/Alpha IV program testing/Heat Data')
 iv_spec_directory = os.path.abspath('V:/Production/Inventory/General/SpecialDiodeMarks')
+
+block_list_file = os.path.join(app_root_directory, 'services', 'block_engravings.csv')
+build_list_file = os.path.join(app_root_directory, 'services', 'build_engravings.csv')
 
 default_keithley_settings = {
 	# BASIC SETTINGS

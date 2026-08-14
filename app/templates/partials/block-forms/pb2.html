@@ -86,8 +86,9 @@
 
 <button
 	class="important-button"
-	hx-post="/trigger_pb2_info_save"
+	hx-post="/save_pb2_info/"
 	hx-target="#generic_save_popup"
+	hx-include="#pb2-info, #block-info, #inspection-info"
 	hx-swap="innerHTML">
 	Save PB2 Info
 </button>

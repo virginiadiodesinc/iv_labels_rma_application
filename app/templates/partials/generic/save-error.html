@@ -1,0 +1,17 @@
+<div class="modal-overlay">
+    <div class="modal">
+        <p>
+            Sorry, the following went wrong with saving your data:
+        </p>
+        <p>
+            {{failure_cause}}
+        </p>
+
+        <button
+            hx-post="/cancel_generic_save_dialog/"
+            hx-target="#generic_save_popup"
+            hx-swap="innerHTML">
+            Cancel
+        </button>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+<div class="modal-overlay">
+    <div class="modal">
+        <p>
+            Sorry, there are some non-negotiable errors in the data you're trying to save:
+        </p>
+
+        {% for error in errors %}
+            <ul>
+                {{error}}
+            </ul>
+        {% endfor %}
+
+        <button
+            hx-post="/cancel_generic_save_dialog/"
+            hx-target="#generic_save_popup"
+            hx-swap="innerHTML">
+            Cancel
+        </button>
+    </div>
+</div>

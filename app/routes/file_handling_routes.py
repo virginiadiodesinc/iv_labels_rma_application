@@ -16,6 +16,7 @@ from app.services import string_utilities as su
 import re
 from app.services import diode_spec_search as dss
 from app.services import postprocess as pp
+from app.db.models import Note_Type
 
 file_bp = Blueprint("file", __name__)
 
@@ -97,9 +98,9 @@ def populate_info_from_build_file():
 
 		note_rows = []
 		for note in build_dict.get("notes", []):
-			note_rows.append({"text": note, "note_type": "GENERIC"})
-		note_rows.append({"text": build_dict.get("vbr", ""), "note_type": "GENERIC"})
-		note_rows.append({"text": build_dict.get("indium_info"), "note_type": "INDIUM"})
+			note_rows.append({"text": note, "type": Note_Type.GENERIC})
+		note_rows.append({"text": build_dict.get("vbr", ""), "type": Note_Type.GENERIC})
+		note_rows.append({"text": build_dict.get("indium_info"), "type": Note_Type.GENERIC})
 
 		return render_template("partials/block-forms/build-file-population-response.html", block=build_dict, parts=part_rows, notes=note_rows, populated_build_name=build_dict["full_build_name"])
 

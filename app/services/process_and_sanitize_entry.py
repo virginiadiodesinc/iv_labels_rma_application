@@ -24,7 +24,8 @@ def validate_block_info(block_engraving):
 	else:
 		block_engravings_file.close()
 		return False
-	
+
+
 def validate_build_info(build_name):
 	build_names_file = open(BUILD_LIST_FILE)
 	build_names_reader = csv.reader(build_names_file)
@@ -41,6 +42,7 @@ def validate_build_info(build_name):
 		build_names_file.close()
 		return False
 
+
 def sanitize_and_save_feedback(initials, feedback):
 	data = {
 		"user_initials": initials,
@@ -52,6 +54,7 @@ def sanitize_and_save_feedback(initials, feedback):
 		**data
 	)
 
+
 def retrieve_build_info(block_engraving, block_serial_number, block_revision):
 	filters = {
 		"block_engraving": block_engraving,
@@ -62,6 +65,7 @@ def retrieve_build_info(block_engraving, block_serial_number, block_revision):
 
 	return result
 
+
 def retrieve_build_parts(block_engraving, block_serial_number, block_revision):
 	filters = {
 		"block_id": block_engraving+" "+block_serial_number+" "+block_revision
@@ -69,6 +73,7 @@ def retrieve_build_parts(block_engraving, block_serial_number, block_revision):
 	result = get_table_entries(db_session, Build_Parts,**filters)
 
 	return result
+
 
 def retrieve_notes(block_engraving, block_serial_number, block_revision):
 	filters = {
