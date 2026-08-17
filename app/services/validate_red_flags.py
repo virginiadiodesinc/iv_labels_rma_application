@@ -6,6 +6,7 @@ def validate_block_identification(canonical: dict) -> list[str]:
         errors.append("Block serial number is required.")
     return errors
 
+
 def validate_inspection_info(canonical: dict) -> list[str]:
     errors = []
     if not canonical.get("inspection_date"):
@@ -13,6 +14,7 @@ def validate_inspection_info(canonical: dict) -> list[str]:
     if not canonical.get("inspection_initials"):
         errors.append("Inspection initials are required.")
     return errors
+
 
 def validate_pb1_info(canonical: dict) -> list[str]:
     errors = []
@@ -23,6 +25,7 @@ def validate_pb1_info(canonical: dict) -> list[str]:
     if not canonical.get("pb1_initials"):
         errors.append("PB1 initials are required.")
     return errors
+
 
 def validate_pb2_info(canonical: dict) -> list[str]:
     errors = []
@@ -36,6 +39,7 @@ def validate_pb2_info(canonical: dict) -> list[str]:
         errors.append("PB2 inspection initials are required.")
     return errors
 
+
 def validate_full_build_info(canonical: dict) -> list[str]:
     errors = []
     if not canonical.get("full_build_name"):
@@ -45,6 +49,26 @@ def validate_full_build_info(canonical: dict) -> list[str]:
     if not canonical.get("full_build_date"):
         errors.append("Full build date is required.")
     return errors
+
+
+def validate_all_lots_chosen(parts_list: list[dict]) -> list[str]:
+    errors = []
+    for part in parts_list:
+        if part['part_lot'] == "Choose":
+            errors.append(f"{part['part_name']} has no selected lot. Please select something (including NA or Unknown) for the lot value.")
+    return errors
+
+
+def validate_iv_identification(canonical: dict) -> list[str]:
+    errors = []
+    if not canonical.get("iv_block_engraving"):
+        errors.append("IV block engraving is required.")
+    if not canonical.get("iv_block_serial_number"):
+        errors.append("IV block serial number is required.")
+    if not canonical.get("iv_diode_name"):
+        errors.append("Diode part name is required.")
+    return errors
+
 
 # AN ATTEMPT AT A DYNAMIC VALIDATION WRAPPER
 def validate_info(canonical: dict, validate_callable_list: list[callable]):

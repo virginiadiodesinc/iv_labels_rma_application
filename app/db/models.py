@@ -63,7 +63,7 @@ class IV_Info(Base):
 	diode_lot = Column(String, nullable=False)
 	circuit = Column(String, nullable=False)
 	circuit_lot = Column(String, nullable=False)
-	assembly_no = Column(Integer)
+	assembly_number = Column(Integer)
 	subassembly_tag = Column(String)
 	iv_date = Column(Date, nullable=False)
 	points_per_decade = Column(Integer, nullable=False)
@@ -77,8 +77,9 @@ class IV_Info(Base):
 	hysteresis_mean = Column(Float, nullable=False)
 	hysteresis_maximum = Column(Float, nullable=False)
 	hysteresis_minimum = Column(Float, nullable=False)
-	reverse_current = Column(Float, nullable=False)
-	reverse_voltage = Column(Float, nullable=False)
+	reverse_breakdown_current = Column(Float, nullable=False)
+	reverse_breakdown_voltage = Column(Float, nullable=False)
+	additional_information = Column(String)
 	iv_file_path = Column(String)
 
 class IV_Points(Base):

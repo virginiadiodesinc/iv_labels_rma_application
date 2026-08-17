@@ -102,11 +102,11 @@ def take_iv():
 		source_values = process_dict['I (uA)']
 		source_values = [str(abs(float(value))) for value in source_values]
 
-		voltage_up_values = process_dict['Vup (mV)']
-		voltage_down_values = process_dict['Vdown (mV)']
+		voltage_up_values = [str(abs(float(value) / 1000.0)) for value in process_dict['Vup (mV)']]
+		voltage_down_values = [str(abs(float(value) / 1000.0)) for value in process_dict['Vdown (mV)']]
 		voltage_avg_values = [str(abs(((float(up) + float(down)) / 2) / 1000.0)) for up, down in zip(voltage_up_values, voltage_down_values)]
 
-		truncated_source_values = ["{:.2f}".format(float(value)) for value in source_values]
+		truncated_source_values = ["{:.2f}".format(float(value) / 1000.0) for value in source_values]
 		truncated_voltage_values = ["{:.2f}".format(float(value)) for value in voltage_avg_values]
 
 		df = pd.DataFrame({

@@ -50,6 +50,10 @@ def validate_rework_summary_note_added(note_list):
 UNIVERSAL_BLOCK_YELLOW_FLAG_CHECKS = [
     ("unlisted_block_name", lambda c: c.get("block_engraving") or "", validate_block_name_listed),
 ]
+FULL_BUILD_YELLOW_FLAG_CHECKS = [
+    ("unlisted_block_name", lambda c: c.get("block_engraving") or "", validate_block_name_listed),
+    ("unlisted_build_name", lambda c: c.get("full_build_name") or "", validate_build_name_listed),
+]
 
 # "unlisted_build_name" needs a Yellow_Flags.unlisted_build_name column
 # added to models.py before it gets a FieldSpec + a check here -- see the

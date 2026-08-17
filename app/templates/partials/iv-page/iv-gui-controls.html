@@ -184,10 +184,10 @@
 		</button>
 		<button class="important-button"
 				id="save-iv-button"
-				hx-post="/save_iv_file/"
+				hx-post="/save_iv_info/"
 				hx-include="#iv-info, #iv-curve-points, #iv-assembly-information"
-				hx-swap="none">
-				Save IV File
+				hx-target="#generic-save-popup">
+				Save IV Info
 		</button>
 		<br>
 		<button id="polarity-test-button"

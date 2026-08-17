@@ -28,17 +28,17 @@
 			hx-vals='js:{ "lot-select": this.value }'>
 
 			<option value="Choose"
-				{% if current_lot == "Choose" %}selected{% endif %}>
+				{% if current_lot.lower() == "Choose".lower() %}selected{% endif %}>
 				Choose
 			</option>
 
 			<option value="Unknown"
-				{% if current_lot == "Unknown" %}selected{% endif %}>
+				{% if current_lot.lower() == "Unknown".lower() %}selected{% endif %}>
 				Unknown
 			</option>
 
 			<option value="NA"
-				{% if current_lot == "NA" %}selected{% endif %}>
+				{% if current_lot.lower() == "NA".lower() %}selected{% endif %}>
 				NA
 			</option>
 

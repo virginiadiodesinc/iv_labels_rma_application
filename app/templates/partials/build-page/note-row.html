@@ -4,7 +4,7 @@
 			Note Type:
 			<select name="note_type">
 				{% for type in ["GENERIC", "CURRENT_TEST", "REWORK_SUMMARY"] %}
-					<option {% if note and note.type.name == type %}selected{% endif %}>
+					<option {% if note and note.type.name == type %}selected{% endif %} value="{{ type }}">
 						{{type.replace("_", " ").replace("SUMMARY", "INFO")}}</option>
 				{% endfor %}
 			</select>

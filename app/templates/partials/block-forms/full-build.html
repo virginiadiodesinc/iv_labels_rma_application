@@ -55,12 +55,12 @@
 		class="important-button"
 		id="save-build-button"
 		name="save-build-button"
-		hx-post="/attempt_save_build_file/"
-		hx-include="#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info, #block-id"
-		hx-target="#save-build-popup"
+		hx-post="/save_build_info/"
+		hx-include="#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info"
+		hx-target="#generic-save-popup"
 		hx-swap="innerHTML"
 		>
-		Save Build File
+		Save Build Info
 	</button>
 	
 	<div id="actual-bom-container" class="actual-bom-list">

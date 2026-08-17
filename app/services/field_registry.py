@@ -127,38 +127,68 @@ FIELDS: list[FieldSpec] = [
                 db_model="Yellow_Flags",  callable_name="validate_bom_matches"),
 
     # --- IV parameters ---
-    FieldSpec("points_per_decade", Section.IV, int, db_model="IV_Info"),
-    FieldSpec("ideality", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("saturation_current", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("series_resistance", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("mean_squared_error", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("r_squared_error", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("polarity", Section.IV, str, db_model="IV_Info"),
-    FieldSpec("hysteresis_standard_deviation", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("hysteresis_mean", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("hysteresis_maximum", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("hysteresis_minimum", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("reverse_breakdown_current", Section.IV, float, db_model="IV_Info"),
-    FieldSpec("reverse_breakdown_voltage", Section.IV, float, db_model="IV_Info"),
+    FieldSpec("points_per_decade", Section.IV_PARAMETERS, int, db_model="IV_Info", form_name="iv-points-per-decade"),
+    FieldSpec("ideality", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="n"),
+    FieldSpec("saturation_current", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="is"),
+    FieldSpec("series_resistance", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="rs"),
+    FieldSpec("mean_squared_error", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="mean-squared-error"),
+    FieldSpec("r_squared_error", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="r-squared-error"),
+    # polarity is a NAME match already, but the DB column is an Enum
+    # (Polarity.POSITIVE/NEGATIVE), not the raw "+"/"-" string the form
+    # sends -- db_column alone can't fix that, it's a value-type mismatch,
+    # not a name mismatch. See stage_add_iv_info's explicit override, same
+    # pattern as block_id/iv_id.
+    FieldSpec("polarity", Section.IV_PARAMETERS, str, db_model="IV_Info", form_name="iv-polarity"),
+    FieldSpec("hysteresis_standard_deviation", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="hysteresis-std"),
+    FieldSpec("hysteresis_mean", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="hysteresis-mean"),
+    FieldSpec("hysteresis_maximum", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="hysteresis-max"),
+    FieldSpec("hysteresis_minimum", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="hysteresis-min"),
+    FieldSpec("reverse_breakdown_current", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="reverse-current"),
+    FieldSpec("reverse_breakdown_voltage", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="reverse-voltage"),
+    # PARAMETERS WITHOUT DB VERSIONS - USUALLY CALCULATED VIA THE NUMBERS
+    FieldSpec("series_resistance_4pt", Section.IV_PARAMETERS, float, form_name="rs-4pt"),
+    FieldSpec("series_resistance_alternate", Section.IV_PARAMETERS, float, form_name="rs-1"),
+    FieldSpec("series_resistance_3pt", Section.IV_PARAMETERS, float, form_name="rs-3pt"),
 
     # --- IV numbers ---
     # these are literally strings of the entire list of values
     # We have little to no interest in storing them point by point
     # So this may be folded into the IV_Info table later too.
-    FieldSpec("voltage_up_string", Section.IV, str, db_model="IV_Points"),
-    FieldSpec("voltage_down_string", Section.IV, str, db_model="IV_Points"),
-    FieldSpec("voltage_average_string", Section.IV, str, db_model="IV_Points"),
-    FieldSpec("current", Section.IV, str, db_model="IV_Points"),
-    FieldSpec("temperature_string", Section.IV, str, db_model="IV_Points"),
+    FieldSpec("voltage_up_string", Section.IV_PARAMETERS, str, db_model="IV_Points", db_column="voltage_up_mv", form_name="iv-voltage-up"),
+    FieldSpec("voltage_down_string", Section.IV_PARAMETERS, str, db_model="IV_Points", db_column="voltage_down_mv", form_name="iv-voltage-down"),
+    # voltage_average_string: no obvious source field yet -- "iv-measurement-values"
+    # is a candidate (its values are consistently ~1/1000th of iv-voltage-up/down's,
+    # which smells like the unit-conversion question you flagged earlier as
+    # deferred) but I don't want to guess the mapping wrong. Confirm before wiring.
+    FieldSpec("voltage_average_string", Section.IV_PARAMETERS, str, db_model="IV_Points"),
+    FieldSpec("current", Section.IV_PARAMETERS, str, db_model="IV_Points", db_column="current_ua", form_name="iv-source-values"),
+    # temperature_string/heat_voltage_string: heat-current-list/heat-voltage-list/
+    # temperature-list exist on the form but are all empty in your sample submission
+    # (no heat test taken) -- leaving unwired until heat files are actually next up.
+    FieldSpec("temperature_string", Section.IV_PARAMETERS, str, db_model="IV_Points"),
+    FieldSpec("heat_voltage_string", Section.IV_PARAMETERS, str, db_model="IV_Points"),
 
     # --- IV related fields that aren't parameters? ---
-    FieldSpec("iv_file_path", Section.IV, str, db_model="IV_Info"),
-    FieldSpec("iv_diode_name", Section.IV, str, db_model="IV_Info"),
-    FieldSpec("iv_diode_lot", Section.IV, str, db_model="IV_Info"),
-    FieldSpec("iv_circuit_name", Section.IV, str, db_model="IV_Info"),
-    FieldSpec("iv_circuit_lot", Section.IV, str, db_model="IV_Info"),
-    FieldSpec("iv_assembly_number", Section.IV, str, db_model="IV_Info"),
-    FieldSpec("iv_date", Section.IV, str, db_model="IV_Info"),
+    FieldSpec("iv_file_path", Section.IV_PARAMETERS, str, db_model="IV_Info"),
+    FieldSpec("iv_diode_name", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="diode"),
+    FieldSpec("iv_diode_lot", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="diode_lot"),
+    FieldSpec("iv_circuit_name", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="circuit"),
+    FieldSpec("iv_circuit_lot", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="circuit_lot"),
+    FieldSpec("iv_assembly_number", Section.IV_PARAMETERS, int, db_model="IV_Info", db_column="assembly_number", form_name="iv-assembly-number"),
+    FieldSpec("iv_date", Section.IV_PARAMETERS, date, db_model="IV_Info"),
+
+    # --- IV identity -- separate canonical names from block_engraving/etc.
+    # per the Case B decision (IV's identity can genuinely diverge from the
+    # main block/build panel). No db_model -- these only exist to build the
+    # IV_Info.build_id FK string and the .iv file's identity line, not
+    # stored as their own columns.
+    FieldSpec("iv_block_engraving", Section.IV_PARAMETERS, str, form_name="iv-block-engraving"),
+    FieldSpec("iv_block_serial_number", Section.IV_PARAMETERS, str, form_name="iv-block-sn"),
+    FieldSpec("iv_block_revision", Section.IV_PARAMETERS, str, form_name="iv-block-revision"),
+    FieldSpec("iv_build_name", Section.IV_PARAMETERS, str, form_name="iv-build-name"),
+    # "medium" was old terminology -- per your note, iv-additional-info is
+    # the only real home for it now.
+    FieldSpec("additional_info", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="additional_information", form_name="iv-additional-info"),
 
     # --- part related fields (some overlap with IV here) ---
     # ALL PARTS
@@ -193,10 +223,20 @@ BY_FORM_NAME: dict[str, FieldSpec] = {f.form_name: f for f in FIELDS if f.form_n
 # ---------------------------------------------------------------------------
 
 def canonical_from_form(form) -> dict:
-    """form is anything with .get(key, default) -- request.form works directly."""
+    """form is anything supporting `in` and .get(key, default) -- request.form
+    works directly. Fields whose form_name isn't present in `form` at all are
+    left OUT of the result entirely -- not set to None. That distinction
+    matters: canonical_to_db_kwargs and stage_upsert_build_info only touch
+    keys that are actually present, so a PB1-only submission's canonical
+    dict never mentions inspection_date/pb2_build_name/etc. at all, and a
+    DB upsert built from it can't accidentally null out sections it wasn't
+    asked to change. A field that IS present but left blank by the user
+    still correctly becomes None (a real, intentional "clear this field")."""
     result = {}
     for spec in FIELDS:
         if not spec.form_name:
+            continue
+        if spec.form_name not in form:
             continue
         raw = (form.get(spec.form_name, "") or "").strip()
         if raw == "":
@@ -204,14 +244,20 @@ def canonical_from_form(form) -> dict:
             continue
         if spec.value_type is date:
             result[spec.canonical] = _parse_iso_date(raw)
+        elif spec.value_type in (int, float):
+            result[spec.canonical] = spec.value_type(raw)
         else:
             result[spec.canonical] = raw
 
     # block_revision defaults to "A" when blank -- this is a real business rule,
     # not a generic "blank becomes X" rule, so it stays here rather than being
-    # folded into the loop above.
-    if result.get("block_revision") is None:
+    # folded into the loop above. Only applies if block_revision was actually
+    # part of this submission (it always should be -- every block-related
+    # form needs the identity fields to know which record it's writing to).
+    if "block_revision" in result and not result["block_revision"]:
         result["block_revision"] = "A"
+    if "iv_block_revision" in result and not result["iv_block_revision"]:
+            result["iv_block_revision"] = "A"
 
     return result
 
@@ -289,7 +335,7 @@ class Computed:
     for display. Never store this as its own canonical field; derive it."""
     name: str
     fn: Callable[[dict], str]
-    placeholder: str = ""
+    placeholder: str = "X"
 
 
 @dataclass(frozen=True)
@@ -319,6 +365,78 @@ def _block_sn(canonical: dict) -> str:
     return f"{canonical.get('block_serial_number') or ''}{suffix}"
 
 
+def _iv_block_sn(canonical: dict) -> str:
+    """Same idea as _block_sn, but reading IV's own separate identity
+    fields -- IV's block/serial/revision can genuinely diverge from the
+    main block/build panel's, per the Case B decision."""
+    rev = canonical.get("iv_block_revision") or "A"
+    suffix = "" if rev == "A" else rev
+    return f"{canonical.get('iv_block_serial_number') or ''}{suffix}"
+
+
+def _format_saturation_current(canonical: dict):
+    """Is: needs the same LabView-style scientific notation the heat file
+    uses (format_labview_scientific, defined further down -- fine, since
+    this function's body isn't evaluated until it's actually called at
+    render time, well after the whole module has finished loading)."""
+    value = canonical.get("saturation_current")
+    if value is None:
+        return None
+    return format_labview_scientific(value, 3)
+
+
+def build_block_id_from_iv(canonical: dict) -> str:
+    """Same string shape as build_block_id, but from IV's own identity
+    fields -- this is what IV_Info.build_id (the FK to Build_Info) gets
+    set to."""
+    return f"{canonical.get('iv_block_engraving') or ''} {canonical.get('iv_block_serial_number') or ''} {canonical.get('iv_block_revision') or ''}"
+
+
+def iv_identity_as_block_identity(canonical: dict) -> dict:
+    """Translates IV's own identity fields into the plain
+    block_engraving/block_serial_number/block_revision keys
+    stage_upsert_build_info expects, so an IV save can ensure its parent
+    Build_Info row exists (per the FK constraint) without needing its own
+    upsert function. Deliberately ONLY these three keys -- so if this
+    creates a new Build_Info row, it's a genuinely minimal stub; if the row
+    already exists, this just re-sets the same three values it already
+    had, thanks to canonical_from_form's absent-vs-blank fix (a dict with
+    only these three keys can never null out anything else on that row)."""
+    return {
+        "block_engraving": canonical.get("iv_block_engraving"),
+        "block_serial_number": canonical.get("iv_block_serial_number"),
+        "block_revision": canonical.get("iv_block_revision"),
+    }
+
+
+def _format_time_12h(hour: int, minute: int) -> str:
+    """12-hour time, no leading zero on the hour, AM/PM suffix -- e.g.
+    '12:22 PM' or '9:05 AM'. Built manually rather than via strftime's
+    %#I/%-I, since those flags are platform-specific (Windows vs.
+    Linux/Mac) -- same reasoning as why _stringify builds dates manually
+    instead of using strftime."""
+    hour12 = hour % 12 or 12
+    period = "AM" if hour < 12 else "PM"
+    return f"{hour12}:{minute:02d} {period}"
+
+
+def stamp_iv_datetime(canonical: dict) -> dict:
+    """Adds iv_date (a real date -- reused as-is for both the IV_Info DB
+    column and the file line, via _stringify's existing date handling) and
+    iv_time_of_day (a pre-formatted string, since _stringify only
+    special-cases date objects, not time-of-day) using the current moment.
+    Call this once, right before saving -- this isn't something the user
+    submits (no form_name for either), and it can't be a Computed token,
+    since Computed tokens must stay pure functions of canonical, not the
+    system clock. Same reasoning as why enrich_with_build_suffix is a
+    separate explicit step rather than baked into rendering."""
+    now = datetime.now()
+    canonical = dict(canonical)
+    canonical["iv_date"] = now.date()
+    canonical["iv_time_of_day"] = _format_time_12h(now.hour, now.minute)
+    return canonical
+
+
 def _pb2_line() -> LineTemplate:
     return LineTemplate(
         line_index=5,
@@ -335,92 +453,65 @@ def _pb2_line() -> LineTemplate:
         ],
     )
 
-# --- IV file: not built out yet (that needs diode/circuit/assembly_no/
-# polarity/medium FieldSpecs added to FIELDS first, which is a bigger step
-# than today's scope), but here's row 0 worked out to prove Glued handles
-# the ugly part. The old write_IV_file version of this line was:
-#
-#   build_name_with_suffix + ' B' + build_sn + ' ' + diode + ' Cir' + circuit
-#   + ' A#' + assembly_no + ' ' + polarity + ' ' + block_engraving + ' '
-#   + block_sn + ' ' + medium
-#
-# As a LineTemplate, once the relevant FieldSpecs exist:
-#
-#   LineTemplate(0, separator=" ", tokens=[
-#       Computed("full_build_name_with_suffix", ...),
-#       Glued([Literal("B"), Field("build_serial_number")]),
-#       Field("diode_name"),
-#       Glued([Literal("Cir"), Field("circuit_name")]),
-#       Glued([Literal("A#"), Field("assembly_no")]),
-#       Field("polarity"),
-#       Field("block_engraving"),
-#       Computed("block_sn", _block_sn),
-#       Field("medium"),
-#   ])
-#
-# That's the whole line -- no new machinery beyond Glued, and it reads in
-# the same order as the old concatenation did. The "Label: value" lines
-# (rows 2-13, Points/Decade etc.) need nothing new either -- they're just
-# LineTemplate(i, [Literal("Points/Decade: "), Field("points_per_decade")],
-# separator="") -- a two-token line with an empty separator already does it.
-#
-# The Vup/Vdown/Isource data rows and the tab-separated header are a
-# different kind of problem entirely -- a variable-length list of numeric
-# rows, not named fields -- and don't belong in this registry at all. Render
-# those the same way write_IV_file always did (zip the three lists, format,
-# join with '\t'), just without going through FieldSpec/LineTemplate.
+# --- IV file ---
+# Row 0's mixed prefix-gluing (B{sn}, Cir{circuit}, A#{assembly_no}) is
+# handled by Glued -- see field_registry's Glued docs. Uses IV's own
+# identity fields throughout (iv_block_engraving, iv_diode_name, etc.),
+# never the block/build ones -- Case B, fully separate.
 #
 # PB2 has an update path (piecemeal); IV does not, per your confirmation
 # that IV always overwrites -- so IV only ever needs render_new_line, never
 # update_existing_line.
 IV_FILE_TEMPLATE: list[LineTemplate] = [
     LineTemplate(0, separator=" ", tokens=[
-        Computed("full_build_name_with_suffix", ...),
-        Glued([Literal("B"), Field("build_serial_number")]),
-        Field("diode_name"),
-        Glued([Literal("Cir"), Field("circuit_name")]),
-        Glued([Literal("A#"), Field("assembly_no")]),
+        Field("iv_full_build_name_with_suffix"),  # enrich_with_build_suffix must run first -- see below
+        Glued([Literal("B"), Computed("iv_block_sn", _iv_block_sn)]),
+        Glued([Field("iv_diode_name"), Literal("_LOT"), Field("iv_diode_lot")]),
+        Glued([Literal("Cir"), Glued([Field("iv_circuit_name"), Literal("_LOT"), Field("iv_circuit_lot")])]),
+        Glued([Literal("A#"), Field("iv_assembly_number")]),
         Field("polarity"),
-        Field("block_engraving"),
-        Computed("block_sn", _block_sn),
-        Field("medium"),
+        Field("iv_block_engraving"),
+        Computed("iv_block_sn", _iv_block_sn),
+        Field("additional_info"),
     ]),
-    LineTemplate(1, tokens=[Literal("Date"), Literal("Time"), Literal("AM/PM")]),
+    # Single space between date and time below -- your example
+    # "5/19/2026  12:22 PM" reads like it might have two spaces; if that's
+    # deliberate rather than a typing artifact, change separator to "  ".
+    LineTemplate(1, tokens=[Field("iv_date"), Field("iv_time_of_day")]),
     LineTemplate(2, tokens=[Literal("Points/Decade:"), Field("points_per_decade")]),
-    LineTemplate(3, tokens=[Literal("n (ideality):"), Field("points_per_decade")]),
-    LineTemplate(4, tokens=[Literal("Is:"), Field("points_per_decade")]),
-    LineTemplate(5, tokens=[Literal("Rs:"), Field("points_per_decade")]),
-    LineTemplate(6, tokens=[Literal("Mean Square Error:"), Field("points_per_decade")]),
-    LineTemplate(7, tokens=[Literal("R^2 Error:"), Field("points_per_decade")]),
-    LineTemplate(8, tokens=[Literal("Polarity"), Field("points_per_decade")]),
-    LineTemplate(9, tokens=[Literal("Hysteresis SD (mV) ="), Field("points_per_decade")]),
-    LineTemplate(10, tokens=[Literal("Hysteresis Mean (mV) ="), Field("points_per_decade")]),
-    LineTemplate(11, tokens=[Literal("Hysteresis Max (mV) ="), Field("points_per_decade")]),
-    LineTemplate(12, tokens=[Literal("Hysteresis Min (mV) ="), Field("points_per_decade")]),
-    LineTemplate(13, tokens=[Literal("Reverse Current (uA):"), Field("points_per_decade")]),
-    LineTemplate(14, tokens=[Literal("Reverse Voltage (V):"), Field("points_per_decade")]),
+    LineTemplate(3, tokens=[Literal("n (ideality):"), Field("ideality")]),
+    LineTemplate(4, tokens=[Literal("Is:"), Computed("saturation_current", _format_saturation_current)]),
+    LineTemplate(5, tokens=[Literal("Rs:"), Field("series_resistance")]),
+    LineTemplate(6, tokens=[Literal("Mean Square Error:"), Field("mean_squared_error")]),
+    LineTemplate(7, tokens=[Literal("R^2 Error:"), Field("r_squared_error")]),
+    LineTemplate(8, tokens=[Literal("Polarity:"), Field("polarity")]),  # colon was missing -- old row was 'Polarity: ' + value
+    LineTemplate(9, tokens=[Literal("Hysteresis SD (mV) ="), Field("hysteresis_standard_deviation")]),
+    LineTemplate(10, tokens=[Literal("Hysteresis Mean (mV) ="), Field("hysteresis_mean")]),
+    LineTemplate(11, tokens=[Literal("Hysteresis Max (mV) ="), Field("hysteresis_maximum")]),
+    LineTemplate(12, tokens=[Literal("Hysteresis Min (mV) ="), Field("hysteresis_minimum")]),
+    LineTemplate(13, tokens=[Literal("Reverse Current (uA):"), Field("reverse_breakdown_current")]),
+    LineTemplate(14, tokens=[Literal("Reverse Voltage (V):"), Field("reverse_breakdown_voltage")]),
+    # separator="\t" is a guess matching the data rows below -- the old
+    # source has this as literal groups of spaces
+    # ('Voltage Up (mV)    Voltage Down (mV)    Current (uA)'), which reads
+    # as either "someone typed spaces to fake a tab stop" or "it's genuinely
+    # space-delimited and the data rows below it are the odd one out."
+    # Worth checking an actual historical .iv file rather than guessing from
+    # the Python source, since both are plausible.
     LineTemplate(15, separator="\t", tokens=[Literal("Voltage Up (mV)"), Literal("Voltage Down (mV)"), Literal("Current (uA)")])
     # rows 16-37 (and beyond) to be filled in later, but something like:
     # LineTemplate(row, separator="\t", tokens=[Field("row_voltage_up"), Field("row_voltage_down"), Field("row_current")])
 ]
 
-# added difficulty because it uses a mix of tabs, spaces, and semicolons
-HEAT_FILE_TEMPLATE: list[LineTemplate] = [
-    LineTemplate(0, separator=" ", tokens=[
-    Literal("Date"),
-    Literal("Time"),
-    Literal("AM/PM\t"),
-    Computed("full_build_name_with_suffix", ...),
-    Glued([Literal("B"), Field("build_serial_number")]),
-    Field("diode_name"),
-    Glued([Literal("Cir"), Field("circuit_name")]),
-    Glued([Literal("A#"), Field("assembly_no")]),
-    Field("polarity"),
-    Field("block_engraving"),
-    Computed("block_sn", _block_sn),
-    Field("medium"),
-    ]),
-]
+# --- Heat test file ---
+# This does NOT get a HEAT_FILE_TEMPLATE list -- line 1 has three different
+# separators within a single line (space, tab, then semicolons), which is
+# more heterogeneous than LineTemplate/Glued handle (Glued groups a
+# no-separator sub-section inside a UNIFORMLY-separated line; this line
+# isn't uniformly separated at all). Built directly in file_service.py's
+# save_heat_test_file, same reasoning as the Vup/Vdown/Isource IV data rows
+# bypassing LineTemplate. Line 2 (plain tab-separated headers) and the data
+# rows are simple enough to build directly there too, for consistency.
 
 BLOCK_FILE_TEMPLATE: list[LineTemplate] = [
     LineTemplate(0, [Field("block_engraving"), Field("pb1_build_name")]),
@@ -438,8 +529,38 @@ BUILD_FILE_TEMPLATE: list[LineTemplate] = [
     LineTemplate(3, [Field("inspection_initials")]),
     LineTemplate(4, [Field("pb1_date")]),
     _pb2_line(),
-    # rows 6-29 (diode/circuit/parts/notes) are a separate repeating-group
-    # concern -- see the note at the bottom of this file.
+    # rows 6-29: diode/circuit/parts/notes. The diode1/qty_chips1/circuit1/
+    # indium/Vbr/MMIC/MMIC_lot/PCB/filter1/diode2/qty_chips2/circuit2/filter2
+    # tokens below aren't FieldSpecs in FIELDS -- they're slot names produced
+    # by parts_service.assign_parts_to_build_slots(), merged into canonical
+    # before this template renders (same pattern as merge_yellow_flags).
+    # assembly_initials1/2 and assembly_date1/2 both just reuse
+    # full_build_initials/full_build_date directly per your Q3 answer --
+    # no separate slot-producing step needed for those two.
+    LineTemplate(6, [Field("diode1")]),
+    LineTemplate(7, [Field("qty_chips1")]),
+    LineTemplate(8, [Field("full_build_initials")]),   # assembly_initials1
+    LineTemplate(9, [Field("full_build_date")]),        # assembly_date1
+    LineTemplate(10, [Field("circuit1")]),
+    LineTemplate(11, [Field("indium")]),
+    LineTemplate(12, [Field("Vbr")]),
+    LineTemplate(13, [Field("MMIC")]),
+    LineTemplate(14, [Field("MMIC_lot")]),
+    LineTemplate(15, [Field("notes")]),        # mapping from note-row entries -- still open, see chat
+    LineTemplate(16, [Field("PCB")]),
+    LineTemplate(17, [Field("filter1")]),
+    LineTemplate(18, [Field("diode2")]),
+    LineTemplate(19, [Field("qty_chips2")]),
+    LineTemplate(20, [Field("full_build_initials")]),   # assembly_initials2 -- same value as row 8
+    LineTemplate(21, [Field("full_build_date")]),        # assembly_date2 -- same value as row 9
+    LineTemplate(22, [Field("circuit2")]),
+    LineTemplate(23, [Field("notes1")]),       # mapping from note-row entries -- still open, see chat
+    LineTemplate(24, [Field("notes2")]),
+    LineTemplate(25, [Field("notes3")]),
+    LineTemplate(26, [Field("notes4")]),
+    LineTemplate(27, [Field("notes5")]),
+    LineTemplate(28, [Field("notes6")]),
+    LineTemplate(29, [Field("filter2")]),
 ]
 
 
@@ -452,22 +573,37 @@ def block_file_name(canonical: dict) -> str:
     """Matches the old write_block_file naming: '<engraving> <sn+rev>.txt', lowercased."""
     return f"{canonical.get('block_engraving') or ''} {_block_sn(canonical)}.txt".lower()
 
+def build_file_name(canonical: dict) -> str:
+    """Matches the old write_block_file naming: '<build_name> <sn+rev>.txt', lowercased."""
+    return f"{canonical.get('full_build_name_with_suffix') or ''} {_block_sn(canonical)}.txt".lower()
 
-def enrich_with_build_suffix(canonical: dict, lookup_fn) -> dict:
-    """Adds 'full_build_name_with_suffix' by looking up the block engraving's
+
+def enrich_with_build_suffix(
+    canonical: dict,
+    lookup_fn,
+    build_name_key: str = "full_build_name",
+    block_engraving_key: str = "block_engraving",
+    output_key: str = "full_build_name_with_suffix",
+) -> dict:
+    """Adds the suffixed build name by looking up the block engraving's
     suffix (old su.get_build_name_with_suffix, which reads block_engravings.csv).
     This does file I/O, which is why it's a separate explicit step rather than
     a Computed token -- Computed tokens stay pure functions of the canonical
     dict so render_new_line/update_existing_line never touch disk themselves.
     Only call this where you actually need the suffixed name (full build
-    saves, print labels) -- inspection/PB1/PB2 saves don't need it."""
+    saves, IV saves, print labels) -- inspection/PB1/PB2 saves don't need it.
+
+    Defaults match the block/build case; IV saves call this with
+    build_name_key="iv_build_name", block_engraving_key="iv_block_engraving",
+    output_key="iv_full_build_name_with_suffix" -- IV's identity is separate
+    from block/build's per the Case B decision, so its enriched name needs
+    its own key too, not a shared one."""
     canonical = dict(canonical)
-    if canonical.get("full_build_name") and canonical.get("block_engraving"):
-        canonical["full_build_name_with_suffix"] = lookup_fn(
-            canonical["full_build_name"], canonical["block_engraving"]
+    if canonical.get(build_name_key) and canonical.get(block_engraving_key):
+        canonical[output_key] = lookup_fn(
+            canonical[build_name_key], canonical[block_engraving_key]
         )
     return canonical
-
 
 def _build_label(canonical: dict) -> str:
     """'BUILD_R10 3-02B' style label -- e.g. for print labels, and this is
@@ -486,7 +622,7 @@ def _render_token(token: Token, canonical: dict) -> str:
         return token.text
     if isinstance(token, Field):
         value = canonical.get(token.canonical)
-        return _stringify(value) if value not in (None, "") else token.placeholder
+        return stringify(value) if value not in (None, "") else token.placeholder
     if isinstance(token, Computed):
         value = token.fn(canonical)
         return value if value not in (None, "") else token.placeholder
@@ -495,12 +631,26 @@ def _render_token(token: Token, canonical: dict) -> str:
     raise TypeError(f"Unknown token type: {token!r}")
 
 
-def _stringify(value) -> str:
+def stringify(value) -> str:
     if isinstance(value, date):
         # LabView files use M/D/YYYY -- adjust if that's not actually right,
         # this is a guess based on the old iso_date_to_labview naming.
         return f"{value.month}/{value.day}/{value.year}"
     return str(value)
+
+
+def format_labview_scientific(value: float, decimals: int = 5) -> str:
+    """Matches the heat file's number format: uppercase E, no leading zero
+    on the exponent (E+0, not E+00), N decimal digits in the mantissa.
+    Python's default :e format gives lowercase e, a fixed decimal count,
+    and a minimum 2-digit exponent -- none of which match the sample file,
+    so this is built manually, same reasoning as stringify()'s date
+    handling avoiding strftime's platform-specific quirks."""
+    formatted = f"{value:.{decimals}e}"
+    mantissa, exponent = formatted.split("e")
+    exponent_sign = exponent[0]
+    exponent_digits = exponent[1:].lstrip("0") or "0"
+    return f"{mantissa}E{exponent_sign}{exponent_digits}"
 
 
 def render_new_line(template: LineTemplate, canonical: dict) -> str:

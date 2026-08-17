@@ -144,3 +144,40 @@ document.addEventListener("DOMContentLoaded", () => {
 		sortPartsContainer();
 	});
 });
+
+function addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound) {
+	const confirmButton = document.getElementById('save-confirm-button');
+	if (!yellowFlagsFound) return;
+
+	confirmButton.disabled = true;
+
+	totalTime = 3000;
+	interval = 100;
+
+	timeElapsed = 0;
+	timeRemaining = totalTime;
+	
+	timerInterval = setInterval(() => {
+		timeRemaining = timeRemaining - interval
+		confirmButton.textContent = `Ready in ${timeRemaining / 1000.0}s`
+	}, interval);
+	setTimeout(() => {
+		clearInterval(timerInterval)
+		confirmButton.disabled = false;
+		confirmButton.textContent = 'Confirm'
+	}, totalTime);
+};
+
+document.addEventListener("htmx:afterSwap", function (event) {
+    const target = event.detail.target;
+
+        if (!target || target.id !== "generic-save-popup") {
+        return;
+    }
+    
+    const popup = document.getElementById("generic-save-popup");
+
+    const yellowFlagsFound = popup.dataset.yellowFlagsFound === "true";
+
+    addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound);
+});

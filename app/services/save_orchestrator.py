@@ -19,8 +19,10 @@ from typing import Callable, Optional
 from app.services import field_registry as fr
 from app.services import file_service
 from app.services import db_service
+from app.services import postprocess
 from app import config
 import traceback
+import os
 
 
 @dataclass
@@ -30,12 +32,12 @@ class SaveResult:
     error: Optional[Exception] = None
 
 
-def _save_block_file_and_info(canonical: dict, write_file: Callable[[dict, str], str], write_db: Callable[[dict], object]) -> SaveResult:
+def _save_block_file_and_info(canonical: dict, write_file: Callable[[dict, str], str]) -> SaveResult:
     """write_file(canonical, block_file_directory) -> path written. Bind the
     section (or full-overwrite) choice at the call site below, so every
     block-file save variant shares this one implementation."""
     try:
-        entry = write_db(canonical)
+        entry = db_service.stage_upsert_build_info(canonical)
     except Exception as e:
         traceback.print_exc()
         db_service.roll_back_db_changes()
@@ -52,39 +54,122 @@ def _save_block_file_and_info(canonical: dict, write_file: Callable[[dict, str],
     db_service.commit_db_changes()
     return SaveResult(success=True)
 
+def _save_build_file_and_info(canonical: dict, write_file: Callable[[dict, str], str], parts_list: list[dict], notes_list: list[dict]) -> SaveResult:
+    """write_file(canonical, build_file_directory) -> path written. Bind the
+    section (or full-overwrite) choice at the call site below, so every
+    block-file save variant shares this one implementation."""
+    try:
+        entry = db_service.stage_upsert_build_info(canonical)
+        build_parts_list = db_service.stage_replace_build_parts_and_notes(canonical, parts_list, notes_list)
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    try:
+        file_path = write_file(canonical, config.build_file_directory)
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="file", error=e)
+
+    entry.block_file_path = file_path
+    db_service.commit_db_changes()
+    return SaveResult(success=True)
+
 
 def save_inspection_info(canonical: dict) -> SaveResult:
     return _save_block_file_and_info(
         canonical,
-        lambda c, d: file_service.save_block_file_section(c, fr.Section.INSPECTION, d),
-        lambda c: db_service.stage_upsert_build_info_sections(c, [fr.Section.INSPECTION, fr.Section.IDENTITY])
+        lambda c, d: file_service.save_block_file_section(c, fr.Section.INSPECTION, d)
     )
 
 
 def save_pb1_info(canonical: dict) -> SaveResult:
     return _save_block_file_and_info(
         canonical,
-        lambda c, d: file_service.save_block_file_section(c, fr.Section.PB1, d),
-        lambda c: db_service.stage_upsert_build_info_sections(c, [fr.Section.PB1, fr.Section.IDENTITY])
+        lambda c, d: file_service.save_block_file_section(c, fr.Section.PB1, d)
     )
 
 
 def save_pb2_info(canonical: dict) -> SaveResult:
     return _save_block_file_and_info(
         canonical,
-        lambda c, d: file_service.save_block_file_section(c, fr.Section.PB2, d),
-        lambda c: db_service.stage_upsert_build_info_sections(c, [fr.Section.PB2, fr.Section.IDENTITY])
+        lambda c, d: file_service.save_block_file_section(c, fr.Section.PB2, d)
     )
 
 
-def save_all_block_info(canonical: dict) -> SaveResult:
+def save_block_info(canonical: dict) -> SaveResult:
     """The deliberate full-overwrite path -- canonical here needs to be
-    complete (all sections' fields present), since save_full_block_file
+    complete (all sections' fields present), since save_block_file
     blanks anything canonical doesn't have. Make sure whatever route calls
     this gathers the full form (hx-include covering #block-info,
     #inspection-info, #pb1-info, #pb2-info), not just one section's."""
     return _save_block_file_and_info(
         canonical, 
-        file_service.save_full_block_file,
-        db_service.stage_upsert_build_info
+        file_service.save_block_file
         )
+
+
+def save_build_info(canonical: dict, parts_list: list[dict], notes_list: list[dict]) -> SaveResult:
+    return _save_build_file_and_info(
+        canonical,
+        file_service.save_build_file,
+        parts_list,
+        notes_list
+        )
+
+
+def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list: list,
+                  heat_current_list: list = None, heat_voltage_list: list = None) -> SaveResult:
+    canonical = fr.stamp_iv_datetime(canonical)
+
+    block_identity = fr.iv_identity_as_block_identity(canonical)
+    try:
+        db_service.stage_upsert_build_info(block_identity)
+    except Exception as e:
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    try:
+        iv_entry = db_service.stage_add_iv_info(canonical)
+    except Exception as e:
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    canonical = dict(canonical)
+    canonical["iv_id"] = iv_entry.iv_id
+
+    try:
+        db_service.stage_add_iv_points(canonical)
+    except Exception as e:
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    try:
+        file_path = file_service.save_iv_file(canonical, vup_list, vdown_list, isource_list, config.iv_file_auto_directory)
+    except Exception as e:
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="file", error=e)
+
+    iv_entry.iv_file_path = file_path
+
+    # Heat test only ran if both lists are real and have actual values in
+    # them -- matches the old route's all(...)-and-any(...) check.
+    heat_test_taken = bool(heat_current_list) and bool(heat_voltage_list) and any(heat_current_list) and any(heat_voltage_list)
+    print("HEAT TEST?", heat_test_taken)
+    if heat_test_taken:
+        try:
+            temperature_list = postprocess.calculate_heat_parameters(
+                heat_current_list, heat_voltage_list, canonical.get("ideality")
+            )
+            iv_file_name = os.path.basename(file_path)
+            file_service.save_heat_test_file(
+                canonical, iv_file_name, temperature_list, heat_voltage_list, config.heat_data_directory
+            )
+        except Exception as e:
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="file", error=e)
+
+    db_service.commit_db_changes()
+    return SaveResult(success=True)

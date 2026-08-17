@@ -330,8 +330,8 @@ def populate_iv_from_db():
 
 	average_voltage_values = [(float(up) + float(down)) / 2 for up, down in zip(measure_values_up, measure_values_down)]
 	process_dict = pp.calculate_iv_parameters(source_values, measure_values_up, measure_values_down)
-	reverse_current = pp.clean_string_or_list_values(str(iv_info_dict["reverse_current"]))
-	reverse_voltage = pp.clean_string_or_list_values(str(iv_info_dict["reverse_voltage"]))
+	reverse_current = pp.clean_string_or_list_values(str(iv_info_dict["reverse_breakdown_current"]))
+	reverse_voltage = pp.clean_string_or_list_values(str(iv_info_dict["reverse_breakdown_voltage"]))
 	reverse_current, reverse_voltage = pp.get_reverse_breakdown_values(reverse_current, reverse_voltage)
 	max_current = process_dict["Imax"]
 
@@ -376,17 +376,13 @@ def populate_iv_from_db():
 		"diode_lot": iv_info_dict["diode_lot"],
 		"circuit": iv_info_dict["circuit"],
 		"circuit_lot": iv_info_dict["circuit_lot"],
-		"assembly_number": iv_info_dict["assembly_no"],
+		"assembly_number": iv_info_dict["assembly_number"],
 		"subassembly_tag": iv_info_dict["subassembly_tag"],
 		"build_name": build_name
 	}
 
 	full_iv_dict = {**clean_process_dict, **iv_population_dict}
 
-	print(build_info)
-	print(full_iv_dict)
-
-	print("IV info dictionaries created")
 	df = pd.DataFrame({
 			"Current (uA)": source_values,
 			"Voltage (V)": average_voltage_values
@@ -418,4 +414,4 @@ def cancel_iv_selection():
 
 @db_bp.post("/cancel_generic_save_dialog/")
 def cancel_generic_save_dialog():
-	return "", 200
+	return '<div id="generic-save-popup"></div>', 200
