@@ -1,8 +1,11 @@
 import sys
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, BASE_DIR)
+SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SETUP_DIR)
+sys.path.insert(0, ROOT_DIR)
+
+ICON_PATH = os.path.join(ROOT_DIR, "app", "static", "img", "IVL.ico")
 
 import webview
 import threading
@@ -70,7 +73,7 @@ def main():
 	webview.settings['OPEN_DEVTOOLS_IN_DEBUG'] = False
 
 	webview.create_window("IV/Labels/Components", "http://127.0.0.1:5000/iv_and_build", maximized=True)
-	webview.start(debug=True)
+	webview.start(debug=True, icon=ICON_PATH)
 
 if __name__ == "__main__":
 	main()

@@ -11,7 +11,7 @@
 
 {% set is_custom_lot =
 	current_lot
-	and current_lot not in ['Unknown', 'NA']
+	and current_lot.lower() not in ['Unknown'.lower(), 'NA'.lower()]
 	and current_lot not in lot_list
 %}
 
@@ -28,17 +28,17 @@
 			hx-vals='js:{ "lot-select": this.value }'>
 
 			<option value="Choose"
-				{% if current_lot.lower() == "Choose".lower() %}selected{% endif %}>
+				{% if current_lot and current_lot.lower() == "Choose".lower() %}selected{% endif %}>
 				Choose
 			</option>
 
 			<option value="Unknown"
-				{% if current_lot.lower() == "Unknown".lower() %}selected{% endif %}>
+				{% if current_lot and current_lot.lower() == "Unknown".lower() %}selected{% endif %}>
 				Unknown
 			</option>
 
 			<option value="NA"
-				{% if current_lot.lower() == "NA".lower() %}selected{% endif %}>
+				{% if current_lot and current_lot.lower() == "NA".lower() %}selected{% endif %}>
 				NA
 			</option>
 

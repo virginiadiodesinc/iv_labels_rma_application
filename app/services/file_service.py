@@ -11,7 +11,10 @@ import statistics
 from app.services import field_registry as fr
 from app.services import string_utilities
 from app import config
+import webview
+from pathlib import Path
 
+current_iv_file_directory = config.iv_file_directory
 
 def get_block_file_path(canonical: dict, block_file_directory: str) -> str:
     return os.path.join(block_file_directory, fr.block_file_name(canonical))
@@ -66,6 +69,7 @@ def save_block_file(canonical: dict, block_file_directory: str) -> str:
     return path
 
 
+
 def save_build_file(canonical: dict, build_file_directory: str) -> str:
     canonical = fr.enrich_with_build_suffix(canonical, string_utilities.get_build_name_with_suffix)
     path = get_build_file_path(canonical, build_file_directory)
@@ -78,18 +82,19 @@ def save_build_file(canonical: dict, build_file_directory: str) -> str:
     return path
 
 
-def save_iv_file(canonical: dict, vup_list: list, vdown_list: list, isource_list: list, iv_file_directory: str) -> str:
-    """IV files are always a full fresh overwrite -- never piecemeal, per
-    your confirmation. The header row (line 15) already lives in
-    IV_FILE_TEMPLATE; the data rows below it are a variable-length list of
-    raw numbers, not named fields, so they're built directly here rather
-    than through LineTemplate.
+def get_iv_file_path(canonical: dict, iv_file_directory: str) -> str:
+    """Split out of save_iv_file so path can be computed BEFORE the DB
+    decides insert vs. update (stage_upsert_iv_info needs the path first).
+    NOTE: expects canonical to already be enriched
+    (fr.enrich_with_build_suffix) -- caller's job now, not this function's."""
+    file_name = fr.render_new_line(fr.IV_FILE_TEMPLATE[0], canonical).lower() + ".iv"
+    return os.path.join(iv_file_directory, file_name)
 
-    The trailing blank line after the data is REQUIRED -- the old LabView
-    reader breaks without it. Don't remove it."""
-    canonical = fr.enrich_with_build_suffix(canonical, string_utilities.get_build_name_with_suffix, 
-                                            build_name_key="iv_build_name", block_engraving_key="iv_block_engraving",
-                                            output_key="iv_full_build_name_with_suffix")
+
+def save_iv_file(canonical: dict, vup_list: list, vdown_list: list, isource_list: list, iv_file_directory: str) -> str:
+    """canonical must already be enriched -- no longer calls
+    fr.enrich_with_build_suffix itself, to avoid doing the CSV lookup twice
+    per save now that get_iv_file_path also needs it."""
     lines = [fr.render_new_line(template, canonical) for template in fr.IV_FILE_TEMPLATE]
 
     for vup, vdown, isource in zip(vup_list, vdown_list, isource_list):
@@ -97,13 +102,20 @@ def save_iv_file(canonical: dict, vup_list: list, vdown_list: list, isource_list
 
     lines.append("")  # required trailing blank line -- do not remove
 
-    file_name = lines[0].lower() + ".iv"
-    path = os.path.join(iv_file_directory, file_name)
+    path = get_iv_file_path(canonical, iv_file_directory)  # same-file call, unqualified
+    stem = Path(path).stem
 
-    with open(path, "w", encoding="utf-8") as f:
+    selected_path = webview.windows[0].create_file_dialog(
+            webview.FileDialog.SAVE,
+            save_filename=stem,
+            directory=iv_file_directory
+            )
+    selected_path = Path(selected_path[0])
+
+    with selected_path.open(mode="w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
-    return path
+    return selected_path
 
 
 def calculate_heat_deltas(temperature_list: list) -> tuple:
@@ -174,3 +186,10 @@ def save_heat_test_file(canonical: dict, iv_file_name: str, temperature_list: li
         f.write("\n".join(lines))
 
     return path
+
+
+def delete_file(path: str) -> None:
+    """You likely already have this from block/build delete work -- only
+    including it in case IV is first."""
+    if path and os.path.isfile(path):
+        os.remove(path)

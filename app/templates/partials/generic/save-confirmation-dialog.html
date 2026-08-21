@@ -1,5 +1,5 @@
 <div 
-    id="generic-save-popup"
+    id="generic-popup"
     class="modal-overlay"
     data-yellow-flags-found="{{ yellow_flags_found | lower }}"
 >
@@ -53,15 +53,15 @@
                 id="save-confirm-button"
                 hx-post="{{ post_url }}"
                 hx-include="{{ include_selector }}"
-                hx-vals='{"confirmed": "true"}'
-                hx-target="#generic-save-popup"
+                hx-vals='{"confirmed": "true", "print_label": "{{print_label | string | lower}}"}'
+                hx-target="#generic-popup"
                 hx-swap="outerHTML">
                 Confirm
             </button>
 
             <button
-                hx-post="/cancel_generic_save_dialog/"
-                hx-target="#generic-save-popup"
+                hx-post="/cancel_generic_dialog/"
+                hx-target="#generic-popup"
                 hx-swap="outerHTML">
                 Cancel
             </button>

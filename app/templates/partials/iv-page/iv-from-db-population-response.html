@@ -1,5 +1,3 @@
-<div id="open-iv-popup" hx-swap-oob="true"></div>
-
 <details open id="iv-assembly-information" hx-swap-oob="true">
     <summary>Part Information</summary>
     {% include "partials/iv-page/iv-assembly-information.html" %}
@@ -17,11 +15,13 @@
 	</div>
 	<div id="iv-plot-display-controls" class="iv-plot-display-controls">
 		<select>
-			<option value="linear">Linear</option>
 			<option value="log" selected>Log</option>
+			<option value="linear">Linear</option>
 		</select>
 	</div>
 
 	{% include "partials/iv-page/iv-plot-figure.html" %}
 	
 </div>
+
+<div id="generic-popup" hx-swap-oob="true"></div>

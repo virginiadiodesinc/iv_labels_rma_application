@@ -41,26 +41,15 @@
 	</button>
 
 	<button
-		id="print-build-button"
-		name="print-build-button"
-		hx-swap-oob="true"
-		hx-post="/print/full_build/"
-		hx-include="#full-build-form, #block-info"
-		hx-swap="none"
-		>
-		Print Build
-	</button>
-
-	<button
 		class="important-button"
 		id="save-build-button"
 		name="save-build-button"
 		hx-post="/save_build_info/"
 		hx-include="#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info"
-		hx-target="#generic-save-popup"
+		hx-target="#generic-popup"
 		hx-swap="innerHTML"
 		>
-		Save Build Info
+		Save/Print Build Info
 	</button>
 	
 	<div id="actual-bom-container" class="actual-bom-list">

@@ -22,10 +22,6 @@ def validate_bom_matches(build_name, part_list):
     return
 
 
-def validate_lots_chosen_for_all_parts(part_list):
-    return
-
-
 def validate_current_test_note_added(note_list):
     return
 
@@ -53,6 +49,11 @@ UNIVERSAL_BLOCK_YELLOW_FLAG_CHECKS = [
 FULL_BUILD_YELLOW_FLAG_CHECKS = [
     ("unlisted_block_name", lambda c: c.get("block_engraving") or "", validate_block_name_listed),
     ("unlisted_build_name", lambda c: c.get("full_build_name") or "", validate_build_name_listed),
+]
+IV_YELLOW_FLAG_CHECKS =  [
+    ("unlisted_block_name", lambda c: c.get("iv_block_engraving") or "", validate_block_name_listed),
+    ("unlisted_build_name", lambda c: c.get("iv_build_name") or "", validate_build_name_listed),
+
 ]
 
 # "unlisted_build_name" needs a Yellow_Flags.unlisted_build_name column

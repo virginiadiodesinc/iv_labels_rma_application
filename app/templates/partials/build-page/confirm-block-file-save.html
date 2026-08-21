@@ -29,14 +29,14 @@
             <button
                 hx-post="{{ post_url }}"
                 hx-include="{{ include_selector }}"
-                hx-target="#generic-save-popup"
+                hx-target="#generic-popup"
                 hx-swap="innerHTML">
                 Save
             </button>
 
             <button
                 hx-post="/cancel_block_file_save/"
-                hx-target="#generic-save-popup"
+                hx-target="#generic-popup"
                 hx-swap="innerHTML">
                 Cancel
             </button>

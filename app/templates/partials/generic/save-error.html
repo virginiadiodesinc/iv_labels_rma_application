@@ -1,5 +1,5 @@
 <div 
-    id="generic-save-popup" 
+    id="generic-popup" 
     class="modal-overlay">
     <div class="modal">
         <p>
@@ -10,8 +10,8 @@
         </p>
 
         <button
-            hx-post="/cancel_generic_save_dialog/"
-            hx-target="#generic-save-popup"
+            hx-post="/cancel_generic_dialog/"
+            hx-target="#generic-popup"
             hx-swap="outerHTML">
             Cancel
         </button>

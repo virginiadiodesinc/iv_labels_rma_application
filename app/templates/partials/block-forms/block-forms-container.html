@@ -12,18 +12,21 @@
 </div>
 
 <div>
-	<button hx-post="/attempt_save_block_file/"
-			hx-target="#generic-save-popup" 
-			hx-swap="innerHTML"
-			hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info"
-			hx-disabled-elt="#block-forms-container button"
-			class="important-button">
-			Save Block File
-	</button>
 	<button hx-get="/clear_block_info/"
 			hx-target="#block-forms-container"
 			hx-swap="innerHTML"
 			class="important-button">
 			Clear Block Info
+	</button>
+
+	<div class="line-break"></div>
+	<div class="line-break"></div>
+
+	<button hx-post="/save_block_info/"
+			hx-target="#generic-popup" 
+			hx-swap="innerHTML"
+			hx-include="#block-info, #inspection-info, #pb1-info, #pb2-info"
+			hx-disabled-elt="#block-forms-container button">
+			Save Block Info Without Printing
 	</button>
 </div>

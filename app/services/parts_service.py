@@ -78,7 +78,7 @@ def notes_from_form(form) -> list:
     return notes
 
 
-def iv_parts_from_form(form) -> list:
+def iv_parts_from_form(form) -> dict:
     parts_list = form.getlist("part")
     lots_list = _resolve_lots(form)
 
@@ -86,7 +86,7 @@ def iv_parts_from_form(form) -> list:
             "iv_diode_name": parts_list[0] if len(parts_list) > 0 else None,
             "iv_diode_lot": lots_list[0] if len(lots_list) > 0 else None,
             "iv_circuit_name": parts_list[1] if len(parts_list) > 1 else None,
-            "iv_circuit_lot": lots_list[1] if len(lots_list) > 1 else None,
+            "iv_circuit_lot": lots_list[1] if len(lots_list) > 1 and len(parts_list) > 1 else None,
         }
 
 

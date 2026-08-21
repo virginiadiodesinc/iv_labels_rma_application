@@ -171,11 +171,11 @@ function addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound) {
 document.addEventListener("htmx:afterSwap", function (event) {
     const target = event.detail.target;
 
-        if (!target || target.id !== "generic-save-popup") {
+        if (!target || target.id !== "generic-popup") {
         return;
     }
     
-    const popup = document.getElementById("generic-save-popup");
+    const popup = document.getElementById("generic-popup");
 
     const yellowFlagsFound = popup.dataset.yellowFlagsFound === "true";
 

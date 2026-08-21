@@ -44,8 +44,6 @@ class Build_Parts(Base):
 	part_type = Column(String, nullable=False)
 	part_lot = Column(String, nullable=False)
 	subassembly_tag = Column(String)
-	#weight = Column(Float, nullable=False) not yet implemented
-	# FIELDS ONLY USED FOR CERTAIN PARTS (PCB AND DIODE, CURRENTLY)
 	reverse_breakdown_voltage = Column(String)
 	temperature = Column(String)
 	indium = Column(String)
@@ -61,8 +59,8 @@ class IV_Info(Base):
 	iv_id = Column(Integer, primary_key=True, autoincrement=True)
 	diode = Column(String, nullable=False)
 	diode_lot = Column(String, nullable=False)
-	circuit = Column(String, nullable=False)
-	circuit_lot = Column(String, nullable=False)
+	circuit = Column(String)
+	circuit_lot = Column(String)
 	assembly_number = Column(Integer)
 	subassembly_tag = Column(String)
 	iv_date = Column(Date, nullable=False)
@@ -80,7 +78,9 @@ class IV_Info(Base):
 	reverse_breakdown_current = Column(Float, nullable=False)
 	reverse_breakdown_voltage = Column(Float, nullable=False)
 	additional_information = Column(String)
-	iv_file_path = Column(String)
+	temperature = Column(Float)
+	iv_file_path = Column(String, nullable=False)
+	heat_file_path = Column(String)
 
 class IV_Points(Base):
 	__tablename__ = "iv_points"
@@ -102,6 +102,14 @@ class Notes(Base):
 	type = Column(Enum(Note_Type), nullable=False)
 	note = Column(String, nullable=False)
 
+class Yellow_Flags(Base):
+	__tablename__ = 'yellow_flags'
+	block_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
+	flag_list_id = Column(Integer, primary_key=True, autoincrement=True)
+	mismatched_bom = Column(Boolean)
+	unlisted_block_name = Column(Boolean)
+	unlisted_build_name = Column(Boolean)
+
 class Feedback(Base):
 	__tablename__ = 'feedback'
 	feedback_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -112,11 +120,3 @@ class Feedback(Base):
 	__table_args__ = (
 		CheckConstraint("length(user_initials) = 3", name="initials_length_check"),
 	)
-
-class Yellow_Flags(Base):
-	__tablename__ = 'yellow_flags'
-	block_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
-	flag_list_id = Column(Integer, primary_key=True, autoincrement=True)
-	mismatched_bom = Column(Boolean)
-	unlisted_block_name = Column(Boolean)
-	unlisted_build_name = Column(Boolean)

@@ -20,6 +20,7 @@ from app.services import field_registry as fr
 from app.services import file_service
 from app.services import db_service
 from app.services import postprocess
+from app.services import string_utilities
 from app import config
 import traceback
 import os
@@ -123,19 +124,31 @@ def save_build_info(canonical: dict, parts_list: list[dict], notes_list: list[di
 def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list: list,
                   heat_current_list: list = None, heat_voltage_list: list = None) -> SaveResult:
     canonical = fr.stamp_iv_datetime(canonical)
+    # Enriched ONCE here -- get_iv_file_path, stage_upsert_iv_info, and
+    # save_iv_file all assume this already happened, so they don't each
+    # redo the CSV lookup.
+    canonical = fr.enrich_with_build_suffix(
+        canonical, string_utilities.get_build_name_with_suffix,
+        build_name_key="iv_build_name", block_engraving_key="iv_block_engraving",
+        output_key="iv_full_build_name_with_suffix",
+    )
 
     block_identity = fr.iv_identity_as_block_identity(canonical)
     try:
         db_service.stage_upsert_build_info(block_identity)
     except Exception as e:
+        traceback.print_exc()
         db_service.roll_back_db_changes()
-        return SaveResult(success=False, failure_cause="db", error=e)
+        return SaveResult(success=False, failure_cause="db build info", error=e)
+
+    iv_file_path = file_service.get_iv_file_path(canonical, config.iv_file_auto_directory)
 
     try:
-        iv_entry = db_service.stage_add_iv_info(canonical)
+        iv_entry = db_service.stage_upsert_iv_info(canonical, iv_file_path)
     except Exception as e:
+        traceback.print_exc()
         db_service.roll_back_db_changes()
-        return SaveResult(success=False, failure_cause="db", error=e)
+        return SaveResult(success=False, failure_cause="db iv info", error=e)
 
     canonical = dict(canonical)
     canonical["iv_id"] = iv_entry.iv_id
@@ -143,33 +156,33 @@ def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list
     try:
         db_service.stage_add_iv_points(canonical)
     except Exception as e:
+        traceback.print_exc()
         db_service.roll_back_db_changes()
-        return SaveResult(success=False, failure_cause="db", error=e)
+        return SaveResult(success=False, failure_cause="db iv points", error=e)
 
     try:
-        file_path = file_service.save_iv_file(canonical, vup_list, vdown_list, isource_list, config.iv_file_auto_directory)
+        iv_file_path = file_service.save_iv_file(canonical, vup_list, vdown_list, isource_list, config.iv_file_directory)
+        iv_entry.iv_file_path = str(iv_file_path)
     except Exception as e:
+        traceback.print_exc()
         db_service.roll_back_db_changes()
-        return SaveResult(success=False, failure_cause="file", error=e)
+        return SaveResult(success=False, failure_cause="iv file", error=e)
 
-    iv_entry.iv_file_path = file_path
-
-    # Heat test only ran if both lists are real and have actual values in
-    # them -- matches the old route's all(...)-and-any(...) check.
     heat_test_taken = bool(heat_current_list) and bool(heat_voltage_list) and any(heat_current_list) and any(heat_voltage_list)
-    print("HEAT TEST?", heat_test_taken)
     if heat_test_taken:
         try:
             temperature_list = postprocess.calculate_heat_parameters(
                 heat_current_list, heat_voltage_list, canonical.get("ideality")
             )
-            iv_file_name = os.path.basename(file_path)
-            file_service.save_heat_test_file(
-                canonical, iv_file_name, temperature_list, heat_voltage_list, config.heat_data_directory
+            heat_file_name = os.path.basename(iv_file_path)
+            heat_path = file_service.save_heat_test_file(
+                canonical, heat_file_name, temperature_list, heat_voltage_list, config.heat_data_directory
             )
+            iv_entry.heat_file_path = heat_path
         except Exception as e:
+            traceback.print_exc()
             db_service.roll_back_db_changes()
-            return SaveResult(success=False, failure_cause="file", error=e)
+            return SaveResult(success=False, failure_cause="heat file", error=e)
 
     db_service.commit_db_changes()
     return SaveResult(success=True)

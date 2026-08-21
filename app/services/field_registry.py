@@ -186,10 +186,8 @@ FIELDS: list[FieldSpec] = [
     FieldSpec("iv_block_serial_number", Section.IV_PARAMETERS, str, form_name="iv-block-sn"),
     FieldSpec("iv_block_revision", Section.IV_PARAMETERS, str, form_name="iv-block-revision"),
     FieldSpec("iv_build_name", Section.IV_PARAMETERS, str, form_name="iv-build-name"),
-    # "medium" was old terminology -- per your note, iv-additional-info is
-    # the only real home for it now.
     FieldSpec("additional_info", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="additional_information", form_name="iv-additional-info"),
-
+    FieldSpec("temperature", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="temperature"),
     # --- part related fields (some overlap with IV here) ---
     # ALL PARTS
     FieldSpec("part_name", Section.BUILD_PARTS, str, db_model="Build_Parts"),
@@ -472,7 +470,7 @@ IV_FILE_TEMPLATE: list[LineTemplate] = [
         Field("polarity"),
         Field("iv_block_engraving"),
         Computed("iv_block_sn", _iv_block_sn),
-        Field("additional_info"),
+        Field("additional_info", placeholder="X"),
     ]),
     # Single space between date and time below -- your example
     # "5/19/2026  12:22 PM" reads like it might have two spaces; if that's
@@ -647,6 +645,8 @@ def format_labview_scientific(value: float, decimals: int = 5) -> str:
     so this is built manually, same reasoning as stringify()'s date
     handling avoiding strftime's platform-specific quirks."""
     formatted = f"{value:.{decimals}e}"
+    if formatted == "inf":
+        return formatted
     mantissa, exponent = formatted.split("e")
     exponent_sign = exponent[0]
     exponent_digits = exponent[1:].lstrip("0") or "0"

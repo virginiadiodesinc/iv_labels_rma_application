@@ -2,10 +2,10 @@
 	<div>
 		<button id="open-iv-button"
 				hx-post="/open_iv_from_db/"
-				hx-target="#open-iv-popup"
-				hx-swap="innerHTML"
+				hx-target="#generic-popup"
+				hx-swap="outerHTML"
 				hx-include="#iv-assembly-information-form">
-				Open IV File from DB
+				Select IV Info from DB
 		</button>
 	</div>
 	{% include "partials/iv-page/iv-file-upload.html" %}
@@ -186,7 +186,7 @@
 				id="save-iv-button"
 				hx-post="/save_iv_info/"
 				hx-include="#iv-info, #iv-curve-points, #iv-assembly-information"
-				hx-target="#generic-save-popup">
+				hx-target="#generic-popup">
 				Save IV Info
 		</button>
 		<br>
@@ -224,5 +224,3 @@
 		</label>
 	</div>
 </div>
-
-<div id="open-iv-popup"></div>

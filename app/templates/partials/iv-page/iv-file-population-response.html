@@ -1,3 +1,8 @@
+<details open id="iv-assembly-information" hx-swap-oob="true">
+	<summary>Part Information</summary>
+	{% include "partials/iv-page/iv-assembly-information.html" %}
+</details>
+
 <div id="iv-curve-information" class="iv-curve-information" hx-swap-oob="true">
 	{% include "partials/iv-page/iv-info.html" %}
 </div>
@@ -10,16 +15,11 @@
 	</div>
 	<div id="iv-plot-display-controls" class="iv-plot-display-controls">
 		<select>
-			<option value="linear">Linear</option>
 			<option value="log" selected>Log</option>
+			<option value="linear">Linear</option>
 		</select>
 	</div>
 
 	{% include "partials/iv-page/iv-plot-figure.html" %}
 	
 </div>
-
-<details open id="iv-assembly-information" hx-swap-oob="true">
-	<summary>Part Information</summary>
-	{% include "partials/iv-page/iv-assembly-information.html" %}
-</details>

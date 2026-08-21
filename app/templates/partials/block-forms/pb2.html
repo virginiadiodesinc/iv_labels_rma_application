@@ -87,18 +87,9 @@
 <button
 	class="important-button"
 	hx-post="/save_pb2_info/"
-	hx-target="#generic-save-popup"
+	hx-target="#generic-popup"
 	hx-include="#pb2-info, #block-info, #inspection-info"
+	hx-vals='{"print_label": "true"}'
 	hx-swap="outerHTML">
-	Save PB2 Info
-</button>
-
-<button
-	id="print-pb2-button"
-	name="print-pb2-button"
-	hx-post="/print/pb2_label/"
-	hx-include="#pb2-info, #block-info"
-	hx-swap="none"
-	>
-	Print PB2 Info
+	Save/Print PB2 Info
 </button>

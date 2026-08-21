@@ -58,6 +58,14 @@ def validate_all_lots_chosen(parts_list: list[dict]) -> list[str]:
             errors.append(f"{part['part_name']} has no selected lot. Please select something (including NA or Unknown) for the lot value.")
     return errors
 
+def validate_iv_lots_chosen(iv_parts_dict: dict) -> list[str]:
+    errors = []
+    if iv_parts_dict["iv_diode_lot"] == "Choose":
+        errors.append(f"{iv_parts_dict['iv_diode_name']} has no selected lot. Please select something (including NA or Unknown) for the lot value.")
+    if iv_parts_dict["iv_circuit_name"] and iv_parts_dict["iv_circuit_lot"] and iv_parts_dict["iv_circuit_lot"] == "Choose":
+        errors.append(f"{iv_parts_dict['iv_circuit_name']} has no selected lot. Please select something (including NA or Unknown) for the lot value.")
+    return errors
+
 
 def validate_iv_identification(canonical: dict) -> list[str]:
     errors = []
@@ -65,6 +73,8 @@ def validate_iv_identification(canonical: dict) -> list[str]:
         errors.append("IV block engraving is required.")
     if not canonical.get("iv_block_serial_number"):
         errors.append("IV block serial number is required.")
+    if not canonical.get("iv_build_name"):
+            errors.append("IV build name is required.")
     if not canonical.get("iv_diode_name"):
         errors.append("Diode part name is required.")
     return errors

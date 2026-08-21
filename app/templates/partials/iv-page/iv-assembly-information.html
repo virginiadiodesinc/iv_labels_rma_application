@@ -46,7 +46,7 @@
 				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['diode_lot'] if part else '' }}">
 			</label>
 			<div class="lot-container">
-				{% set current_lot = iv_data.diode_lot
+				{% set current_lot = iv_data.diode_lot.lower()
 					if iv_data is defined and iv_data.diode_lot
 					else ''
 				%}
@@ -69,7 +69,7 @@
 				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['circuit_lot'] if part else '' }}">
 			</label>
 			<div class="lot-container">
-				{% set current_lot = iv_data.circuit_lot
+				{% set current_lot = iv_data.circuit_lot.lower()
 					if iv_data is defined and iv_data.circuit_lot
 					else ''
 				%}
@@ -87,6 +87,7 @@
 		<label> Additional Info
 			<input type="text"
 					name="iv-additional-info"
+					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, false)"
 					value="{{iv_data.additional_info if iv_data and iv_data.additional_info else ''}}"
 					>
 		</label>

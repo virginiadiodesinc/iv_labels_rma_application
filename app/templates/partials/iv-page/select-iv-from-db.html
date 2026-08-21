@@ -1,4 +1,6 @@
-<div class="modal-overlay">
+<div 
+    id="generic-popup"
+    class="modal-overlay">
     <div class="modal">
 
         <h3>Select IV File</h3>
@@ -7,15 +9,15 @@
 
             <div class="scroll-box">
 
-                {% for path in file_paths %}
+                {% for iv in iv_list %}
                 <label class="path-option">
                     <input
                         type="radio"
-                        name="selected-iv-path"
-                        value="{{ path }}"
+                        name="selected-iv-id"
+                        value="{{ iv.iv_id }}"
                         {% if loop.first %}checked{% endif %}
                     >
-                    {{ path }}
+                    {{ iv.iv_path_stem }}
                 </label>
                 <br>
                 {% endfor %}
@@ -27,16 +29,24 @@
                 <button
                     type="button"
                     hx-post="/populate_iv_from_db/"
-                    hx-include="#iv-selection-form,#iv-assembly-information-form">
+                    hx-include="#iv-selection-form, #iv-assembly-information-form">
                     Confirm
                 </button>
 
                 <button
                     type="button"
-                    hx-post="/cancel_iv_selection/"
-                    hx-target="#open-iv-popup"
-                    hx-swap="innerHTML">
+                    hx-post="/cancel_generic_dialog/"
+                    hx-target="#generic-popup"
+                    hx-swap="outerHTML">
                     Cancel
+                </button>
+
+                <button
+                    type="button"
+                    hx-post="/delete_iv_info/"
+                    hx-target="#generic-popup"
+                    hx-swap="outerHTML">
+                    Delete IV
                 </button>
 
             </div>

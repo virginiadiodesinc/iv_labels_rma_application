@@ -3,14 +3,17 @@
     class="modal-overlay">
     <div class="modal">
         <p>
-            Your save was a success!
+            Sorry, the following went wrong with deleting your data:
+        </p>
+        <p>
+            {{failure_cause}}
         </p>
 
         <button
             hx-post="/cancel_generic_dialog/"
             hx-target="#generic-popup"
             hx-swap="outerHTML">
-            Continue
+            Cancel
         </button>
     </div>
 </div>

@@ -1,4 +1,6 @@
-<div class="modal-overlay">
+<div 
+    id="generic-popup"
+    class="modal-overlay">
     <div class="modal">
         <p>
             Sorry, there are some non-negotiable errors in the data you're trying to save:
@@ -11,9 +13,9 @@
         {% endfor %}
 
         <button
-            hx-post="/cancel_generic_save_dialog/"
-            hx-target="#generic-save-popup"
-            hx-swap="innerHTML">
+            hx-post="/cancel_generic_dialog/"
+            hx-target="#generic-popup"
+            hx-swap="outerHTML">
             Cancel
         </button>
     </div>
