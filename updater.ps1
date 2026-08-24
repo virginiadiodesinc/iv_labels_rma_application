@@ -1,10 +1,10 @@
 # updater.ps1
-# Lives at true root next to launcher.bat. Checks a remote manifest against
-# manifest.local.json and swaps in any section (python / app / setup) that's
-# out of date. Never touches app.log or the shortcuts.
+# Lives at true root next to launcher.bat. Checks a manifest on a network
+# share against manifest.local.json and swaps in any section (python / app /
+# setup) that's out of date. Never touches app.log or the shortcuts.
 
 param(
-    [string]$ManifestUrl = "https://your-server.example.com/releases/manifest.json"
+    [string]$ManifestPath = "\\linkserver\PythonDrive\Python3\IV and Labels\manifest.production.json"
 )
 
 $RootDir            = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -36,10 +36,12 @@ function Update-Section {
 
     Write-Host "Updating $SectionName to $($RemoteInfo.version)..."
 
+    # $RemoteInfo.file is the full network path to that section's zip,
+    # e.g. \\YOUR-SERVER\releases\app-2026.08.14.zip
     try {
-        Invoke-WebRequest -Uri $RemoteInfo.url -OutFile $tempZip -UseBasicParsing -TimeoutSec 300
+        Copy-Item -Path $RemoteInfo.file -Destination $tempZip -Force -ErrorAction Stop
     } catch {
-        Write-Host "  Download failed for $SectionName - will retry next launch."
+        Write-Host "  Copy failed for $SectionName - will retry next launch."
         return
     }
 
@@ -60,7 +62,7 @@ function Update-Section {
     $oldDir = "$sectionDir.old"
     if (Test-Path $oldDir) { Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue }
     if (Test-Path $sectionDir) { Rename-Item -Path $sectionDir -NewName "$SectionName.old" }
-    Rename-Item -Path $tempExtract -NewName $sectionDir
+    Move-Item -Path $tempExtract -Destination $sectionDir
     if (Test-Path $oldDir) { Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue }
 
     $LocalManifest.$SectionName = $RemoteInfo.version
@@ -73,10 +75,9 @@ function Update-Section {
 $localManifest = Get-LocalManifest
 
 try {
-    $raw = Invoke-WebRequest -Uri $ManifestUrl -UseBasicParsing -TimeoutSec 10
-    $remoteManifest = $raw.Content | ConvertFrom-Json
+    $remoteManifest = Get-Content -Path $ManifestPath -Raw -ErrorAction Stop | ConvertFrom-Json
 } catch {
-    Write-Host "Could not reach update server - continuing with current version."
+    Write-Host "Could not reach the update share - continuing with current version."
     exit 0
 }
 
