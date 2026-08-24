@@ -68,6 +68,7 @@ function Update-Section {
     $LocalManifest.$SectionName = $RemoteInfo.version
     Save-LocalManifest $LocalManifest
     Write-Host "  $SectionName updated to $($RemoteInfo.version)."
+    return $true
 }
 
 # --- Main ---
@@ -91,6 +92,23 @@ foreach ($section in @("python", "app", "setup")) {
     if ($null -eq $remoteInfo) { continue }
 
     if ($remoteInfo.version -gt $localVersion) {
-        Update-Section -SectionName $section -RemoteInfo $remoteInfo -LocalManifest $localManifest
+        if (Update-Section -SectionName $section -RemoteInfo $remoteInfo -LocalManifest $localManifest) {
+            $anyUpdated = $true
+        }
+    }
+}
+ 
+# Icons on python.exe/pythonw.exe get wiped out any time python/ is replaced,
+# and shortcuts are cheap to just recreate. Re-run after ANY successful
+# update rather than tracking which section specifically needs it - this is
+# read from the just-updated setup/ folder, so it always reflects whatever
+# the newest release shipped.
+if ($anyUpdated) {
+    $setupDir      = Join-Path $RootDir "setup"
+    $refreshScript = Join-Path $setupDir "shortcut-icon-update.bat"
+    if (Test-Path $refreshScript) {
+        Write-Host "Refreshing shortcuts and icons..."
+        Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$refreshScript`" auto" `
+            -WorkingDirectory $setupDir -WindowStyle Hidden -Wait
     }
 }
