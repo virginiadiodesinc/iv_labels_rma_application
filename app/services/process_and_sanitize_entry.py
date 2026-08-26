@@ -53,6 +53,7 @@ def sanitize_and_save_feedback(initials, feedback):
 		Feedback,
 		**data
 	)
+	commit_db_changes(db_session)
 
 
 def retrieve_build_info(block_engraving, block_serial_number, block_revision):

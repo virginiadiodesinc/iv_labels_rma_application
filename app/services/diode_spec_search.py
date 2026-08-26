@@ -1,6 +1,11 @@
 import pandas as pd
 import win32com.client as win32
+import win32gui
+import win32con
+import pythoncom
 import os
+import threading
+import time
 from app import config
 
 def get_runcode_from_full_part_number(full_part_number):
@@ -30,27 +35,89 @@ def get_runcode_from_full_part_number(full_part_number):
     full_runcode = full_part_number[first_index_of_runcode:last_index_of_runcode + 1]
     return full_runcode
 
+
 def get_file_path_from_runcode(runcode):
     runcode_file_name = str(runcode) + ".xls"
     runcode_file_path = os.path.join(config.iv_spec_directory, runcode_file_name)
     return runcode_file_path
 
+
+def _bring_dialog_to_front(stop_event, timeout_seconds=20):
+    """
+    Runs on a background thread while the main thread is blocked inside
+    Workbooks.Open(). Polls for a newly-appeared top-level window whose
+    title suggests it's Excel's password prompt (or another blocking
+    alert) and forces it to the foreground, so the user doesn't have to
+    hunt for it behind other windows.
+    """
+    deadline = time.time() + timeout_seconds
+    keywords = ("password", "microsoft excel")
+
+    def enum_handler(hwnd, _):
+        if stop_event.is_set():
+            return
+        if not win32gui.IsWindowVisible(hwnd):
+            return
+        title = win32gui.GetWindowText(hwnd)
+        if title and any(k in title.lower() for k in keywords):
+            try:
+                win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                win32gui.SetForegroundWindow(hwnd)
+                stop_event.set()
+            except Exception:
+                pass
+
+    while not stop_event.is_set() and time.time() < deadline:
+        win32gui.EnumWindows(enum_handler, None)
+        time.sleep(0.25)
+
+
 def get_spec_sheet_from_file(spec_file_path):
-    # Open Excel application
-    excel = win32.Dispatch("Excel.Application")
-    excel.Visible = False
+    # COM requires the calling thread to be initialized, especially important
+    # if this ever runs inside a web request handler / worker thread.
+    pythoncom.CoInitialize()
 
-    #FileName, UpdateLinks, ReadOnly, Format, Password
-    wb = excel.Workbooks.Open(spec_file_path, False, True, None)
-    iv_sheet = wb.Sheets("IV Spec")
+    excel = None
+    wb = None
+    stop_event = threading.Event()
+    watcher = threading.Thread(target=_bring_dialog_to_front, args=(stop_event,), daemon=True)
 
-    iv_spec_data = iv_sheet.UsedRange.Value
-    spec_df = pd.DataFrame(iv_spec_data)
+    try:
+        # DispatchEx (not Dispatch) forces a brand-new, isolated Excel process
+        # instead of attaching to whatever Excel instance is already running
+        # on the machine. This is what prevents us from closing/hiding a
+        # user's unrelated, already-open workbooks.
+        excel = win32.DispatchEx("Excel.Application")
+        excel.Visible = False
+        excel.DisplayAlerts = False  # auto-dismiss non-critical prompts (format warnings, etc.)
 
-    wb.Close(False)
-    excel.Quit()
+        watcher.start()
 
-    return spec_df
+        #FileName, UpdateLinks, ReadOnly, Format, Password
+        wb = excel.Workbooks.Open(spec_file_path, False, True, None)
+
+        stop_event.set()  # no need to keep polling once Open() has returned
+
+        iv_sheet = wb.Sheets("IV Spec")
+        iv_spec_data = iv_sheet.UsedRange.Value
+        spec_df = pd.DataFrame(iv_spec_data)
+
+        return spec_df
+    
+    finally:
+        stop_event.set()
+        if wb is not None:
+            try:
+                wb.Close(False)
+            except Exception:
+                pass
+        if excel is not None:
+            try:
+                excel.Quit()  # safe now: this Quit() only affects our private, isolated instance
+            except Exception:
+                pass
+        pythoncom.CoUninitialize()
+
 
 def clean_spec_df(spec_df):
     spec_df = spec_df.dropna(axis=1, how='all')
@@ -58,9 +125,11 @@ def clean_spec_df(spec_df):
     spec_df = spec_df.fillna('')
     return spec_df
 
+
 def get_html_table_from_spec_df(spec_df):
     html_table = spec_df.to_html(index=False, header=False)
     return html_table
+
 
 def get_html_table_from_full_part_number(full_part_number):
     runcode = get_runcode_from_full_part_number(full_part_number)
@@ -72,6 +141,7 @@ def get_html_table_from_full_part_number(full_part_number):
     html_table = get_html_table_from_spec_df(spec_df)
     return html_table
 
+
 def get_html_table_from_runcode(runcode):
     spec_file_path = get_file_path_from_runcode(runcode)
     
@@ -80,15 +150,3 @@ def get_html_table_from_runcode(runcode):
 
     html_table = get_html_table_from_spec_df(spec_df)
     return html_table
-
-
-# def main():
-#     diode_list = ["G1SP4D4.8F22N223A", "A2APXD9FGXXX_LOT1174", "1273"]
-#     for diode in diode_list:
-#         table = get_html_table_from_full_part_number(diode)
-#         print(table)
-#     return
-
-# if __name__ == "__main__":
-#     main()
-
