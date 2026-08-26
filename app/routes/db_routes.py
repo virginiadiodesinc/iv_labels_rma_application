@@ -284,8 +284,8 @@ def confirm_save_pb2_info():
         add_table_entry(db_session, Build_Info, **new_entry)
         return "", 200
     
-@db_bp.post("/open_iv_from_db/")
-def open_iv_from_db():
+@db_bp.post("/select_iv_from_db/")
+def select_iv_from_db():
     build_info = request.form
     canonical = fr.canonical_from_form(request.form)
     build_id = fr.build_block_id_from_iv(canonical)

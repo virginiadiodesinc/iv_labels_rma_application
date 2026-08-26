@@ -214,11 +214,11 @@ def delete_iv_info(iv_id) -> DeleteResult:
 
 # =============================================================================
 # db_routes.py (load side -- becomes load_routes.py eventually) --
-# REPLACE open_iv_from_db and populate_iv_from_db
+# REPLACE select_iv_from_db and populate_iv_from_db
 # =============================================================================
 
-@db_bp.post("/open_iv_from_db/")
-def open_iv_from_db():
+@db_bp.post("/select_iv_from_db/")
+def select_iv_from_db():
     build_info = request.form
     build_id_query = (
         build_info.get("iv-block-engraving") + " " +

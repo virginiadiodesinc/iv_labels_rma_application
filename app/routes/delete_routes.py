@@ -45,7 +45,17 @@ def delete_build_info():
 
 @delete_bp.post("/delete_iv_info/")
 def delete_iv_info_route():
+    route_name = "delete_iv_info"
     iv_id = request.form.get("selected-iv-id")
+    confirmed = request.form.get("confirmed") == "true"
+
+    if not confirmed:
+            return render_template(
+                "partials/generic/delete-iv-confirmation-dialog.html",
+                route=route_name,
+                iv_id=iv_id
+            ), 200
+    
     result = delete_orchestrator.delete_iv_info(iv_id)
 
     if not result.success:
