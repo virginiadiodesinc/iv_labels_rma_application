@@ -61,7 +61,7 @@ class IV_Info(Base):
 	diode_lot = Column(String, nullable=False)
 	circuit = Column(String)
 	circuit_lot = Column(String)
-	assembly_number = Column(Integer)
+	assembly_number = Column(String)
 	subassembly_tag = Column(String)
 	iv_date = Column(Date, nullable=False)
 	points_per_decade = Column(Integer, nullable=False)

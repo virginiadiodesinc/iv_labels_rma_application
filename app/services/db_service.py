@@ -39,7 +39,7 @@ def stage_replace_build_parts_and_notes(canonical: dict, parts_list: list, notes
 
     existing_notes = queries.get_table_entries(db_session, Notes, block_id=block_id)
     for entry in existing_notes:
-        queries.delete_table_entry(db_session, Notes, entry.instance_id)
+        queries.delete_table_entry(db_session, Notes, entry.note_id)
  
     new_entries = []
     for part in parts_list:

@@ -91,7 +91,27 @@ def get_iv_file_path(canonical: dict, iv_file_directory: str) -> str:
     return os.path.join(iv_file_directory, file_name)
 
 
-def save_iv_file(canonical: dict, vup_list: list, vdown_list: list, isource_list: list, iv_file_directory: str) -> str:
+def get_iv_file_path_stem(canonical: dict, iv_file_directory: str) -> str:
+    """Split out of save_iv_file so path can be computed BEFORE the DB
+    decides insert vs. update (stage_upsert_iv_info needs the path first).
+    NOTE: expects canonical to already be enriched
+    (fr.enrich_with_build_suffix) -- caller's job now, not this function's."""
+    file_stem = fr.render_new_line(fr.IV_FILE_TEMPLATE[0], canonical).lower() + ".iv"
+    return file_stem
+
+
+def choose_iv_file_path(canonical: dict, iv_file_directory: str) -> str:
+    file_stem = fr.render_new_line(fr.IV_FILE_TEMPLATE[0], canonical).lower() + ".iv"
+    selected_path = webview.windows[0].create_file_dialog(
+        webview.FileDialog.SAVE,
+        save_filename=file_stem,
+        directory=iv_file_directory
+        )
+    selected_path = str(Path(selected_path[0]))
+    return selected_path
+
+
+def save_iv_file(canonical: dict, vup_list: list, vdown_list: list, isource_list: list, iv_file_path: str) -> str:
     """canonical must already be enriched -- no longer calls
     fr.enrich_with_build_suffix itself, to avoid doing the CSV lookup twice
     per save now that get_iv_file_path also needs it."""
@@ -102,20 +122,10 @@ def save_iv_file(canonical: dict, vup_list: list, vdown_list: list, isource_list
 
     lines.append("")  # required trailing blank line -- do not remove
 
-    path = get_iv_file_path(canonical, iv_file_directory)  # same-file call, unqualified
-    stem = Path(path).stem
-
-    selected_path = webview.windows[0].create_file_dialog(
-            webview.FileDialog.SAVE,
-            save_filename=stem,
-            directory=iv_file_directory
-            )
-    selected_path = Path(selected_path[0])
-
-    with selected_path.open(mode="w", encoding="utf-8") as f:
+    with open(iv_file_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
-    return selected_path
+    return iv_file_path
 
 
 def calculate_heat_deltas(temperature_list: list) -> tuple:
