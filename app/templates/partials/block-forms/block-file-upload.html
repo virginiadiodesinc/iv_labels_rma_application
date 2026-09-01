@@ -7,6 +7,7 @@
 	</button>
 	<text name="block-file-upload-text" id="block-file-upload-text" class="selectable-text">{{file_path if file_path else 'No file selected'}}</text>
 	<input type="hidden" name="block-file-path" id="block-file-path" value="{{file_path if file_path else ''}}">
+	<div class="small-line-break"></div>
 	<button 
 		class="important-button"
 		type="submit"
@@ -14,6 +15,6 @@
 		hx-swap="innerHTML"
 		hx-target="#block-forms-container"
 		{% if not file_path or file_path == '' %}disabled{% endif %}>
-		Populate Block Data
+		Populate from Block File
 	</button>
 </form>

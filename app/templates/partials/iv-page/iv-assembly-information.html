@@ -4,7 +4,7 @@
 			<input type="text"
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-engraving"
-					value="{{iv_data.block_name if iv_data and iv_data.block_name else ''}}"
+					value="{{iv_data.block_name | upper if iv_data and iv_data.block_name else ''}}"
 					>
 		</label>
 		<label> Block Serial Number
@@ -18,7 +18,7 @@
 			<input type="text"
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-revision"
-					value="{{iv_data.build_revision if iv_data and iv_data.build_revision else ''}}"
+					value="{{iv_data.build_revision | upper if iv_data and iv_data.build_revision else ''}}"
 					size="2">
 		</label>
 		<br>
@@ -26,9 +26,16 @@
 			<input type="text"
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-build-name"
-					value="{{iv_data.build_name if iv_data and iv_data.build_name else ''}}"
+					value="{{iv_data.build_name | upper if iv_data and iv_data.build_name else ''}}"
 					>
 		</label>
+		<button
+			hx-post="/import_block_identifiers_to_iv/"
+			hx-include="#block-info, #full-build-name-input"
+			hx-target="#iv-build-info-container"
+			hx-swap="innerHTML">
+			Get Block Identifiers from Build Side
+		</button>
 	</div>
 	<div id="iv-part-information-container" class="iv-part-information-container">
 		<div class="iv-diode-information-line">

@@ -9,38 +9,46 @@
 
             <div class="scroll-box">
 
-                {% for iv in iv_list %}
-                <label class="path-option">
-                    <input
-                        type="radio"
-                        name="selected-iv-id"
-                        value="{{ iv.iv_id }}"
-                        {% if loop.first %}checked{% endif %}
-                    >
-                    {{ iv.iv_path_stem }}
-                </label>
-                <br>
-                {% endfor %}
+                {% if iv_list %}
+                    {% for iv in iv_list %}
+                    <label class="path-option">
+                        <input
+                            type="radio"
+                            name="selected-iv-id"
+                            value="{{ iv.iv_id }}"
+                            {% if loop.first %}checked{% endif %}
+                        >
+                        {{ iv.iv_path_stem }}
+                    </label>
+                    <br>
+                    {% endfor %}
+                {% else %}
+                    <p>Please input a Block Engraving, Serial Number, and possibly a Revision in order to search the database for IV information</p>
+                {% endif %}
+
 
             </div>
 
             <div class="button-row">
 
+            {% if iv_list %}
                 <button
                     type="button"
                     hx-post="/populate_iv_from_db/"
                     hx-include="#iv-selection-form, #iv-assembly-information-form">
                     Confirm
                 </button>
+            {% endif %}
 
-                <button
-                    type="button"
-                    hx-post="/cancel_generic_dialog/"
-                    hx-target="#generic-popup"
-                    hx-swap="outerHTML">
-                    Cancel
-                </button>
+            <button
+                type="button"
+                hx-post="/cancel_generic_dialog/"
+                hx-target="#generic-popup"
+                hx-swap="outerHTML">
+                Cancel
+            </button>
 
+            {% if iv_list %}
                 <button
                     type="button"
                     hx-post="/delete_iv_info/"
@@ -48,6 +56,7 @@
                     hx-swap="outerHTML">
                     Delete IV
                 </button>
+            {% endif %}
 
             </div>
 

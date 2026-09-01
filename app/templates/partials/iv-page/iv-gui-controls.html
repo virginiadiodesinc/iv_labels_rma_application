@@ -1,22 +1,13 @@
 <div id="iv-gui-controls" class="iv-gui-controls">
-	<div>
-		<button id="open-iv-button"
-				hx-post="/select_iv_from_db/"
-				hx-target="#generic-popup"
-				hx-swap="outerHTML"
-				hx-include="#iv-assembly-information-form">
-				Select IV Info from DB
-		</button>
-	</div>
 	{% include "partials/iv-page/iv-file-upload.html" %}
 
 	<details open id="iv-assembly-information">
-		<summary>Part Information</summary>
+		<summary><h1>IV ASSEMBLY INFORMATION</h1></summary>
 		{% include "partials/iv-page/iv-assembly-information.html" %}
 	</details>
 
 	<details open>
-		<summary>IV Basic Controls</summary>
+		<summary><h1>IV BASIC CONTROLS</h1></summary>
 		<form id="iv-basic-controls-form">
 			<label> Compliance Voltage (V)
 				<input 
@@ -71,7 +62,7 @@
 	</details>
 
 	<details>
-		<summary>IV Advanced Controls</summary>
+		<summary><h1>IV ADVANCED CONTROLS</h1></summary>
 		<form id="iv-advanced-controls-form">
 			<label> Default Delay
 				<input type="checkbox"
@@ -206,21 +197,5 @@
 				Add IV Assembly to Build Parts
 		</button>
 		<br>
-		<button id="spec-sheet-lookup-button"
-				hx-post="/get_diode_spec_sheet/"
-				hx-include="#spec-sheet-runcode-input"
-				hx-swap="innerHTML"
-				hx-target="#iv-spec-table-container">
-				Get Spec Sheet For Diode
-		</button>
-		<label>Runcode
-			<input 
-				id="spec-sheet-runcode-input"
-				class="spec-sheet-runcode-input"
-				name="spec-sheet-runcode-input"
-				type="number" 
-				step="1.0"
-				name="compliance-voltage">
-		</label>
 	</div>
 </div>

@@ -1,13 +1,13 @@
 <form class="pb2-info" id="pb2-info" name="pb2-info">
 	<table>
 		<tr>
-			<th colspan="2">PB2 INFO</th>
+			<th colspan="2">PB2 INFORMATION</th>
 		</tr>
 		<tr>
 			<td>BUILD NAME</td>
 			<td>
 				<input 
-					size="15" 
+					size="25" 
 					id="pb2-build-name-input"
 					name="pb2-build-name-input"
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
@@ -36,39 +36,6 @@
 					value="{{block.pb2_initials if block and block.pb2_initials else ''}}">
 			</td>
 		</tr>
-	<!--
-		<tr>
-			<td>PASS/FAIL</td>
-			<td>
-				<input 
-					size="5" 
-					id="pb2-pass-fail-input" 
-					name="pb2-pass-fail-input"
-					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
-					value="{{block.pb2_pass_fail if block and block.pb2_pass_fail else ''}}">
-			</td>
-		</tr>
-		<tr>
-			<td>COMPONENTS</td>
-			<td>
-				<input 
-					size="5" 
-					id="pb2-components-count-input" 
-					name="pb2-components-count-input"
-					value="{{block.pb2_components_count if block and block.pb2_components_count else ''}}">
-			</td>
-		</tr>
-		<tr>
-			<td>BOND WIRE PADS</td>
-			<td>
-				<input 
-					size="5" 
-					id="pb2-bond-pads-count-input" 
-					name="pb2-bond-pads-count-input"
-					value="{{block.pb2_bond_pads_count if block and block.pb2_bond_pads_count else ''}}">
-			</td>
-		</tr>
-	-->
 		<tr>
 			<td>INSPECTOR</td>
 			<td>

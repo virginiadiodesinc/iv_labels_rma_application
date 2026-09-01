@@ -1,5 +1,26 @@
 <div id="iv-spec-table-container" class="iv-spec-table-container" hx-swap-oob="true">
+    <button 
+        hx-preserve
+        id="spec-sheet-lookup-button"
+        hx-post="/get_diode_spec_sheet/"
+        hx-include="#spec-sheet-runcode-input"
+        hx-swap="innerHTML"
+        hx-target="#iv-spec-table-container">
+        Get Spec Sheet For Diode
+    </button>
+    <label>Runcode
+        <input 
+            id="spec-sheet-runcode-input"
+            class="spec-sheet-runcode-input"
+            name="spec-sheet-runcode-input"
+            type="number" 
+            step="1.0"
+            name="compliance-voltage"
+            value="{{runcode if runcode else ''}}">
+    </label>
+
     {% if html_table %}
+    <div class="small-line-break"></div>
     <details open>
         <summary>Diode Spec Sheet</summary>
         {{ html_table | safe }}
@@ -11,5 +32,9 @@
                 Clear Spec Sheet
         </button>
     </details>
+    {% endif %}
+
+    {% if error %}
+    <p>Sorry, something went wrong with getting the spec sheet.</p>
     {% endif %}
 </div>

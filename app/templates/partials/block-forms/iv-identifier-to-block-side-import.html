@@ -49,22 +49,3 @@
 		</tr>
 	</table>
 </form>
-
-<button
-	class="important-button"
-	hx-post="/populate_block_info"
-	hx-include="#block-info"
-	hx-target="#block-forms-container"
-	hx-swap="innerHTML"
->	
-	Populate Block/Build Information
-</button>
-
-<button
-	hx-post="/import_iv_identifiers_to_block/"
-	hx-include="#iv-build-info-container"
-	hx-target="#block-info"
-	hx-swap="innerHTML"
->
-Get Block Identifiers from IV Side
-</button>

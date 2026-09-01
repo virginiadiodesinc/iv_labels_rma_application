@@ -1024,11 +1024,12 @@ def get_diode_spec_sheet():
 		runcode = runcode_form.get("spec-sheet-runcode-input")
 		html_table = dss.get_html_table_from_runcode(runcode)
 
-		return render_template("partials/iv-page/iv-spec-table.html", html_table=html_table)
+		return render_template("partials/iv-page/iv-spec-table.html", runcode=runcode, html_table=html_table)
 	
 	except:
 		print("Sorry, something went wrong with pulling the diode spec sheet.")
-		return "Sorry, something went wrong with pulling the diode spec sheet."
+		return (render_template("partials/iv-page/iv-spec-table.html", runcode=runcode, error=True))
+
 
 @file_bp.post("/clear_diode_spec_sheet/")
 def clear_diode_spec_sheet():

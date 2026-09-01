@@ -21,14 +21,16 @@
 	</div>
 
 	<div id="iv-page-container" class="iv-page-container">
+		
+		{% include "partials/iv-page/iv-gui-controls.html" %}
+		
+		{% include "partials/iv-page/iv-spec-table.html" %}
 
 		{% include "partials/iv-page/iv-plot.html" %}
 
 		<div id="iv-curve-information" class="iv-curve-information">
 			{% include "partials/iv-page/iv-info.html" %}
 		</div>
-		
-			{% include "partials/iv-page/iv-gui-controls.html" %}
 			
 	</div>	
 	

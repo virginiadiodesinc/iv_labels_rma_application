@@ -154,7 +154,7 @@
 
 .iv-page-container {
 	display: grid;
-	grid-template-rows: auto auto auto;
+	grid-template-rows: auto auto auto auto;
 	justify-content: start;
 	align-content: start;
 }
@@ -165,13 +165,18 @@
 	line-height: 1.8;
 }
 
+.iv-spec-table-container {
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
 .iv-gui-controls details {
 	margin-bottom: 5px;
 }
 
 .iv-curve-information {
-	grid-row-start: 2;
-	grid-row-end: 3;
+	grid-row-start: 3;
+	grid-row-end: 4;
 
 }
 
@@ -187,6 +192,11 @@
 	height: 10px;
 }
 
+.small-line-break {
+	flex-basis: 100%;
+	height: 5px;
+}
+
 .iv-curve-information table {
 	border: thin solid black;
 }
@@ -198,8 +208,8 @@
 .iv-plot-container {
 	display: grid;
 	text-align: center;
-	grid-row-start: 3;
-	grid-row-end: 4;
+	grid-row-start: 4;
+	grid-row-end: 5;
 }
 
 .iv-plot-header-container {
@@ -491,6 +501,12 @@ input[type="date"] {
 	justify-content: space-between;
 }
 
+.iv-upload-button-row {
+	display: flex;
+	justify-content: flex-start;
+	column-gap: 50px;
+}
+
 th {
 	font-size: large;
 	text-align: center;
@@ -532,3 +548,12 @@ th {
 	width: 80%;
 }
 
+
+summary :is(h1, h2, h3, h4, h5, h6) {
+	display: inline;
+	font-size: 1.5rem;
+}
+
+summary:has(:is(h1, h2, h3, h4, h5, h6)) {
+	text-align: center;
+}
