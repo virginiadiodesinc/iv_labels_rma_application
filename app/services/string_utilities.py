@@ -88,7 +88,11 @@ def get_build_name_with_suffix(build_name, block_engraving):
 	block_engraving_df_columns = ["Block_Engraving", "Build_Suffix"]
 	block_engraving_df = pd.read_csv('app/services/block_engravings.csv', names=block_engraving_df_columns, index_col=False)
 
-	build_revision_suffix = block_engraving_df.loc[block_engraving_df["Block_Engraving"] == block_engraving, "Build_Suffix"].values[0]
+	if any(block_engraving_df.loc[block_engraving_df["Block_Engraving"] == block_engraving, "Build_Suffix"]):
+		build_revision_suffix = block_engraving_df.loc[block_engraving_df["Block_Engraving"] == block_engraving, "Build_Suffix"].values[0]
+	else:
+		build_revision_suffix = "unknown"
+
 	build_name_with_suffix = build_name + "_" + build_revision_suffix
 
 	return build_name_with_suffix

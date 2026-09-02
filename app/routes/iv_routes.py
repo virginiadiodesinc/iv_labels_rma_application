@@ -131,8 +131,6 @@ def take_iv():
 			iv_curve["heat_voltage_list"] = ",".join(str(item) for item in heat_voltage_list)
 			iv_curve["temperature_list"] = ",".join(str(item) for item in temperature_list)
 
-		##################################################################
-
 		return render_template("partials/iv-page/run-iv-response.html", iv_curve=iv_curve, iv_data=iv_dict)
 
 	except Exception as e:
@@ -186,12 +184,29 @@ def get_empty_plot():
 	fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_y=True)
 	fig.update_traces(mode='lines+markers')
 
-	# if abs(df["Voltage (mV)"].astype(float).max() - df["Voltage (mV)"].astype(float).min()) < 100:
-	# 	fig.update_xaxes(range=[df["Voltage (mV)"].astype(float).min() - 25, df["Voltage (mV)"].astype(float).min() + 75])
-
 	iv_curve = {} 
 	iv_curve["figure"] = fig.to_html(full_html=False)
 	iv_curve["iv_source_values"] = ""
 	iv_curve["iv_measurement_values"] = ""
 
 	return render_template("partials/iv-page/iv-plot-figure.html", iv_curve=iv_curve)
+
+@iv_bp.post("/adjust_plot_scaling/")
+def adjust_plot_scaling():
+	plot_info = request.form
+
+	voltages = plot_info.get("iv-measurement-values", "").split(",") 
+
+	df = pd.DataFrame({
+		"Voltage (V)": [round(float(point), 2) for point in plot_info.get("iv-measurement-values", "").split(",") if point],
+		"Current (uA)": [round(float(point), 2) for point in plot_info.get("iv-source-values", "").split(",") if point]
+	})
+
+	logarithmic = plot_info.get("plot-scaling-type", "") == "log"
+
+	fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_y=logarithmic)
+	fig.update_traces(mode='lines+markers')
+
+	iv_curve = {"figure": fig.to_html(full_html=False)}
+
+	return render_template("partials/iv-page/iv-plot-figure-without-hidden-inputs.html", iv_curve=iv_curve)

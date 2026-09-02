@@ -96,11 +96,25 @@ def populate_info_from_build_file():
 			{"part_name": mmic_name, "quantity": 1, "part_type": "MMIC", "part_lot": mmic_lot}
 		]
 
+		for part in part_rows[:]:
+			part_name_without_whitespace = re.sub(r"\s+", "", part["part_name"]).lower()
+			if (part_name_without_whitespace == "" or part_name_without_whitespace == "na" or part_name_without_whitespace == "n/a"):
+				part_rows.remove(part)
+
 		note_rows = []
 		for note in build_dict.get("notes", []):
-			note_rows.append({"text": note, "type": Note_Type.GENERIC})
-		note_rows.append({"text": build_dict.get("vbr", ""), "type": Note_Type.GENERIC})
-		note_rows.append({"text": build_dict.get("indium_info"), "type": Note_Type.GENERIC})
+			note_rows.append({"note": note, "type": Note_Type.GENERIC})
+		note_rows.append({"note": build_dict.get("vbr", ""), "type": Note_Type.GENERIC})
+		note_rows.append({"note": build_dict.get("indium_info", ""), "type": Note_Type.GENERIC})
+
+		for note in note_rows[:]:
+			if not note:
+				note_rows.remove(note)
+				continue
+
+			note_without_whitespace = re.sub(r"\s+", "", note["note"]).lower()
+			if (note_without_whitespace == "" or note_without_whitespace == "na" or note_without_whitespace == "n/a"):
+				note_rows.remove(note)
 
 		return render_template("partials/block-forms/build-file-population-response.html", block=build_dict, parts=part_rows, notes=note_rows, populated_build_name=build_dict["full_build_name"])
 

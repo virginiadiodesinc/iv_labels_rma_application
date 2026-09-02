@@ -16,7 +16,12 @@
 			<h3>{{iv_curve.points_per_decade if iv_curve and iv_curve.points_per_decade else ""}} Points per Decade</h3>
 		</div>
 		<div id="iv-plot-display-controls" class="iv-plot-display-controls">
-			<select>
+			<select
+				name="plot-scaling-type"
+				hx-post="/adjust_plot_scaling/"
+				hx-trigger="change"
+				hx-include="#iv-plot"
+				hx-target="#iv-figure">
 				<option value="log" selected>Log</option>
 				<option value="linear">Linear</option>
 			</select>

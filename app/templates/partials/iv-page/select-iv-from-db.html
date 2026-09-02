@@ -8,7 +8,6 @@
         <form id="iv-selection-form">
 
             <div class="scroll-box">
-
                 {% if iv_list %}
                     {% for iv in iv_list %}
                     <label class="path-option">
@@ -23,10 +22,16 @@
                     <br>
                     {% endfor %}
                 {% else %}
-                    <p>Please input a Block Engraving, Serial Number, and possibly a Revision in order to search the database for IV information</p>
+                    {% if missing_forms %}
+                        <p>
+                            Please input at least a Block Engraving and Serial Number in order to search the database for IV information.
+                        </p>
+                    {% else %}
+                        <p>
+                            Sorry, no IVs were found with this Block Information.
+                        </p>
+                    {% endif %}
                 {% endif %}
-
-
             </div>
 
             <div class="button-row">
@@ -57,10 +62,7 @@
                     Delete IV
                 </button>
             {% endif %}
-
             </div>
-
         </form>
-
     </div>
 </div>
