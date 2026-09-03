@@ -26,3 +26,8 @@ def get_iv_and_build_page():
 @page_bp.get("/feedback")
 def get_feedback_page():
 	return render_template("feedback-page.html")
+
+@page_bp.post("/clear_iv_assembly_information/")
+def clear_iv_assembly():
+	tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
+	return render_template("partials/iv-page/iv-assembly-information.html", tags=tag_list)

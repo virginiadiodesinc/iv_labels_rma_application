@@ -11,6 +11,17 @@ from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, IV_Points, Po
 from app.db import queries
 
 
+def get_all_block_revisions(canonical: dict):
+    block_engraving = canonical.get("block_engraving")
+    block_serial_number = canonical.get("block_serial_number")
+    kwargs = {"block_engraving": block_engraving, "block_serial_number": block_serial_number}
+
+    block_revision_entries = queries.get_table_entries(db_session, Build_Info, **kwargs)
+    revision_letters = []
+    for entry in block_revision_entries:
+        revision_letters.append(entry.block_revision)
+    return revision_letters
+
 def stage_upsert_build_info(canonical: dict, **extra_columns):
     """extra_columns is for things that aren't part of the form-sourced
     registry at all -- e.g. block_file_path, which is only known after

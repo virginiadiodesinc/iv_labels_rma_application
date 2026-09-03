@@ -557,3 +557,11 @@ summary :is(h1, h2, h3, h4, h5, h6) {
 summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 	text-align: center;
 }
+
+.block-label {
+	display: block;
+}
+
+.block-input {
+	display: block;
+}

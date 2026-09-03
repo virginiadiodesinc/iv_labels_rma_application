@@ -46,6 +46,15 @@
 					value="{{block.block_revision if block and block.block_revision else ''}}"
 				>
 			</td>
+			<td id="revision-check-cell">
+				<button
+					hx-post="/check_block_revisions/"
+					hx-include="#block-info"
+					hx-target="#generic-popup"
+					hx-swap="outerHTML">	
+					Check Revisions in DB
+				</button>
+			</td>
 		</tr>
 	</table>
 </form>

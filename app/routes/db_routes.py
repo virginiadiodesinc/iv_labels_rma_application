@@ -417,3 +417,34 @@ def populate_iv_from_db():
 @db_bp.post("/cancel_generic_dialog/")
 def cancel_generic_dialog():
     return '<div id="generic-popup"></div>', 200
+
+
+@db_bp.post("/check_block_revisions/")
+def check_block_revisions():
+    canonical = fr.canonical_from_form(request.form)
+    missing_forms = not (canonical.get("block_engraving", "") and canonical.get("block_serial_number", "")) 
+    revision_letter_list = db_service.get_all_block_revisions(canonical)
+    
+    return render_template("partials/generic/revision-list-dialog.html", revision_letter_list=revision_letter_list, missing_forms=missing_forms)
+
+
+@db_bp.post("/select_block_revision_for_form/")
+def select_block_revision_for_form():
+    print(request.form)
+    letter = request.form.get("selected-letter", "")
+    print(letter)
+
+    revision_letter_input = f'''<input  
+                            type="text" 
+                            id="block-revision-input" 
+                            name="block-revision-input"
+                            oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+                            maxlength="2"
+                            size="5"
+                            value="{letter}"
+                            hx-swap-oob="true"
+                        >
+                        '<div id="generic-popup" hx-swap-oob="true"></div>'
+                        '''
+
+    return revision_letter_input, 200

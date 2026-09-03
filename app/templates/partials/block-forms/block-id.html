@@ -35,8 +35,9 @@
 		</tr>
 		<tr>
 			<td>
-				<label for="block-revision-input">BLOCK REVISION:</label>
+				<label for="block-revision-input" class="block-label">BLOCK REVISION:</label>
 				<input 
+					class="block-input"
 					type="text" 
 					id="block-revision-input" 
 					name="block-revision-input"
@@ -45,6 +46,15 @@
 					size="5"
 					value="{{block.block_revision if block and block.block_revision else ''}}"
 				>
+			</td>
+			<td id="revision-check-cell">
+				<button
+					hx-post="/check_block_revisions"
+					hx-include="#block-info"
+					hx-target="#generic-popup"
+					hx-swap="outerHTML">	
+					Check Revisions in DB
+				</button>
 			</td>
 		</tr>
 	</table>
@@ -55,8 +65,7 @@
 	hx-post="/populate_block_info"
 	hx-include="#block-info"
 	hx-target="#block-forms-container"
-	hx-swap="innerHTML"
->	
+	hx-swap="innerHTML">	
 	Populate Block/Build Information
 </button>
 
@@ -64,7 +73,6 @@
 	hx-post="/import_iv_identifiers_to_block/"
 	hx-include="#iv-build-info-container"
 	hx-target="#block-info"
-	hx-swap="innerHTML"
->
-Get Block Identifiers from IV Side
+	hx-swap="innerHTML">
+	Get Block Identifiers from IV Side
 </button>
