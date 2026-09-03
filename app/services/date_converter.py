@@ -1,5 +1,13 @@
 from datetime import datetime
+from pathlib import Path
+import re
 
+def labview_date_to_iso_with_modified_date_fallback(labview_date, file_path):
+	if labview_date_to_iso(labview_date) == False:
+		fallback_date = datetime.fromtimestamp(Path(file_path).stat().st_mtime).strftime("%Y-%m-%d")
+		return fallback_date
+	else:
+		return labview_date_to_iso(labview_date)
 
 def labview_date_to_iso(labview_date):
 	"""Converts a date from LabView format to ISO format
@@ -12,8 +20,11 @@ def labview_date_to_iso(labview_date):
 	"""
 	if len(labview_date) < 6:
 		return ""
-	return (datetime.strptime(labview_date, "%m/%d/%Y").strftime("%Y-%m-%d"))
-
+	try:
+		labview_date = re.sub(r"\s+", "", labview_date)
+		return (datetime.strptime(labview_date, "%m/%d/%Y").strftime("%Y-%m-%d"))
+	except Exception as e:
+		return False
 
 def iso_date_to_labview(iso_date):
 	"""Converts a date from ISO format to LabView format

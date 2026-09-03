@@ -46,7 +46,7 @@ def convert_build_file(file):
 	file_content = file.read()
 	lines = file_content.splitlines()
 	build_info = {}
-	file_name = file.name
+	file_name = file.name.strip()
 	file_name = file_name.replace(".txt", "")
 
 	build_name = file_name.split(os.sep)[-1].split("_")[0].upper()
@@ -61,6 +61,7 @@ def convert_build_file(file):
 		build_rev_letter = build_rev_letter.upper()
 
 	build_info["full_build_name"] = build_name
+	build_info["notes"] = []
 
 	for index, line in enumerate(lines):
 		if line.isspace() or line == "":
@@ -80,7 +81,7 @@ def convert_build_file(file):
 		# THIRD LINE: Inspection Date
 		if index == 2:
 			split_line = line.split()
-			build_info["inspection_date"] = dc.labview_date_to_iso(split_line[0])
+			build_info["inspection_date"] = dc.labview_date_to_iso_with_modified_date_fallback(split_line[0], file.name)
 		
 		# FOURTH LINE: Inspector Initials
 		if index == 3:
@@ -90,7 +91,7 @@ def convert_build_file(file):
 		# FIFTH LINE: PB1 Date
 		if index == 4:
 			split_line = line.split()
-			build_info["pb1_date"] = dc.labview_date_to_iso(split_line[0])
+			build_info["pb1_date"] = dc.labview_date_to_iso_with_modified_date_fallback(split_line[0], file.name)
 
 		# SIXTH LINE: PB1 Initials, PB2 Build Name (optional), PB2 Date (optional), 
 		# PB2 Initials (optional), PB2 Pass/Fail (optional), PB2 Bond Pads (optional),
@@ -101,7 +102,7 @@ def convert_build_file(file):
 			if len(split_line) > 1:
 				build_info["pb2_build_name"] = split_line[1]
 			if len(split_line) > 2:
-				build_info["pb2_date"] = dc.labview_date_to_iso(split_line[2])
+				build_info["pb2_date"] = dc.labview_date_to_iso_with_modified_date_fallback(split_line[2], file.name)
 			if len(split_line) > 3:
 				build_info["pb2_initials"] = split_line[3]
 			if len(split_line) > 4:
@@ -128,7 +129,7 @@ def convert_build_file(file):
 
 		# TENTH LINE: Build Date
 		if index == 9:
-			build_info["full_build_date"] = dc.labview_date_to_iso(line)
+			build_info["full_build_date"] = dc.labview_date_to_iso_with_modified_date_fallback(line, file.name)
 
 		# ELEVENTH LINE: Circuit 1
 		if index == 10:
@@ -152,7 +153,6 @@ def convert_build_file(file):
 
 		# SIXTEENTH LINE: Notes (optional)
 		if index == 15:
-			build_info["notes"] = []
 			if len(line) > 0:
 				build_info["notes"].append(line)
 
@@ -178,7 +178,7 @@ def convert_build_file(file):
 
 		# TWENTY-SECOND LINE: Build Date Again (optional)
 		if index == 21:
-			build_info["full_build_date_again"] = dc.labview_date_to_iso(line)
+			build_info["full_build_date_again"] = dc.labview_date_to_iso_with_modified_date_fallback(line, file.name)
 
 		# TWENTY-THIRD LINE: Circuit 2 (optional)
 		if index == 22:

@@ -63,6 +63,7 @@ def _handle_build_save(route_name, red_flag_checks, yellow_flag_checks, orchestr
 
     yellow_flags = vyf.check_yellow_flags(canonical, yellow_flag_checks)
     yellow_flags_found = vyf.any_flag_raised(yellow_flags)
+    print("YELLOW FLAGS? ", yellow_flags_found)
     if not confirmed:
         return render_template(
             "partials/generic/save-confirmation-dialog.html",

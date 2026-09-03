@@ -174,7 +174,6 @@ document.addEventListener("htmx:afterSwap", function (event) {
         if (!target || target.id !== "generic-popup") {
         return;
     }
-    
     const popup = document.getElementById("generic-popup");
 
     const yellowFlagsFound = popup.dataset.yellowFlagsFound === "true";

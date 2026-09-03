@@ -1,0 +1,27 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Seed newest template of Build Files",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.seed_build_files_post_template_change",
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Seed newest template of Block Files",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.seed_block_files_post_template_change",
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+	]
+}

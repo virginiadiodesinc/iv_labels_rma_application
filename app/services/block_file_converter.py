@@ -38,7 +38,7 @@ def convert_block_file(file):
 		# THIRD LINE: Inspection Date
 		if index == 2:
 			split_line = line.split()
-			block_info["inspection_date"] = dc.labview_date_to_iso(split_line[0])
+			block_info["inspection_date"] = dc.labview_date_to_iso_with_modified_date_fallback(split_line[0], file.name)
 		
 		# FOURTH LINE: Inspector Initials
 		if index == 3:
@@ -48,7 +48,7 @@ def convert_block_file(file):
 		# FIFTH LINE: PB1 Date
 		if index == 4:
 			split_line = line.split()
-			block_info["pb1_date"] = dc.labview_date_to_iso(split_line[0])
+			block_info["pb1_date"] = dc.labview_date_to_iso_with_modified_date_fallback(split_line[0], file.name)
 
 		# SIXTH LINE: PB1 Initials, PB2 Build Name (optional), PB2 Date (optional), 
 		# PB2 Initials (optional), PB2 Pass/Fail (optional), PB2 Bond Pads (optional),
@@ -59,7 +59,7 @@ def convert_block_file(file):
 			if len(split_line) > 1:
 				block_info["pb2_build_name"] = split_line[1]
 			if len(split_line) > 2:
-				block_info["pb2_date"] = dc.labview_date_to_iso(split_line[2])
+				block_info["pb2_date"] = dc.labview_date_to_iso_with_modified_date_fallback(split_line[2], file.name)
 			if len(split_line) > 3:
 				block_info["pb2_initials"] = split_line[3]
 			if len(split_line) > 4:

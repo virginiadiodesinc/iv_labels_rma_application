@@ -1,7 +1,7 @@
 <div 
     id="generic-popup"
     class="modal-overlay"
-    data-yellow-flags-found="{{ yellow_flags_found | lower }}"
+    data-yellow-flags-found="{{ yellow_flags_found | lower if yellow_flags_found else false}}"
 >
     <div class="modal">
 
