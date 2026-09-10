@@ -81,6 +81,9 @@ class IV_Info(Base):
 	temperature = Column(Float)
 	iv_file_path = Column(String, nullable=False)
 	heat_file_path = Column(String)
+	voltage_up_mv = Column(String)
+	voltage_down_mv = Column(String)
+	current_ua = Column(String)
 
 class IV_Points(Base):
 	__tablename__ = "iv_points"

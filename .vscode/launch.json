@@ -23,5 +23,93 @@
 				"PYTHONPATH": "${workspaceFolder}"
 			}
 		},
+		{
+			"name": "Parse Block Files",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.parse_block_files",
+			"args": ["--force"],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Transform Block Records",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.transform_block_records",
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Seed Block Info",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.seed_block_info",
+			// "args": [
+			// 	"--dry-run", "--limit", "20"
+			// ],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Parse Build Files",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.parse_build_files",
+			"args": ["--force"],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+				{
+			"name": "Transform Build Records",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.transform_build_records",
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Seed Build Info",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.seed_build_info",
+			// "args": [
+			// 	"--dry-run", "--limit", "20"
+			// ],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Move IV Columns",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.iv_info_iv_points_fold",
+			// "args": [
+			// 	"--dry-run", "--limit", "20"
+			// ],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
 	]
 }

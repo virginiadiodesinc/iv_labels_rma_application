@@ -48,7 +48,7 @@ def separate_part_and_lot(part_and_lot_text):
 				part_full_text = part_full_text[:-1]
 
 		if len(lot_full_text) > 1:
-			while not lot_full_text[0].isalnum():
+			while lot_full_text and not lot_full_text[0].isalnum():
 				lot_full_text = lot_full_text[1:]
 
 			if len(lot_full_text.split()) > 1:
