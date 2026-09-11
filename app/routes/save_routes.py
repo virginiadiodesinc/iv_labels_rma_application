@@ -152,6 +152,7 @@ def save_build_info():
 @save_bp.post("/save_iv_info/")
 def save_iv_info():
     canonical = fr.canonical_from_form(request.form)
+    print(canonical)
     confirmed = request.form.get("confirmed") == "true"
 
     iv_parts = parts_service.iv_parts_from_form(request.form)

@@ -321,12 +321,13 @@ def populate_iv_from_db():
         for column in iv.__table__.columns
     }
 
-    build_name = Path(iv_info_dict['iv_file_path']).stem.split("_")[0]
-    iv_curve_points = get_table_entries(db_session, IV_Points, iv_id=iv_info_dict['iv_id'])
+    print("DICT: ", iv_info_dict)
 
-    source_values = pp.clean_string_or_list_values(iv_curve_points[0].current_ua, conversion_factor=-6)
-    measure_values_up = pp.clean_string_or_list_values(iv_curve_points[0].voltage_up_mv, conversion_factor=-3)
-    measure_values_down = pp.clean_string_or_list_values(iv_curve_points[0].voltage_down_mv, conversion_factor=-3)
+    build_name = Path(iv_info_dict['iv_file_path']).stem.split("_")[0]
+
+    source_values = pp.clean_string_or_list_values(iv_info_dict['current_ua'], conversion_factor=-6)
+    measure_values_up = pp.clean_string_or_list_values(iv_info_dict['voltage_up_mv'], conversion_factor=-3)
+    measure_values_down = pp.clean_string_or_list_values(iv_info_dict['voltage_down_mv'], conversion_factor=-3)
 
     polarity_symbol = "+" if iv_info_dict["polarity"].value == "positive" else "-"
 
@@ -383,13 +384,14 @@ def populate_iv_from_db():
         "temperature": iv_info_dict["temperature"],
         "additional_info": iv_info_dict["additional_information"],
         "points_per_decade": iv_info_dict["points_per_decade"],
-        "build_name": build_name
+        "build_name": build_name,
+        "polarity": polarity_symbol
     }
 
     full_iv_dict = {**clean_process_dict, **iv_population_dict}
 
     df = pd.DataFrame({
-            "Current (uA)": source_values,
+            "Current (uA)": iv_info_dict['current_ua'].split(','),
             "Voltage (V)": average_voltage_values
         })
 
@@ -398,13 +400,16 @@ def populate_iv_from_db():
 
     iv_curve = {} 
     iv_curve["figure"] = fig.to_html(full_html=False)
-    iv_curve["iv_source_values"] = ",".join(str(value) for value in source_values)
+    iv_curve["iv_source_values"] = ",".join(str(value) for value in iv_info_dict['current_ua'].split(','))
     iv_curve["iv_measurement_values"] = ",".join(str(value) for value in average_voltage_values)
-    iv_curve["iv_voltage_up"] = ",".join(str(value) for value in measure_values_up)
-    iv_curve["iv_voltage_down"] = ",".join(str(value) for value in measure_values_down)
+    iv_curve["iv_voltage_up"] = ",".join(str(value) for value in iv_info_dict['voltage_up_mv'].split(','))
+    iv_curve["iv_voltage_down"] = ",".join(str(value) for value in iv_info_dict['voltage_down_mv'].split(','))
     iv_curve["points_per_decade"] = iv_info_dict["points_per_decade"]
     iv_curve["polarity"] = polarity_symbol
 
+    iv_curve_copy = iv_curve.copy()
+    iv_curve_copy["figure"] = None
+    print(iv_curve_copy)
 
     tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
 

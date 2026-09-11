@@ -43,13 +43,6 @@ def delete_iv_info(iv_id) -> DeleteResult:
         return DeleteResult(success=False, failure_cause="db iv info", error=e)
 
     try:
-        db_service.stage_delete_iv_points(iv_id)
-    except Exception as e:
-        traceback.print_exc()
-        db_service.roll_back_db_changes()
-        return DeleteResult(success=False, failure_cause="db iv points", error=e)
-
-    try:
         if entry.iv_file_path:
             file_service.delete_file(entry.iv_file_path)
     except Exception as e:

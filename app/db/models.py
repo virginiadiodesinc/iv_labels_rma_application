@@ -85,14 +85,6 @@ class IV_Info(Base):
 	voltage_down_mv = Column(String)
 	current_ua = Column(String)
 
-class IV_Points(Base):
-	__tablename__ = "iv_points"
-	iv_id = Column(Integer, ForeignKey("iv_info.iv_id"), nullable=False)
-	point_id = Column(Integer, primary_key=True, autoincrement=True)
-	voltage_up_mv = Column(String, nullable=False)
-	voltage_down_mv = Column(String, nullable=False)
-	current_ua = Column(String, nullable=False)
-
 class Note_Type(enum.Enum):
 	GENERIC = "generic"
 	CURRENT_TEST = "current_test"

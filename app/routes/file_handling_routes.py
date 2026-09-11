@@ -169,6 +169,10 @@ def populate_info_from_iv_file():
 		iv_curve["points_per_decade"] = iv_dict["points_per_decade"]
 		iv_curve["polarity"] = iv_dict["polarity"]
 
+		iv_curve_copy = iv_curve.copy()
+		iv_curve_copy["figure"] = None
+		print(iv_curve_copy)
+
 
 		current_list = pp.clean_string_or_list_values(iv_dict["current"], conversion_factor = -6)
 		voltage_up_list = pp.clean_string_or_list_values(iv_dict["voltage_up"], conversion_factor = -3)

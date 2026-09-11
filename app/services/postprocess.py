@@ -44,6 +44,9 @@ def convert_keithley_string_to_list(keithley_string):
     return keithley_list
 
 def calculate_iv_parameters(current_list, voltage_up_list, voltage_down_list):
+    print("current_list: ", current_list)
+    print("voltage_up_list: ", voltage_up_list)
+    print("voltage_down_list: ", voltage_down_list)
     # POINTS PER DECADE IS TOTAL NUMBER OF POINTS (- 1) / 4
     points_per_decade = int((len(current_list) - 1) / 4)
 

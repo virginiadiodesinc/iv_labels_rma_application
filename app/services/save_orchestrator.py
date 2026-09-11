@@ -154,13 +154,6 @@ def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list
     canonical["iv_id"] = iv_entry.iv_id
 
     try:
-        db_service.stage_add_iv_points(canonical)
-    except Exception as e:
-        traceback.print_exc()
-        db_service.roll_back_db_changes()
-        return SaveResult(success=False, failure_cause="db iv points", error=e)
-
-    try:
         file_service.save_iv_file(canonical, vup_list, vdown_list, isource_list, iv_file_path)
         iv_entry.iv_file_path = str(iv_file_path)
     except Exception as e:

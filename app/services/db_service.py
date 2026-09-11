@@ -7,7 +7,7 @@ for the field-name mapping instead of hand-listing columns per route.
 
 from app.services import field_registry as fr
 from app.db.database import db_session
-from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, IV_Points, Polarity
+from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity
 from app.db import queries
 
 
@@ -103,7 +103,6 @@ def stage_upsert_iv_info(canonical: dict, iv_file_path: str) -> object:
 
     if existing:
         entry = existing[0]
-        stage_delete_iv_points(entry.iv_id)  # same-file call, unqualified
         entry = queries.update_table_entry(db_session, IV_Info, entry.iv_id, **kwargs)
     else:
         entry = queries.add_table_entry(db_session, IV_Info, **kwargs)

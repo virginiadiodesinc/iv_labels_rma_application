@@ -154,19 +154,19 @@ FIELDS: list[FieldSpec] = [
     # these are literally strings of the entire list of values
     # We have little to no interest in storing them point by point
     # So this may be folded into the IV_Info table later too.
-    FieldSpec("voltage_up_string", Section.IV_PARAMETERS, str, db_model="IV_Points", db_column="voltage_up_mv", form_name="iv-voltage-up"),
-    FieldSpec("voltage_down_string", Section.IV_PARAMETERS, str, db_model="IV_Points", db_column="voltage_down_mv", form_name="iv-voltage-down"),
+    FieldSpec("voltage_up_string", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="voltage_up_mv", form_name="iv-voltage-up"),
+    FieldSpec("voltage_down_string", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="voltage_down_mv", form_name="iv-voltage-down"),
     # voltage_average_string: no obvious source field yet -- "iv-measurement-values"
     # is a candidate (its values are consistently ~1/1000th of iv-voltage-up/down's,
     # which smells like the unit-conversion question you flagged earlier as
     # deferred) but I don't want to guess the mapping wrong. Confirm before wiring.
-    FieldSpec("voltage_average_string", Section.IV_PARAMETERS, str, db_model="IV_Points"),
-    FieldSpec("current", Section.IV_PARAMETERS, str, db_model="IV_Points", db_column="current_ua", form_name="iv-source-values"),
+    FieldSpec("voltage_average_string", Section.IV_PARAMETERS, str, db_model="IV_Info"),
+    FieldSpec("current", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="current_ua", form_name="iv-source-values"),
     # temperature_string/heat_voltage_string: heat-current-list/heat-voltage-list/
     # temperature-list exist on the form but are all empty in your sample submission
     # (no heat test taken) -- leaving unwired until heat files are actually next up.
-    FieldSpec("temperature_string", Section.IV_PARAMETERS, str, db_model="IV_Points"),
-    FieldSpec("heat_voltage_string", Section.IV_PARAMETERS, str, db_model="IV_Points"),
+    FieldSpec("temperature_string", Section.IV_PARAMETERS, str, db_model="IV_Info"),
+    FieldSpec("heat_voltage_string", Section.IV_PARAMETERS, str, db_model="IV_Info"),
 
     # --- IV related fields that aren't parameters? ---
     FieldSpec("iv_file_path", Section.IV_PARAMETERS, str, db_model="IV_Info"),

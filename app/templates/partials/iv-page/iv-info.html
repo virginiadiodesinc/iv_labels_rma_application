@@ -122,7 +122,7 @@
 	<table class="heat-test-table">
 		<tr>
 			<td>Pass Heat</td>
-			<td>{{iv_data.pass_heat if iv_data and iv_data.pass_heat is not none else ''}}</td>
+			<td>{{iv_data.pass_heat if iv_data and iv_data.pass_heat is not none else '0.0'}}</td>
 			<td>
 				<input type="hidden" name="pass-heat" value="{{iv_data.pass_heat if iv_data and iv_data.pass_heat is not none else ''}}">
 			</td>
