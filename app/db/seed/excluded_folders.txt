@@ -1,0 +1,44 @@
+# One folder name per line. No quotes, no commas.
+# Lines starting with # (like this one) are ignored -- comment out a name
+# instead of deleting it if you're not sure yet.
+#
+# Example:
+# Scratch
+# Old IV Data
+
+
+.recycle
+.TemporaryItems
+.trash
+2611B KEITHLEY TESTS
+ATest
+Alpha IV program testing
+Assembly Bench Test
+Berhanu
+Boeing aray 1
+CUSTOM
+CUSTOM NGC
+CUSTOM VDI5.1NS
+CXAMP-MMP506
+Heat Data
+Hooded block
+KEK diode mounts
+KH
+KTM-testing
+Kurtz's thermal measurements
+RC1137A
+RC732C test
+RC936D
+Ring Slot Antenna and Tunable Detector
+Si Carrier RC1112D
+TeraProbes
+goali
+kurtz
+pthompson
+root junk
+snd
+test pt
+Xtest
+~test
+dennisfolder
+New Folder

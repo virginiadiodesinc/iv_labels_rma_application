@@ -111,5 +111,73 @@
 				"PYTHONPATH": "${workspaceFolder}"
 			}
 		},
+		{
+			"name": "Parse IV Files",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.parse_iv_files",
+			"args": [
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Transform IV Records",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.transform_iv_records",
+			"args": [
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Seed IV Info",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.seed_iv_info",
+			"args": [
+				// "--dry-run", "--limit", "250"
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Add Seed Indexes",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.add_seed_indexes",
+			"args": [
+				// "--dry-run", "--limit", "250"
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Bootstrap IV Checkpoint",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.bootstrap_iv_checkpoint",
+			"args": [
+				// "--dry-run", "--limit", "250"
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
 	]
 }

@@ -31,4 +31,11 @@ def find_invalid_columns(fields, valid_column_names):
 
 
 def find_missing_required(fields, required_fields):
-    return [key for key in required_fields if not fields.get(key)]
+    """Presence check, NOT truthiness -- transform already drops any field
+    that's genuinely blank (see apply_blank_handling), so by the time a
+    record reaches seed, "key absent" is the only valid signal for
+    "missing." A key that IS present should be trusted as-is, whatever its
+    value -- `not fields.get(key)` would incorrectly flag legitimate 0 /
+    0.0 / False values (e.g. reverse_breakdown_current == 0.0) as missing,
+    since those are falsy in Python but perfectly valid data."""
+    return [key for key in required_fields if key not in fields]
