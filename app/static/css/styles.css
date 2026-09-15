@@ -85,7 +85,7 @@
 .build-page-container {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr) .25fr repeat(3, 1fr) .25fr repeat(7, 1fr) .25fr;
-	grid-template-rows: 5vh 1fr;
+	grid-template-rows: 1fr;
 	justify-content: start;
 	align-content: start;
 }
@@ -93,41 +93,24 @@
 .block-info-container {
 	grid-column-start: 1;
 	grid-column-end: 4;
-	grid-row-start: 2;
-	grid-row-end: 3;
 }
 
 .bom-container {
 	grid-column-start: 5;
 	grid-column-end: 8;
-	grid-row-start: 2;
-	grid-row-end: 3;
 }
 
 .full-build-container {
 	grid-column-start: 9;
 	grid-column-end: 16;
-	grid-row-start: 2;
-	grid-row-end: 3;
 }
-
-.block-file-upload-form {
-	grid-row-start: 1;
-	grid-row-end: 2;
-	grid-column-start: 1;
-	grid-column-end: 8;
-}
-
-.build-file-upload-form {
-	grid-row-start: 1;
-	grid-row-end: 2;
-	grid-column-start: 9;
-	grid-column-end: 16;
-}
-
 
 .actual-bom-list > div > div:nth-child(even) {
 	background-color: lightblue;
+}
+
+.actual-bom-list > div > div:nth-child(odd) {
+	background-color: lightgray;
 }
 
 .bom-list tr:nth-child(even)
@@ -138,6 +121,61 @@
 .bom-sub-list tr:nth-child(even)
 {
 	background-color: lightblue;
+}
+
+.bom-list tr:nth-child(odd)
+{
+	background-color: lightgray;
+}
+
+.bom-sub-list tr:nth-child(odd)
+{
+	background-color: lightgray;
+}
+
+.bom-list-form th {
+	background-color: white;
+}
+
+.bom-list {
+	width: 100%;
+}
+
+.bom-sub-list {
+	width: 100%;
+}
+
+.bom-part-row {
+	width: 100%;
+}
+
+.bom-part-name {
+	width: 80%;
+}
+
+.bom-part-quantity {
+	width: 10%;
+}
+
+.bom-part-check-container {
+	width: 5%;
+	justify-content: center;
+}
+
+.border-container {
+	grid-column-start: 16;
+	grid-column-end: 17;
+	display: flex;
+}
+
+.border-left-side {
+	flex: 1;
+	border-right: solid lightgray;
+}
+
+.border-right-side {
+	flex: 3;
+	background-color: white;
 }
 
 /* .bom-list td:nth-child(even), th:nth-child(even) {
@@ -157,6 +195,7 @@
 	grid-template-rows: auto auto auto auto;
 	justify-content: start;
 	align-content: start;
+	background-color: white;
 }
 
 .iv-gui-controls {
@@ -253,11 +292,24 @@
 	display: flex;
 	flex-direction: column;
 	overflow-x: auto;
+	row-gap: 10px;
 }
 
 .actual-bom-list input {
 	max-width: 100%;
 	box-sizing: border-box;
+}
+
+.actual-parts-container {
+	display: flex;
+	flex-direction: column;
+	row-gap: 10px;
+}
+
+.actual-notes-container {
+	display: flex;
+	flex-direction: column;
+	row-gap: 10px;
 }
 
 input {
@@ -564,4 +616,25 @@ summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 
 .block-input {
 	display: block;
+}
+
+.secret-file-upload-container {
+	display: none;
+	grid-template-columns: 5fr 6fr 6fr;
+}
+
+.block-file-upload-form {
+	grid-column-start: 1;
+	grid-column-end: 2;
+
+}
+
+.build-file-upload-form {
+	grid-column-start: 2;
+	grid-column-end: 3;
+}
+
+.iv-file-upload-form {
+	grid-column-start: 3;
+	grid-column-end: 4;
 }

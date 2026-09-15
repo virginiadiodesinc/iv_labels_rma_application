@@ -168,6 +168,7 @@ function addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound) {
 	}, totalTime);
 };
 
+
 document.addEventListener("htmx:afterSwap", function (event) {
     const target = event.detail.target;
 
@@ -179,4 +180,31 @@ document.addEventListener("htmx:afterSwap", function (event) {
     const yellowFlagsFound = popup.dataset.yellowFlagsFound === "true";
 
     addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound);
+});
+
+function toggleSecretFileUploadContainer(fileUploadContainer, currentDisplayType) {
+	if (currentDisplayType == "none") {
+		fileUploadContainer.style.display = "grid"
+	}
+	else if (currentDisplayType == "grid") {
+		fileUploadContainer.style.display = "none"
+	}
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.body.addEventListener("click", (event) => {
+
+		if (event.ctrlKey) {
+			const target = event.target;
+
+			if (!target || target.id !== "vdi-logo") {
+				return
+			}
+
+			fileUploadContainer = document.getElementById('secret-file-upload-container')
+			
+			currentDisplayType = window.getComputedStyle(fileUploadContainer).display;
+			toggleSecretFileUploadContainer(fileUploadContainer, currentDisplayType);
+		}
+	});
 });

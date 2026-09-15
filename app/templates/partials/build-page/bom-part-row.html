@@ -1,9 +1,10 @@
 <tr class="bom-part-row"
-	data-part-name="{{bom_part["part_name"]}}"
-	data-part-quantity="{{bom_part["quantity"]}}"
-	data-part-type="{{bom_part["category"]}}">
-	<td class="selectable-text">{{bom_part["part_name"]}}</td>
-	<td>
+	data-part-name="{{bom_part['part_name']}}"
+	data-part-quantity="{{bom_part['part_quantity']}}"
+	data-part-type="{{bom_part['part_type']}}">
+	<td class="selectable-text bom-part-name">{{ bom_part["part_name"] }}</td>
+	<td class="bom-part-quantity">{{ bom_part["part_quantity"] | int }}</td>
+	<td class="bom-part-check-container">
 		<input type="checkbox"
 		name="bom-part-check"
 		class="bom-part-check"

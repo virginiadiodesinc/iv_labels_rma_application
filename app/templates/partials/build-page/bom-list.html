@@ -20,14 +20,14 @@
 	Add BOM part(s)
 </button>
 
-<form id="bom-list-form" name="bom-list-form">
+<form id="bom-list-form" name="bom-list-form" class="bom-list-form">
 	<label>Select/Deselect All
 		<input type="checkbox" class="select-all-checkbox"
 		_= "on click set .bom-part-check.checked to my checked">
 	</label>	
 	<details open>
 		<summary></summary>
-		<table id="bom-list" class="bom-list">
+		<table id="bom-list" class="bom-list" colspan="3">
 			<tr>
 				<th id="bom-build-name">{{build_name}}</th>
 			</tr>
@@ -40,9 +40,9 @@
 		{% for sub_part in sub_parts %}
 		<details open>
 		<summary></summary>
-			<table class="bom-sub-list">
+			<table class="bom-sub-list" colspan="3">
 				<tr>
-					<th id="bom_sub-build-name">{{sub_part.name}}</th>
+					<th id="bom-sub-build-name">{{sub_part.name}}</th>
 				</tr>
 				{% for bom_part in sub_part.sub_parts %}
 					{% set bom_index = loop.index0 + sub_part.starting_index %}

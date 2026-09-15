@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="combined-page">
-
-	<div id="build-page-container" class="build-page-container">
+<div id="secret-file-upload-container" class="secret-file-upload-container">
 		{% include "partials/block-forms/block-file-upload.html" %}
 		{% include "partials/block-forms/build-file-upload.html" %}
+		{% include "partials/iv-page/iv-file-upload.html" %}
+</div>
+<div class="combined-page">
+	<div id="build-page-container" class="build-page-container">
 		<div class="block-info-container">
 			<div id="block-forms-container" name="block-forms-container" class="block-forms-container">
 				{% include "partials/block-forms/block-forms-container.html" %}
@@ -17,6 +19,10 @@
 		</div>
 		<div class="full-build-container" id="full-build-container">
 			{% include "partials/block-forms/full-build.html" %}
+		</div>
+		<div class="border-container">
+			<div class="border-left-side"></div>
+			<div class="border-right-side"></div>
 		</div>	
 	</div>
 
