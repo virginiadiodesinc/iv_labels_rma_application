@@ -1,41 +1,7 @@
 {
-  "block_engraving": {
-    "total": 127537,
-    "present": 127536,
-    "blank": 1,
-    "distinct_example_values": [
-      "100R3X2",
-      "100R5X2",
-      "100X2R6",
-      "1027X3R1",
-      "102X2R1",
-      "102X2R2",
-      "1030X3R1",
-      "1030X3R2",
-      "108R1X3",
-      "108X2R1"
-    ]
-  },
-  "pb1_build_name": {
-    "total": 97967,
-    "present": 97967,
-    "blank": 0,
-    "distinct_example_values": [
-      "(25)",
-      "(WR0.65TWG2)",
-      "(WR0.65X3SHMQ)",
-      "(WR1.0X3SHB)",
-      "(WR1.5BC4PFW)",
-      "(WR1.5DH)",
-      "(WR1.5EP90B)",
-      "(WR1.9X3)",
-      "(WR1.9X3)-",
-      "(WR2.2-10T)"
-    ]
-  },
   "block_revision": {
-    "total": 127619,
-    "present": 127619,
+    "total": 263146,
+    "present": 263146,
     "blank": 0,
     "distinct_example_values": [
       "A",
@@ -51,9 +17,9 @@
     ]
   },
   "block_serial_number": {
-    "total": 127619,
-    "present": 127611,
-    "blank": 8,
+    "total": 263146,
+    "present": 263130,
+    "blank": 16,
     "distinct_example_values": [
       "\u0000",
       "(WR0.65",
@@ -68,9 +34,9 @@
     ]
   },
   "inspection_date": {
-    "total": 127522,
-    "present": 127275,
-    "blank": 247,
+    "total": 262971,
+    "present": 262476,
+    "blank": 495,
     "distinct_example_values": [
       "2001-09-07",
       "2002-04-15",
@@ -85,9 +51,9 @@
     ]
   },
   "inspection_initials": {
-    "total": 126178,
-    "present": 126173,
-    "blank": 5,
+    "total": 260426,
+    "present": 260415,
+    "blank": 11,
     "distinct_example_values": [
       "\u0000",
       "1-0",
@@ -101,10 +67,44 @@
       "BDC"
     ]
   },
+  "block_engraving": {
+    "total": 262889,
+    "present": 262887,
+    "blank": 2,
+    "distinct_example_values": [
+      "100R3X2",
+      "100R5X2",
+      "100X2R6",
+      "1027X3R1",
+      "102X2R1",
+      "102X2R2",
+      "1030X3R1",
+      "1030X3R2",
+      "108R1X3",
+      "108X2R1"
+    ]
+  },
+  "pb1_build_name": {
+    "total": 203314,
+    "present": 203314,
+    "blank": 0,
+    "distinct_example_values": [
+      "(25)",
+      "(WR0.65TWG2)",
+      "(WR0.65X3SHMQ)",
+      "(WR1.0X3SHB)",
+      "(WR1.5BC4PFW)",
+      "(WR1.5DH)",
+      "(WR1.5EP90B)",
+      "(WR1.9X3)",
+      "(WR1.9X3)-",
+      "(WR2.2-10T)"
+    ]
+  },
   "pb1_date": {
-    "total": 111080,
-    "present": 111065,
-    "blank": 15,
+    "total": 229681,
+    "present": 229651,
+    "blank": 30,
     "distinct_example_values": [
       "1999-03-04",
       "2002-04-16",
@@ -119,9 +119,9 @@
     ]
   },
   "pb1_initials": {
-    "total": 111448,
-    "present": 98304,
-    "blank": 13144,
+    "total": 230425,
+    "present": 204034,
+    "blank": 26391,
     "distinct_example_values": [
       "\u0000",
       " ??",
@@ -136,9 +136,9 @@
     ]
   },
   "pb2_build_name": {
-    "total": 63470,
-    "present": 10516,
-    "blank": 52954,
+    "total": 130060,
+    "present": 21085,
+    "blank": 108975,
     "distinct_example_values": [
       "-",
       "KPS",
@@ -153,9 +153,9 @@
     ]
   },
   "pb2_date": {
-    "total": 39879,
-    "present": 10467,
-    "blank": 29412,
+    "total": 80975,
+    "present": 20987,
+    "blank": 59988,
     "distinct_example_values": [
       "2002-08-19",
       "2019-10-02",
@@ -170,9 +170,9 @@
     ]
   },
   "pb2_initials": {
-    "total": 39879,
-    "present": 10476,
-    "blank": 29403,
+    "total": 80975,
+    "present": 21005,
+    "blank": 59970,
     "distinct_example_values": [
       " DS",
       " MW",
@@ -187,9 +187,9 @@
     ]
   },
   "pb2_inspection_initials": {
-    "total": 38685,
-    "present": 10468,
-    "blank": 28217,
+    "total": 78595,
+    "present": 20989,
+    "blank": 57606,
     "distinct_example_values": [
       " BXO",
       "36",

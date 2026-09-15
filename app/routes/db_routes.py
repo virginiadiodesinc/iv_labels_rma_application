@@ -321,8 +321,6 @@ def populate_iv_from_db():
         for column in iv.__table__.columns
     }
 
-    print("DICT: ", iv_info_dict)
-
     build_name = Path(iv_info_dict['iv_file_path']).stem.split("_")[0]
 
     source_values = pp.clean_string_or_list_values(iv_info_dict['current_ua'], conversion_factor=-6)
@@ -407,10 +405,6 @@ def populate_iv_from_db():
     iv_curve["points_per_decade"] = iv_info_dict["points_per_decade"]
     iv_curve["polarity"] = polarity_symbol
 
-    iv_curve_copy = iv_curve.copy()
-    iv_curve_copy["figure"] = None
-    print(iv_curve_copy)
-
     tag_list = ["NA", "1", "2", "A", "B", "A1", "A2", "G1", "G2", "G3", "G4", "W"]
 
     diode_lots_list = jb2.get_Lots(full_iv_dict["diode"])
@@ -435,9 +429,7 @@ def check_block_revisions():
 
 @db_bp.post("/select_block_revision_for_form/")
 def select_block_revision_for_form():
-    print(request.form)
     letter = request.form.get("selected-letter", "")
-    print(letter)
 
     revision_letter_input = f'''<input  
                             type="text" 

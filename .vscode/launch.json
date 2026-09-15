@@ -2,33 +2,40 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Seed newest template of Build Files",
-			"type": "debugpy",
-			"request": "launch",
-			"module": "app.db.seed.seed_build_files_post_template_change",
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"PYTHONPATH": "${workspaceFolder}"
-			}
-		},
-		{
-			"name": "Seed newest template of Block Files",
-			"type": "debugpy",
-			"request": "launch",
-			"module": "app.db.seed.seed_block_files_post_template_change",
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"PYTHONPATH": "${workspaceFolder}"
-			}
-		},
-		{
 			"name": "Parse Block Files",
 			"type": "debugpy",
 			"request": "launch",
 			"module": "app.db.seed.parse_block_files",
-			"args": ["--force"],
+			"args": [
+
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Parse Build Files",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.parse_build_files",
+			"args": [
+
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Parse IV Files",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.parse_iv_files",
+			"args": [
+			],
 			"console": "integratedTerminal",
 			"cwd": "${workspaceFolder}",
 			"env": {
@@ -40,6 +47,30 @@
 			"type": "debugpy",
 			"request": "launch",
 			"module": "app.db.seed.transform_block_records",
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Transform Build Records",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.transform_build_records",
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Transform IV Records",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.transform_iv_records",
+			"args": [
+			],
 			"console": "integratedTerminal",
 			"cwd": "${workspaceFolder}",
 			"env": {
@@ -61,29 +92,6 @@
 			}
 		},
 		{
-			"name": "Parse Build Files",
-			"type": "debugpy",
-			"request": "launch",
-			"module": "app.db.seed.parse_build_files",
-			"args": ["--force"],
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"PYTHONPATH": "${workspaceFolder}"
-			}
-		},
-				{
-			"name": "Transform Build Records",
-			"type": "debugpy",
-			"request": "launch",
-			"module": "app.db.seed.transform_build_records",
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"PYTHONPATH": "${workspaceFolder}"
-			}
-		},
-		{
 			"name": "Seed Build Info",
 			"type": "debugpy",
 			"request": "launch",
@@ -98,50 +106,52 @@
 			}
 		},
 		{
-			"name": "Move IV Columns",
-			"type": "debugpy",
-			"request": "launch",
-			"module": "app.db.seed.iv_info_iv_points_fold",
-			// "args": [
-			// 	"--dry-run", "--limit", "20"
-			// ],
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"PYTHONPATH": "${workspaceFolder}"
-			}
-		},
-		{
-			"name": "Parse IV Files",
-			"type": "debugpy",
-			"request": "launch",
-			"module": "app.db.seed.parse_iv_files",
-			"args": [
-			],
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"PYTHONPATH": "${workspaceFolder}"
-			}
-		},
-		{
-			"name": "Transform IV Records",
-			"type": "debugpy",
-			"request": "launch",
-			"module": "app.db.seed.transform_iv_records",
-			"args": [
-			],
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"PYTHONPATH": "${workspaceFolder}"
-			}
-		},
-		{
 			"name": "Seed IV Info",
 			"type": "debugpy",
 			"request": "launch",
 			"module": "app.db.seed.seed_iv_info",
+			"args": [
+				// "--dry-run", "--limit", "250"
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Bootstrap IV Checkpoint",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.bootstrap_iv_checkpoint",
+			"args": [
+				// "--dry-run", "--limit", "250"
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Bootstrap Block Checkpoint",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.bootstrap_block_checkpoint",
+			"args": [
+				// "--dry-run", "--limit", "250"
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Bootstrap Build Checkpoint",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.seed.bootstrap_build_checkpoint",
 			"args": [
 				// "--dry-run", "--limit", "250"
 			],
@@ -166,10 +176,10 @@
 			}
 		},
 		{
-			"name": "Bootstrap IV Checkpoint",
+			"name": "Parse Transform Seed All",
 			"type": "debugpy",
 			"request": "launch",
-			"module": "app.db.seed.bootstrap_iv_checkpoint",
+			"module": "app.db.seed.parse_transform_seed_all",
 			"args": [
 				// "--dry-run", "--limit", "250"
 			],

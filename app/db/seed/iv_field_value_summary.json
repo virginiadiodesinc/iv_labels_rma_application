@@ -1,7 +1,7 @@
 {
   "block_serial_number": {
-    "total": 220864,
-    "present": 220699,
+    "total": 220935,
+    "present": 220770,
     "blank": 165,
     "distinct_example_values": [
       "0-07",
@@ -17,9 +17,9 @@
     ]
   },
   "block_revision": {
-    "total": 220864,
-    "present": 78445,
-    "blank": 142419,
+    "total": 220935,
+    "present": 78491,
+    "blank": 142444,
     "distinct_example_values": [
       "A",
       "B",
@@ -34,9 +34,9 @@
     ]
   },
   "diode": {
-    "total": 220864,
-    "present": 218541,
-    "blank": 2323,
+    "total": 220935,
+    "present": 218609,
+    "blank": 2326,
     "distinct_example_values": [
       "+55OGELCP1B4",
       "0.22LOWERFREQ",
@@ -51,8 +51,8 @@
     ]
   },
   "circuit": {
-    "total": 220864,
-    "present": 218563,
+    "total": 220935,
+    "present": 218634,
     "blank": 2301,
     "distinct_example_values": [
       ",18HPF",
@@ -68,9 +68,9 @@
     ]
   },
   "assembly_number": {
-    "total": 220864,
-    "present": 184680,
-    "blank": 36184,
+    "total": 220935,
+    "present": 184747,
+    "blank": 36188,
     "distinct_example_values": [
       "#1",
       "#118",
@@ -85,8 +85,8 @@
     ]
   },
   "polarity": {
-    "total": 220864,
-    "present": 219595,
+    "total": 220935,
+    "present": 219666,
     "blank": 1269,
     "distinct_example_values": [
       "+",
@@ -94,8 +94,8 @@
     ]
   },
   "block_engraving": {
-    "total": 220864,
-    "present": 220775,
+    "total": 220935,
+    "present": 220846,
     "blank": 89,
     "distinct_example_values": [
       "+",
@@ -111,9 +111,9 @@
     ]
   },
   "additional_information": {
-    "total": 220864,
-    "present": 219508,
-    "blank": 1356,
+    "total": 220935,
+    "present": 219578,
+    "blank": 1357,
     "distinct_example_values": [
       "#1 Test in Block +",
       "#1 Test in Block -",
@@ -128,8 +128,8 @@
     ]
   },
   "iv_date": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "1/1/2020",
@@ -145,8 +145,8 @@
     ]
   },
   "points_per_decade": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0",
@@ -157,8 +157,8 @@
     ]
   },
   "ideality": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "-0.000169",
@@ -174,8 +174,8 @@
     ]
   },
   "saturation_current": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000E+0",
@@ -191,8 +191,8 @@
     ]
   },
   "series_resistance": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "-0.200000",
@@ -208,8 +208,8 @@
     ]
   },
   "mean_squared_error": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000E+0",
@@ -225,8 +225,8 @@
     ]
   },
   "r_squared_error": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.135955",
@@ -242,8 +242,8 @@
     ]
   },
   "hysteresis_standard_deviation": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000",
@@ -259,8 +259,8 @@
     ]
   },
   "hysteresis_mean": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000",
@@ -276,8 +276,8 @@
     ]
   },
   "hysteresis_maximum": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000",
@@ -293,8 +293,8 @@
     ]
   },
   "hysteresis_minimum": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000",
@@ -310,8 +310,8 @@
     ]
   },
   "reverse_breakdown_current": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000",
@@ -327,8 +327,8 @@
     ]
   },
   "reverse_breakdown_voltage": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "0.000000",
@@ -344,8 +344,8 @@
     ]
   },
   "voltage_up_mv": {
-    "total": 220864,
-    "present": 220157,
+    "total": 220935,
+    "present": 220228,
     "blank": 707,
     "distinct_example_values": [
       "0.000000,0.000000,0.000000,0.000000",
@@ -361,8 +361,8 @@
     ]
   },
   "voltage_down_mv": {
-    "total": 220864,
-    "present": 220157,
+    "total": 220935,
+    "present": 220228,
     "blank": 707,
     "distinct_example_values": [
       "0.000000,0.000000,0.000000,0.000000",
@@ -378,8 +378,8 @@
     ]
   },
   "current_ua": {
-    "total": 220864,
-    "present": 220157,
+    "total": 220935,
+    "present": 220228,
     "blank": 707,
     "distinct_example_values": [
       "0.000000,0.000000,0.000000,0.000000",
@@ -395,8 +395,8 @@
     ]
   },
   "diode_lot": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "1002",
@@ -412,8 +412,8 @@
     ]
   },
   "circuit_lot": {
-    "total": 220864,
-    "present": 220864,
+    "total": 220935,
+    "present": 220935,
     "blank": 0,
     "distinct_example_values": [
       "1111",

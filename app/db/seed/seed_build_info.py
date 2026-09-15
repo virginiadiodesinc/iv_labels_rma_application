@@ -27,6 +27,8 @@ from app.db.database import db_session
 from app.db.models import Build_Info, Build_Parts, Notes, Note_Type
 from app.db import queries
 from pathlib import Path
+from collections import defaultdict
+from sqlalchemy import select
 import argparse
 import datetime
 import json
@@ -38,6 +40,7 @@ OUTPUT_DIR = Path(__file__).resolve().parent
 DB_READY_PATH = OUTPUT_DIR / "db_ready_build_records.jsonl"
 SKIPPED_LOG_PATH = OUTPUT_DIR / "seed_build_skipped.jsonl"
 ERROR_LOG_PATH = OUTPUT_DIR / "seed_build_errors.jsonl"
+CHECKPOINT_PATH = OUTPUT_DIR / "seed_build_checkpoint.jsonl"
 
 REQUIRED_FIELDS = ["block_engraving", "block_serial_number", "block_revision"]
 BATCH_SIZE = 100  # smaller than block's 200 -- each build record does more work (info + parts + notes)
@@ -49,6 +52,53 @@ VALID_NOTES_COLUMNS = seed_shared.valid_columns(Notes)
 
 def build_block_id(fields):
     return seed_shared.build_block_id(fields)
+
+
+def load_checkpoint():
+    """(path, mtime)-keyed, same reasoning as seed_iv_info.py -- an edited
+    build file must be reseeded, not skipped forever."""
+    done = {}
+    if CHECKPOINT_PATH.exists():
+        with open(CHECKPOINT_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    entry = json.loads(line)
+                    done[entry["source_path"]] = entry["source_mtime"]
+    return done
+
+
+def already_seeded(checkpoint_done, source_path, source_mtime):
+    prior_mtime = checkpoint_done.get(source_path)
+    return prior_mtime is not None and prior_mtime == source_mtime
+
+
+def append_checkpoint(checkpoint_file, source_path, source_mtime):
+    checkpoint_file.write(json.dumps({"source_path": source_path, "source_mtime": source_mtime}) + "\n")
+    checkpoint_file.flush()
+
+
+def bulk_prefetch(batch):
+    """ONE query each for existing Build_Info / Build_Parts / Notes rows
+    covering the WHOLE batch, replacing 3 round-trip queries PER RECORD
+    with 3 queries per BATCH. Returns (existing_build_ids: set[str],
+    existing_parts_by_block: dict[str, list], existing_notes_by_block: dict[str, list])."""
+    block_ids = [build_block_id(r["fields"]) for r in batch]  # block_id doesn't need date-coerced fields
+
+    existing_build_ids = set()
+    if block_ids:
+        rows = db_session.execute(select(Build_Info.block_id).where(Build_Info.block_id.in_(block_ids))).all()
+        existing_build_ids = {row[0] for row in rows}
+
+    existing_parts_by_block = defaultdict(list)
+    existing_notes_by_block = defaultdict(list)
+    if block_ids:
+        for entry in db_session.execute(select(Build_Parts).where(Build_Parts.block_id.in_(block_ids))).scalars().all():
+            existing_parts_by_block[entry.block_id].append(entry)
+        for entry in db_session.execute(select(Notes).where(Notes.block_id.in_(block_ids))).scalars().all():
+            existing_notes_by_block[entry.block_id].append(entry)
+
+    return existing_build_ids, existing_parts_by_block, existing_notes_by_block
 
 
 def read_db_ready_records():
@@ -108,16 +158,12 @@ def coerce_note(note):
     return coerced
 
 
-def replace_parts_and_notes(block_id, parts, notes):
+def replace_parts_and_notes(block_id, parts, notes, existing_parts, existing_notes):
     """Delete-then-reinsert, matching
-    db_service.stage_replace_build_parts_and_notes exactly, just without
-    needing a `canonical` dict / field_registry -- block_id is already
-    known here."""
-    existing_parts = queries.get_table_entries(db_session, Build_Parts, block_id=block_id)
+    db_service.stage_replace_build_parts_and_notes -- existing_parts /
+    existing_notes are PREFETCHED (bulk_prefetch), not queried here."""
     for entry in existing_parts:
         queries.delete_table_entry(db_session, Build_Parts, entry.instance_id)
-
-    existing_notes = queries.get_table_entries(db_session, Notes, block_id=block_id)
     for entry in existing_notes:
         queries.delete_table_entry(db_session, Notes, entry.note_id)
 
@@ -127,7 +173,7 @@ def replace_parts_and_notes(block_id, parts, notes):
         queries.add_table_entry(db_session, Notes, block_id=block_id, **coerce_note(note))
 
 
-def process_one_record(record, dry_run):
+def process_one_record(record, dry_run, existing_build_ids, existing_parts_by_block, existing_notes_by_block):
     """Upserts Build_Info, then replaces its Build_Parts/Notes wholesale.
     Returns ("added" | "updated" | "would_upsert", block_id)."""
     fields = coerce_dates(record["fields"])
@@ -136,24 +182,40 @@ def process_one_record(record, dry_run):
     if dry_run:
         return "would_upsert", block_id
 
-    existed_before = db_session.get(Build_Info, block_id) is not None
+    existed_before = block_id in existing_build_ids
 
     kwargs = dict(fields)
     kwargs["block_id"] = block_id
     kwargs["build_file_path"] = record["source_path"]  # NEVER block_file_path -- see module docstring
-    queries.upsert_table_entry(db_session, Build_Info, block_id, **kwargs)
 
-    replace_parts_and_notes(block_id, record.get("parts", []), record.get("notes", []))
+    if existed_before:
+        queries.update_table_entry(db_session, Build_Info, block_id, **kwargs)
+    else:
+        queries.add_table_entry(db_session, Build_Info, **kwargs)
+
+    replace_parts_and_notes(
+        block_id,
+        record.get("parts", []),
+        record.get("notes", []),
+        existing_parts_by_block.get(block_id, []),
+        existing_notes_by_block.get(block_id, []),
+    )
 
     return ("updated" if existed_before else "added"), block_id
 
 
-def run_batch(batch, dry_run, error_log):
+def run_batch(batch, dry_run, error_log, checkpoint_file):
     added = updated = errors = 0
+    if dry_run:
+        existing_build_ids, existing_parts_by_block, existing_notes_by_block = set(), {}, {}
+    else:
+        existing_build_ids, existing_parts_by_block, existing_notes_by_block = bulk_prefetch(batch)
 
     try:
         for record in batch:
-            status, block_id = process_one_record(record, dry_run)
+            status, block_id = process_one_record(
+                record, dry_run, existing_build_ids, existing_parts_by_block, existing_notes_by_block
+            )
             if status == "added":
                 added += 1
             elif status == "updated":
@@ -162,6 +224,8 @@ def run_batch(batch, dry_run, error_log):
                 added += 1  # dry-run: lumped together, doesn't distinguish add/update
         if not dry_run:
             queries.commit_db_changes(db_session)
+            for record in batch:
+                append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
         return added, updated, errors
     except Exception:
         if not dry_run:
@@ -169,7 +233,9 @@ def run_batch(batch, dry_run, error_log):
         added = updated = errors = 0
         for record in batch:
             try:
-                status, block_id = process_one_record(record, dry_run)
+                status, block_id = process_one_record(
+                    record, dry_run, existing_build_ids, existing_parts_by_block, existing_notes_by_block
+                )
                 if status == "added":
                     added += 1
                 elif status == "updated":
@@ -178,6 +244,7 @@ def run_batch(batch, dry_run, error_log):
                     added += 1
                 if not dry_run:
                     queries.commit_db_changes(db_session)
+                    append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
             except Exception as row_error:
                 if not dry_run:
                     queries.roll_back_db_changes(db_session)
@@ -195,12 +262,26 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--force", action="store_true", help="Ignore checkpoint, reprocess everything")
     args = parser.parse_args()
 
     if not DB_READY_PATH.exists():
         raise SystemExit(f"{DB_READY_PATH} not found -- run transform_build_records.py first.")
 
+    checkpoint_done = set() if args.force else load_checkpoint()
+    if args.force and CHECKPOINT_PATH.exists():
+        CHECKPOINT_PATH.unlink()
+
     all_records = list(read_db_ready_records())
+
+    if checkpoint_done:
+        before_count = len(all_records)
+        all_records = [
+            r for r in all_records
+            if not already_seeded(checkpoint_done, r["source_path"], r["source_mtime"])
+        ]
+        print(f"Skipping {before_count - len(all_records)} record(s) already seeded per checkpoint.")
+
     if args.limit is not None:
         all_records = all_records[: args.limit]
 
@@ -214,10 +295,11 @@ def main():
 
     total_added = total_updated = total_errors = 0
 
-    with open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log:
+    with open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log, \
+         open(CHECKPOINT_PATH, "a", encoding="utf-8") as checkpoint_file:
         for i in range(0, len(clean_records), BATCH_SIZE):
             batch = clean_records[i : i + BATCH_SIZE]
-            added, updated, errors = run_batch(batch, args.dry_run, error_log)
+            added, updated, errors = run_batch(batch, args.dry_run, error_log, checkpoint_file)
             total_added += added
             total_updated += updated
             total_errors += errors

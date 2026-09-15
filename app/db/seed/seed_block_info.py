@@ -45,32 +45,65 @@ from app.db.database import db_session
 from app.db.models import Build_Info
 from app.db import queries
 from pathlib import Path
+from sqlalchemy import select
 import argparse
 import datetime
 import json
 
 from app.db.seed import block_key_mapping as mapping
+from app.db.seed import seed_shared
 
 OUTPUT_DIR = Path(__file__).resolve().parent
 DB_READY_PATH = OUTPUT_DIR / "db_ready_block_records.jsonl"
 SKIPPED_LOG_PATH = OUTPUT_DIR / "seed_block_skipped.jsonl"
 ERROR_LOG_PATH = OUTPUT_DIR / "seed_block_errors.jsonl"
+CHECKPOINT_PATH = OUTPUT_DIR / "seed_block_checkpoint.jsonl"
 
 REQUIRED_FIELDS = ["block_engraving", "block_serial_number", "block_revision"]
 BATCH_SIZE = 200
 
-VALID_BUILD_INFO_COLUMNS = {c.name for c in Build_Info.__table__.columns}
+VALID_BUILD_INFO_COLUMNS = seed_shared.valid_columns(Build_Info)
 
 
 def build_block_id(fields):
-    """
-    PLACEHOLDER -- replace with the real field_registry.build_block_id()
-    logic before running for real. Whatever this returns MUST exactly match
-    what the live app computes for the same engraving/serial/revision, since
-    it's the primary key other tables (and the future build-file seed) key
-    off of.
-    """
-    return f"{fields['block_engraving']} {fields['block_serial_number']} {fields['block_revision']}"
+    """Delegates to seed_shared -- see that module for why this can't be a
+    local copy. PLACEHOLDER until the real field_registry.build_block_id()
+    logic replaces seed_shared.build_block_id()."""
+    return seed_shared.build_block_id(fields)
+
+
+def load_checkpoint():
+    """(path, mtime)-keyed, same reasoning as seed_iv_info.py."""
+    done = {}
+    if CHECKPOINT_PATH.exists():
+        with open(CHECKPOINT_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    entry = json.loads(line)
+                    done[entry["source_path"]] = entry["source_mtime"]
+    return done
+
+
+def already_seeded(checkpoint_done, source_path, source_mtime):
+    prior_mtime = checkpoint_done.get(source_path)
+    return prior_mtime is not None and prior_mtime == source_mtime
+
+
+def append_checkpoint(checkpoint_file, source_path, source_mtime):
+    checkpoint_file.write(json.dumps({"source_path": source_path, "source_mtime": source_mtime}) + "\n")
+    checkpoint_file.flush()
+
+
+def bulk_prefetch(batch):
+    """ONE query for existing block_ids covering the WHOLE batch, instead
+    of one db_session.get() per record."""
+    block_ids = [build_block_id(r["fields"]) for r in batch]
+    existing = set()
+    if block_ids:
+        rows = db_session.execute(select(Build_Info.block_id).where(Build_Info.block_id.in_(block_ids))).all()
+        existing = {row[0] for row in rows}
+    return existing
 
 
 def read_db_ready_records():
@@ -81,14 +114,6 @@ def read_db_ready_records():
                 yield json.loads(line)
 
 
-def find_invalid_columns(fields):
-    return [key for key in fields if key not in VALID_BUILD_INFO_COLUMNS]
-
-
-def find_missing_required(fields):
-    return [key for key in REQUIRED_FIELDS if not fields.get(key)]
-
-
 def preflight_check(records):
     """Scans ALL records for column-name problems before any DB work
     happens. Returns (clean_records, problem_records)."""
@@ -96,8 +121,8 @@ def preflight_check(records):
     problems = []
     for record in records:
         fields = record["fields"]
-        invalid_columns = find_invalid_columns(fields)
-        missing_required = find_missing_required(fields)
+        invalid_columns = seed_shared.find_invalid_columns(fields, VALID_BUILD_INFO_COLUMNS)
+        missing_required = seed_shared.find_missing_required(fields, REQUIRED_FIELDS)
         if invalid_columns or missing_required:
             problems.append({
                 "source_path": record["source_path"],
@@ -125,16 +150,15 @@ def coerce_dates(fields):
     return coerced
 
 
-def insert_one(record, dry_run):
+def insert_one(record, dry_run, existing_block_ids):
     fields = coerce_dates(record["fields"])
     block_id = build_block_id(fields)
 
-    existing = None if dry_run else db_session.get(Build_Info, block_id)
-    if existing:
-        return "skipped", block_id
-
     if dry_run:
         return "would_add", block_id
+
+    if block_id in existing_block_ids:
+        return "skipped", block_id
 
     queries.add_table_entry(
         db_session,
@@ -146,14 +170,15 @@ def insert_one(record, dry_run):
     return "added", block_id
 
 
-def run_batch(batch, dry_run, skipped_log, error_log):
+def run_batch(batch, dry_run, skipped_log, error_log, checkpoint_file):
     """Attempts the whole batch, commits once on success. On failure, rolls
     back and retries row-by-row so only the true offender gets logged."""
     added = skipped = errors = 0
+    existing_block_ids = set() if dry_run else bulk_prefetch(batch)
 
     try:
         for record in batch:
-            status, block_id = insert_one(record, dry_run)
+            status, block_id = insert_one(record, dry_run, existing_block_ids)
             if status in ("added", "would_add"):
                 added += 1
             elif status == "skipped":
@@ -161,6 +186,8 @@ def run_batch(batch, dry_run, skipped_log, error_log):
                 skipped_log.write(json.dumps({"block_id": block_id, "source_path": record["source_path"]}) + "\n")
         if not dry_run:
             queries.commit_db_changes(db_session)
+            for record in batch:
+                append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
         return added, skipped, errors
     except Exception:
         if not dry_run:
@@ -169,14 +196,17 @@ def run_batch(batch, dry_run, skipped_log, error_log):
         added = skipped = errors = 0
         for record in batch:
             try:
-                status, block_id = insert_one(record, dry_run)
+                status, block_id = insert_one(record, dry_run, existing_block_ids)
                 if status in ("added", "would_add"):
                     added += 1
                     if not dry_run:
                         queries.commit_db_changes(db_session)
+                        append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
                 elif status == "skipped":
                     skipped += 1
                     skipped_log.write(json.dumps({"block_id": block_id, "source_path": record["source_path"]}) + "\n")
+                    if not dry_run:
+                        append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
             except Exception as row_error:
                 if not dry_run:
                     queries.roll_back_db_changes(db_session)
@@ -194,12 +224,26 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="Compute block_ids and report what would happen, without touching the DB")
     parser.add_argument("--limit", type=int, default=None, help="Only process the first N records (for testing)")
+    parser.add_argument("--force", action="store_true", help="Ignore checkpoint, reprocess everything")
     args = parser.parse_args()
 
     if not DB_READY_PATH.exists():
         raise SystemExit(f"{DB_READY_PATH} not found -- run transform_block_records.py first.")
 
+    checkpoint_done = set() if args.force else load_checkpoint()
+    if args.force and CHECKPOINT_PATH.exists():
+        CHECKPOINT_PATH.unlink()
+
     all_records = list(read_db_ready_records())
+
+    if checkpoint_done:
+        before_count = len(all_records)
+        all_records = [
+            r for r in all_records
+            if not already_seeded(checkpoint_done, r["source_path"], r["source_mtime"])
+        ]
+        print(f"Skipping {before_count - len(all_records)} record(s) already seeded per checkpoint.")
+
     if args.limit is not None:
         all_records = all_records[: args.limit]
 
@@ -217,11 +261,12 @@ def main():
     total_added = total_skipped = total_errors = 0
 
     with open(SKIPPED_LOG_PATH, "w", encoding="utf-8") as skipped_log, \
-         open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log:
+         open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log, \
+         open(CHECKPOINT_PATH, "a", encoding="utf-8") as checkpoint_file:
 
         for i in range(0, len(clean_records), BATCH_SIZE):
             batch = clean_records[i : i + BATCH_SIZE]
-            added, skipped, errors = run_batch(batch, args.dry_run, skipped_log, error_log)
+            added, skipped, errors = run_batch(batch, args.dry_run, skipped_log, error_log, checkpoint_file)
             total_added += added
             total_skipped += skipped
             total_errors += errors
