@@ -33,7 +33,7 @@ import logging
 import time
 
 BLOCK_FILE_DIRECTORY = Path("K:/block")
-OUTPUT_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 RAW_RECORDS_PATH = OUTPUT_DIR / "raw_block_records.jsonl"
 ERROR_RECORDS_PATH = OUTPUT_DIR / "raw_block_errors.jsonl"
 CHECKPOINT_PATH = OUTPUT_DIR / "block_parse_checkpoint.jsonl"

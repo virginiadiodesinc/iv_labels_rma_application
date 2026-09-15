@@ -44,7 +44,7 @@ import json
 from app.db.seed import iv_key_mapping as mapping
 from app.db.seed import seed_shared
 
-OUTPUT_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 DB_READY_PATH = OUTPUT_DIR / "db_ready_iv_records.jsonl"
 ERROR_LOG_PATH = OUTPUT_DIR / "seed_iv_errors.jsonl"
 MISSING_BUILD_INFO_LOG_PATH = OUTPUT_DIR / "seed_iv_missing_build_info.jsonl"

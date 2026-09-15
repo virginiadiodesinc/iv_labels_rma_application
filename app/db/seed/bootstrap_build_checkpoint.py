@@ -24,7 +24,7 @@ from pathlib import Path
 from sqlalchemy import select
 import json
 
-OUTPUT_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 DB_READY_PATH = OUTPUT_DIR / "db_ready_build_records.jsonl"
 CHECKPOINT_PATH = OUTPUT_DIR / "seed_build_checkpoint.jsonl"
 

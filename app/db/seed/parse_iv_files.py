@@ -36,7 +36,7 @@ import time
 from app.db.seed import iv_folder_classification as folder_config
 
 IV_FILE_DIRECTORY = Path("I:/")
-OUTPUT_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 RAW_RECORDS_PATH = OUTPUT_DIR / "raw_iv_records.jsonl"
 ERROR_RECORDS_PATH = OUTPUT_DIR / "raw_iv_errors.jsonl"
 CHECKPOINT_PATH = OUTPUT_DIR / "iv_parse_checkpoint.jsonl"

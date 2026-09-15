@@ -53,7 +53,7 @@ import json
 from app.db.seed import block_key_mapping as mapping
 from app.db.seed import seed_shared
 
-OUTPUT_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 DB_READY_PATH = OUTPUT_DIR / "db_ready_block_records.jsonl"
 SKIPPED_LOG_PATH = OUTPUT_DIR / "seed_block_skipped.jsonl"
 ERROR_LOG_PATH = OUTPUT_DIR / "seed_block_errors.jsonl"

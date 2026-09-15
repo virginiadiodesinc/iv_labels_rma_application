@@ -33,7 +33,7 @@ import re
 from app.db.seed import build_key_mapping as mapping
 from app.services import string_utilities as su
 
-OUTPUT_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 RAW_RECORDS_PATH = OUTPUT_DIR / "raw_build_records.jsonl"
 DB_READY_PATH = OUTPUT_DIR / "db_ready_build_records.jsonl"
 WARNINGS_PATH = OUTPUT_DIR / "build_transform_warnings.jsonl"

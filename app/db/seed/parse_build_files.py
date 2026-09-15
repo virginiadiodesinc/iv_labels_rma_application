@@ -33,7 +33,7 @@ import logging
 import time
 
 BUILD_FILE_DIRECTORY = Path("K:/build")
-OUTPUT_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 RAW_RECORDS_PATH = OUTPUT_DIR / "raw_build_records.jsonl"
 ERROR_RECORDS_PATH = OUTPUT_DIR / "raw_build_errors.jsonl"
 CHECKPOINT_PATH = OUTPUT_DIR / "build_parse_checkpoint.jsonl"
@@ -100,7 +100,7 @@ def main():
     args = parser.parse_args()
 
     setup_logging()
-    logging.info("Starting block file parse run.")
+    logging.info("Starting build file parse run.")
 
     checkpoint = {} if args.force else load_checkpoint()
     if args.force and CHECKPOINT_PATH.exists():
