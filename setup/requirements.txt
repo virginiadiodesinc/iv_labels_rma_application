@@ -1,0 +1,13 @@
+Flask
+Jinja2
+SQLAlchemy
+pandas
+numpy
+pyvisa
+pywebview
+pyodbc
+cryptography
+pywin32
+requests
+plotly
+scipy

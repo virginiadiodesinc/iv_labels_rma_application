@@ -1,0 +1,55 @@
+<div class="modal-overlay">
+    <div class="modal">
+
+        {% if build_name_match == False %}
+            <p>
+                Entered build name does not match any entry on Build Name List.
+            </p>
+
+            <p>
+                If you wish to save the entered build name anyway, press Save,
+                this entry will be flagged for review.
+            </p>
+        {% endif %}
+
+        {% if differences %}
+            <p>
+                The following part quantities differ from those on the BOM:
+            </p>
+
+            <table>
+                <tr>
+                    <th>Part</th>
+                    <th>Current</th>
+                    <th>On BOM</th>
+                </tr>
+
+                {% for name, form_quantity, BOM_quantity in differences %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ form_quantity }}</td>
+                    <td>{{ BOM_quantity }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+
+        <div class="button-row">
+            <button
+                hx-post="/confirm_build_file_save/"
+                hx-include="#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info, #block-id"
+                hx-target="#save-build-popup"
+                hx-swap="innerHTML">
+                Save
+            </button>
+
+            <button
+                hx-post="/cancel_build_file_save/"
+                hx-target="#save-build-popup"
+                hx-swap="innerHTML">
+                Cancel
+            </button>
+        </div>
+
+    </div>
+</div>

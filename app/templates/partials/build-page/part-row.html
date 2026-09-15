@@ -1,0 +1,86 @@
+<div class="part-row" data-has-existing-lot="{{ 'true' if part and part.part_lot else 'false' }}">
+	<div class="part-row-line-1">
+		<div>
+			<label>
+				Part Type:
+				<select
+				name="part_type">
+					{% for type in ['CIRCUIT', 'DIODE', 'FILTER MESH', 'MMIC', 'PCB', 'VAC', 
+					'BCMESH', 'CONNECTOR', 'MA PARTS', 'MISC', 'SP OTHER',
+					 'CABLE', 'FILTER', 'INVENTORY', 'PMP'] %}
+					<option {% if part and part.part_type == type %}selected{% endif %}>{{ type }}</option>
+					{% endfor %}
+				</select>
+			</label>
+		</div>
+		<div>
+			<label>
+				Part Name:
+				<input 
+						class="part-row-part-name"
+						type="text" 
+						name="part" 
+						value="{{
+								part.part_name
+								if part
+								else ''
+							}}" 
+						size="10"
+						hx-get="/search_part_lots/"
+						hx-trigger="revealed, keyup changed delay:300ms"
+						hx-target="next .lot-container"
+						hx-include="closest .part-row"
+						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ part.part_lot if part else '' }}">
+			</label>
+		</div>
+		<div class="delete-row-button-container">
+			<button
+				type="button"
+				onclick="this.closest('.part-row').remove()"
+				class="delete-row-button">
+				X
+			</button>
+		</div>
+	</div>
+	<div class="part-row-line-2">
+		<div class="lot-container">
+			{% if part or (build and build.part_name)%}
+				{% include "partials/build-page/lot-input.html" %}
+			{% endif %}
+		</div>
+
+		<div>
+			<label>
+				Qty:
+				<input class="part-row-part-quantity"
+						type="number" 
+						name="quantity" 
+						value="{{ part.quantity | int if part and part.quantity is not none else '1' }}">
+			</label>
+		</div>
+
+		<div>
+			<label>
+				Tag:
+				<select
+				name="part-tag"
+				class="part-tag">
+					{% for tag in ['NA', '1', '2', '3', 'A', 'B', 'A1', 'A2', 'G1', 'G2', 'G3', 'G4', 'W'] %}
+					<option {% if part and part.subassembly_tag == tag %}selected{% endif %}>{{ tag }}</option>
+					{% endfor %}
+				</select>
+			</label>
+		</div>
+		<div class="diode-row"
+			{% set is_diode = (part and part.part_type == "DIODE") %}
+			{% if not is_diode %}style="display:none"{% endif %}>
+			{% include "partials/build-page/diode-row.html" %}
+		</div>
+		<div class="pcb-row"
+			{% set is_pcb = (part and part.part_type == "PCB") %}
+			{% if not is_pcb %}style="display:none"{% endif %}>
+			{% include "partials/build-page/pcb-row.html" %}
+		</div>
+	</div>
+</div>

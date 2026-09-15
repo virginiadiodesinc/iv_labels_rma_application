@@ -1,0 +1,36 @@
+<div class="diode-reverse-voltage-container">
+	<Label>
+		VBR (V)
+		<input class="diode-extra-number-input"
+						type="text" 
+						name="diode-row-reverse-voltage-input" 
+						value="{{part.reverse_breakdown_voltage if part and part.reverse_breakdown_voltage else 'NA'}}">
+	</Label>
+</div>
+<div class="diode-temperature-container">
+	<Label>
+		Temp (C)
+		<input class="diode-extra-number-input"
+						type="text" 
+						name="diode-row-temperature-input" 
+						value="{{part.temperature if part and part.temperature else 'NA'}}">
+	</Label>
+</div>
+<div class="diode-indium-container">
+	<Label>
+		Indium
+		<input  class="diode-indium-input"
+				type="text" 
+				name="diode-row-indium-input" 
+				value="{{part.indium if part and part.indium else 'NA'}}">
+</Label>
+</div>
+<div class="import-values-from-iv-container">
+	<button id="import-special-values-from-iv-button"
+		name="import-special-values-from-iv-button"
+		hx-include="#iv-info"
+		hx-post="/import_diode_info_from_iv/"
+		hx-target="closest .diode-row">
+		Import From Current IV
+	</button>
+</div>

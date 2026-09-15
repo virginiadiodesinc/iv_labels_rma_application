@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+{% block content %}
+<div id="iv-page-container" class="iv-page-container">
+
+	{% include "partials/iv-page/iv-plot.html" %}
+
+	<div id="iv-curve-information" class="iv-curve-information">
+		{% include "partials/iv-page/iv-info.html" %}
+	</div>
+	
+	{% include "partials/iv-page/iv-gui-controls.html" %}
+	
+</div>	
+{% endblock %}

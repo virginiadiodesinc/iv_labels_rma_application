@@ -1,0 +1,47 @@
+<div 
+    id="generic-popup" 
+    class="modal-overlay">
+    <div class="modal">
+        <form>
+            {% if revision_letter_list %}
+            <p>The following revisions (for this Block Engraving/SN) have been found in the DB. Add to form?</p>
+                {% for letter in revision_letter_list %}
+                <label>
+                    {{ letter | upper }}
+                    <input
+                        class="path-option"
+                        type="radio"
+                        name="selected-letter"
+                        value="{{ letter | upper }}"
+                        {% if loop.first %}checked{% endif %}
+                    >
+                </label>
+                <br>
+                {% endfor %}
+            {% else %}
+                {% if missing_forms %}
+                    <p>Sorry, please input both a Block Engraving and Serial Number to get saved Revisions</p>
+                {% endif %}
+            {% endif %}
+
+            
+            {% if revision_letter_list %}
+                <button
+                    type="button"
+                    hx-post="/select_block_revision_for_form/"
+                    hx-swap="none"
+                    hx-swap="innerHTML">
+                    Confirm
+                </button>
+            {% endif %}
+
+            <button
+                type="button"
+                hx-post="/cancel_generic_dialog/"
+                hx-target="#generic-popup"
+                hx-swap="outerHTML">
+                Cancel
+            </button>
+        </form>
+    </div>
+</div>

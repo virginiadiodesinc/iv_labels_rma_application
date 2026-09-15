@@ -1,0 +1,33 @@
+<form id="iv-file-upload-form" class="iv-file-upload-form">
+	<button
+		hx-post="/upload_iv_file/"
+		hx-target="#iv-file-upload-form"
+		hx-swap="innerHTML"
+		hx-disabled-elt="this">
+		Choose IV File
+	</button>
+	<text name="iv-file-upload-text" id="iv-file-upload-text" class="selectable-text">{{file_path if file_path else 'No file selected'}}</text>
+	<input type="hidden" name="iv-file-path" id="iv-file-path" value="{{file_path if file_path else ''}}">
+	<div class="small-line-break"></div>
+
+	<button 
+		class="important-button"
+		type="submit"
+		hx-post="/populate_info_from_iv_file/"
+		hx-swap="none"
+		{% if not file_path or file_path == '' %}disabled{% endif %}>
+		Populate from IV File
+	</button>
+	<div class="small-line-break"></div>
+
+	<button 
+		class="important-button"
+		id="open-iv-button"
+		hx-post="/select_iv_from_db/"
+		hx-target="#generic-popup"
+		hx-swap="outerHTML"
+		hx-include="#iv-assembly-information-form">
+		Select IV from DB
+	</button>
+	<div class="small-line-break"></div>
+</form>

@@ -1,0 +1,30 @@
+<div class="note-row">
+	<div>
+		<label>
+			Note Type:
+			<select name="note_type">
+				{% for type in ["GENERIC", "CURRENT_TEST", "REWORK_SUMMARY"] %}
+					<option {% if note and note.type.name == type %}selected{% endif %} value="{{ type }}">
+						{{type.replace("_", " ").replace("SUMMARY", "INFO")}}</option>
+				{% endfor %}
+			</select>
+		</label>
+	</div>
+	<div>
+		<label>
+			Note:
+			<input type="text" 
+					name="note"
+					size="40"
+					value="{{note.note if note and note.note else ''}}">
+		</label>
+	</div>
+	<div class="delete-row-button-container">
+		<button
+			type="button"
+			onclick="this.closest('.note-row').remove()"
+			class="delete-row-button">
+			X
+		</button>
+	</div>
+</div>

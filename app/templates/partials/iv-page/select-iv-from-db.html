@@ -1,0 +1,68 @@
+<div 
+    id="generic-popup"
+    class="modal-overlay">
+    <div class="modal">
+
+        <h3>Select IV File</h3>
+
+        <form id="iv-selection-form">
+
+            <div class="scroll-box">
+                {% if iv_list %}
+                    {% for iv in iv_list %}
+                    <label class="path-option">
+                        <input
+                            type="radio"
+                            name="selected-iv-id"
+                            value="{{ iv.iv_id }}"
+                            {% if loop.first %}checked{% endif %}
+                        >
+                        {{ iv.iv_path_stem }}
+                    </label>
+                    <br>
+                    {% endfor %}
+                {% else %}
+                    {% if missing_forms %}
+                        <p>
+                            Please input at least a Block Engraving and Serial Number in order to search the database for IV information.
+                        </p>
+                    {% else %}
+                        <p>
+                            Sorry, no IVs were found with this Block Information.
+                        </p>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="button-row">
+
+            {% if iv_list %}
+                <button
+                    type="button"
+                    hx-post="/populate_iv_from_db/"
+                    hx-include="#iv-selection-form, #iv-assembly-information-form">
+                    Confirm
+                </button>
+            {% endif %}
+
+            <button
+                type="button"
+                hx-post="/cancel_generic_dialog/"
+                hx-target="#generic-popup"
+                hx-swap="outerHTML">
+                Cancel
+            </button>
+
+            {% if iv_list %}
+                <button
+                    type="button"
+                    hx-post="/delete_iv_info/"
+                    hx-target="#generic-popup"
+                    hx-swap="outerHTML">
+                    Delete IV
+                </button>
+            {% endif %}
+            </div>
+        </form>
+    </div>
+</div>

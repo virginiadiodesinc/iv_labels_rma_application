@@ -1,0 +1,22 @@
+<div 
+    id="generic-popup"
+    class="modal-overlay">
+    <div class="modal">
+        <p>
+            Sorry, something went wrong:
+        </p>
+
+        {% for error in errors %}
+            <ul>
+                {{error}}
+            </ul>
+        {% endfor %}
+
+        <button
+            hx-post="/cancel_generic_dialog/"
+            hx-target="#generic-popup"
+            hx-swap="outerHTML">
+            Cancel
+        </button>
+    </div>
+</div>

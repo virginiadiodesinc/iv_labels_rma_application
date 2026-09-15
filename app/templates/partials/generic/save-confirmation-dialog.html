@@ -1,0 +1,70 @@
+<div 
+    id="generic-popup"
+    class="modal-overlay"
+    data-yellow-flags-found="{{ yellow_flags_found | lower if yellow_flags_found else false}}"
+>
+    <div class="modal">
+
+        {% if yellow_flags_found %}
+        <p>
+            Please note the following yellow flags have been found:
+        </p>
+        <ul>
+            {% for yellow_flag_bool, yellow_flag_message in yellow_flag_dict.values() %}
+                {% if yellow_flag_bool %}
+                    <li>{{ yellow_flag_message }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <p>
+            If you'd like to edit the related fields, you can cancel, edit, and resubmit.
+        </p>
+        {% endif %}
+
+        <p>
+            Please confirm that you are ready to save your data to the network.
+        </p>
+        <p>
+            If data exists for the entered block, serial number, and revision combination, it will be overwritten.
+        </p>
+
+        {% if route == 'save_inspection_info' %}
+            {% set post_url = '/save_inspection_info/' %}
+            {% set include_selector = '#inspection-info, #block-info' %}
+        {% elif route == 'save_pb1_info' %}
+            {% set post_url = '/save_pb1_info/' %}
+            {% set include_selector = '#pb1-info, #block-info, #inspection-info' %}
+        {% elif route == 'save_pb2_info' %}
+            {% set post_url = '/save_pb2_info/' %}
+            {% set include_selector = '#pb2-info, #block-info, #inspection-info' %}
+        {% elif route == 'save_block_info' %}
+            {% set post_url = '/save_block_info/' %}
+            {% set include_selector = '#block-info, #inspection-info, #pb1-info, #pb2-info' %}
+        {% elif route == 'save_build_info' %}
+            {% set post_url = '/save_build_info/' %}
+            {% set include_selector = '#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info' %}
+        {% elif route == 'save_iv_info' %}
+            {% set post_url = '/save_iv_info/' %}
+            {% set include_selector = '#iv-info, #iv-curve-points, #iv-assembly-information' %}
+        {% endif %}
+
+        <div class="button-row">
+            <button
+                id="save-confirm-button"
+                hx-post="{{ post_url }}"
+                hx-include="{{ include_selector }}"
+                hx-vals='{"confirmed": "true", "print_label": "{{print_label | string | lower}}"}'
+                hx-target="#generic-popup"
+                hx-swap="outerHTML">
+                Confirm
+            </button>
+
+            <button
+                hx-post="/cancel_generic_dialog/"
+                hx-target="#generic-popup"
+                hx-swap="outerHTML">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>

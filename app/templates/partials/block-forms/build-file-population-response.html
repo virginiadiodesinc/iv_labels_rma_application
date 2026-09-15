@@ -1,0 +1,25 @@
+<div id="block-forms-container" name="block-forms-container" class="block-forms-container" hx-swap-oob="true">
+	{% include "partials/block-forms/block-forms-container.html" %}
+</div>
+
+<table id="full-build-table-body" hx-swap-oob="true">
+	{% include "partials/block-forms/full-build-info.html" %}
+</table>
+
+<div id="actual-bom-container" class="actual-bom-list" hx-swap-oob="true">
+	<div id="actual-parts-container">
+		{% for part in parts %}
+			{% include "partials/build-page/part-row.html" %}
+		{% endfor %}
+	</div>
+	<div id="actual-notes-container">
+		{% for note in notes %}
+			{% include "partials/build-page/note-row.html" %}
+		{% endfor %}
+	</div>
+</div>
+
+<div class="bom-container" id="bom-container" hx-swap-oob="true">
+	{% include "partials/search/bom-search-form.html" %}
+	{% include "partials/build-page/bom-list.html" %}
+</div>

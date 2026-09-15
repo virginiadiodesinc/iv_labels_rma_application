@@ -1,0 +1,16 @@
+<div 
+    id="generic-popup" 
+    class="modal-overlay">
+    <div class="modal">
+        <p>
+            Your deletion was a success!
+        </p>
+
+        <button
+            hx-post="/cancel_generic_dialog/"
+            hx-target="#generic-popup"
+            hx-swap="outerHTML">
+            Continue
+        </button>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+<div id="iv-plot-container" 
+	class="iv-plot-container"
+	hx-get="/get_empty_plot"
+	hx-trigger="load"
+	hx-swap="innerHTML"
+	hx-target="#iv-plot">
+
+	<div id="iv-loading" class="htmx-indicator">
+		Loading IV...
+	</div>
+
+	<div id="iv-plot-subcontainer">
+		<h2 id="iv-plot-title" class="iv-plot-title">Diode IV Curve (A,V)</h2>
+		<div id="iv-plot-header-container" class="iv-plot-header-container">
+			<h3>Polarity {{iv_curve.polarity if iv_curve and iv_curve.polarity else ""}}</h3>
+			<h3>{{iv_curve.points_per_decade if iv_curve and iv_curve.points_per_decade else ""}} Points per Decade</h3>
+		</div>
+		<div id="iv-plot-display-controls" class="iv-plot-display-controls">
+			<select
+				name="plot-scaling-type"
+				hx-post="/adjust_plot_scaling/"
+				hx-trigger="change"
+				hx-include="#iv-plot"
+				hx-target="#iv-figure">
+				<option value="log" selected>Log</option>
+				<option value="linear">Linear</option>
+			</select>
+		</div>
+
+		{% include "partials/iv-page/iv-plot-figure.html" %}
+
+	</div>
+
+</div>

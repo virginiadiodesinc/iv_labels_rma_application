@@ -1,0 +1,33 @@
+<div 
+    id="generic-popup"
+    class="modal-overlay"
+    data-yellow-flags-found="{{ yellow_flags_found | lower }}"
+>
+    <div class="modal">
+
+        <p>
+            Please confirm that you are sure you want to delete this data.
+        </p>
+        <p>
+            It will not be recoverable after you delete.
+        </p>
+
+        <div class="button-row">
+            <button
+                id="save-confirm-button"
+                hx-post="/delete_iv_info/"
+                hx-vals='{"confirmed": "true", "selected-iv-id": "{{ iv_id }}"}'
+                hx-target="#generic-popup"
+                hx-swap="outerHTML">
+                Confirm
+            </button>
+
+            <button
+                hx-post="/cancel_generic_dialog/"
+                hx-target="#generic-popup"
+                hx-swap="outerHTML">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>

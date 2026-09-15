@@ -1,0 +1,19 @@
+<form id="build-file-upload-form" class="build-file-upload-form">
+	<button
+		hx-post="/upload_build_file/"
+		hx-target="#build-file-upload-form"
+		hx-swap="innerHTML">
+		Choose Build File
+	</button>
+	<text name="build-file-upload-text" id="build-file-upload-text" class="selectable-text">{{file_path if file_path else 'No file selected'}}</text>
+	<input type="hidden" name="build-file-path" id="build-file-path" value="{{file_path if file_path else ''}}">
+	<div class="small-line-break"></div>
+	<button 
+		class="important-button"
+		type="submit"
+		hx-post="/populate_info_from_build_file/"
+		hx-swap="none"
+		{% if not file_path or file_path == '' %}disabled{% endif %}>
+		Populate from Build File
+	</button>
+</form>

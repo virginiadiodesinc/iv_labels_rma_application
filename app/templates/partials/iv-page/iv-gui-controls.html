@@ -1,0 +1,208 @@
+<div id="iv-gui-controls" class="iv-gui-controls">
+	{% include "partials/iv-page/iv-file-upload.html" %}
+
+	<details open id="iv-assembly-information">
+		<summary><h1>IV ASSEMBLY INFORMATION</h1></summary>
+		{% include "partials/iv-page/iv-assembly-information.html" %}
+	</details>
+
+	<details open>
+		<summary><h1>IV BASIC CONTROLS</h1></summary>
+		<form id="iv-basic-controls-form">
+			<label> Compliance Voltage (V)
+				<input 
+						class="iv-number-input"
+						type="number" 
+						step="0.1"
+						value="{{ current_settings.compliance_voltage if current_settings and current_settings.compliance_voltage}}"
+						name="compliance-voltage">
+			</label>
+			<label> Maximum Current (mA)
+				<input 
+						class="iv-number-input"
+						type="number"
+						value="{{ current_settings.maximum_current.replace('mA', '') if current_settings and current_settings.maximum_current}}"
+						min="1"
+						max="5"
+						name="maximum-current">
+			</label>
+			<label> Polarity
+				<select name="polarity">
+					<option value="+" 
+					{% if current_settings and current_settings.polarity == '+' %}
+						selected
+					{% endif %}>+</option>
+					<option value="-" 
+					{% if current_settings and current_settings.polarity == '-' %}
+						selected
+					{% endif %}>-</option>
+				</select>
+			</label>
+			<br>
+			<label> Reverse Breakdown Test
+				<input type="checkbox" name="reverse-breakdown-test">
+			</label>
+			<label> Reverse Current (uA)
+				<input 
+						class="iv-number-input"
+						type="number" 
+						step="0.1"
+						value="{{ current_settings.reverse_polarity_start_current if current_settings and current_settings.reverse_polarity_start_current}}"
+						name="reverse-current">
+			</label>
+			<label> Reverse Compliance (V)
+				<input 
+						class="iv-number-input"
+						type="number" 
+						step="0.1"
+						value="{{ current_settings.reverse_compliance_voltage if current_settings and current_settings.reverse_compliance_voltage}}"
+						name="reverse-compliance">
+			</label>
+		</form>
+	</details>
+
+	<details>
+		<summary><h1>IV ADVANCED CONTROLS</h1></summary>
+		<form id="iv-advanced-controls-form">
+			<label> Default Delay
+				<input type="checkbox"
+						id="default-delay"
+						checked = {{ True if current_settings and current_settings.default_delay == 'on'}}
+						name="default-delay"
+						value="on">
+			</label>
+			<label> Sweep Delay (mse)
+				<input 
+						class="iv-number-input"
+						type="number"
+						value="{{ current_settings.sweep_delay if current_settings and current_settings.sweep_delay}}"
+						name="sweep-delay">
+			</label>
+			<label> GPIB Address
+				<input 
+						class="iv-number-input"
+						type="number" 
+						value="{{ current_settings.gpib_address if current_settings and current_settings.gpib_address}}"
+						name="gpib-address">
+			</label>
+			<label> Points/Decade
+				<select name="points-per-decade">
+					<option value="5" 
+					{% if current_settings and current_settings.points_per_decade == '5' %}
+						selected
+					{% endif %}>5</option>
+					<option value="10" 
+					{% if current_settings and current_settings.points_per_decade == '10' %}
+						selected
+					{% endif %}>10</option>
+					<option value="25" 
+					{% if current_settings and current_settings.points_per_decade == '25' %}
+						selected
+					{% endif %}>25</option>
+					<option value="50" 
+					{% if current_settings and current_settings.points_per_decade == '50' %}
+						selected
+					{% endif %}>50</option>
+				</select>
+			</label>
+			<label> Filter Readings
+				<select name="filter-readings">
+					<option value="off" 
+					{% if current_settings and current_settings.filter_readings == 'off' %}
+						selected
+					{% endif %}>Off</option>
+					<option value="2" 
+					{% if current_settings and current_settings.filter_readings == '2' %}
+						selected
+					{% endif %}>2</option>
+					<option value="4" 
+					{% if current_settings and current_settings.filter_readings == '4' %}
+						selected
+					{% endif %}>4</option>
+					<option value="8" 
+					{% if current_settings and current_settings.filter_readings == '8' %}
+						selected
+					{% endif %}>8</option>
+					<option value="16" 
+					{% if current_settings and current_settings.filter_readings == '16' %}
+						selected
+					{% endif %}>16</option>
+					<option value="32" 
+					{% if current_settings and current_settings.filter_readings == '32' %}
+						selected
+					{% endif %}>32</option>
+				</select>
+			</label>
+			<label>Time
+				<select name="integration-time">
+					<option value="60Hz" 
+					{% if current_settings and current_settings.integration_time == '60Hz' %}
+						selected
+					{% endif %}>60 Hz</option>
+					<option value="Medium" 
+					{% if current_settings and current_settings.integration_time == 'Medium' %}
+						selected
+					{% endif %}>Medium</option>
+					<option value="Fast" 
+					{% if current_settings and current_settings.integration_time == 'Fast' %}
+						selected
+					{% endif %}>Fast</option>
+				</select>
+			</label>
+		</form>
+	</details>
+
+	<div id="iv-control-buttons" class="iv-control-buttons">
+		<button class="important-button"
+				id="run-iv-button"
+				hx-post="/take_iv/"
+				hx-target="#iv-plot"
+				hx-swap="innerHTML"
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
+				hx-disabled-elt="#iv-control-buttons button"
+				hx-vals='{"heat_test":"false"}'>
+				Run IV
+		</button>
+		<button class="important-button"
+				id="run-iv-button"
+				hx-post="/take_iv/"
+				hx-target="#iv-plot"
+				hx-swap="innerHTML"
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
+				hx-disabled-elt="#iv-control-buttons button"
+				hx-vals='{"heat_test":"true"}'>
+				Run IV with Heat Test
+		</button>
+		<button class="important-button"
+				id="save-iv-button"
+				hx-post="/save_iv_info/"
+				hx-include="#iv-info, #iv-curve-points, #iv-assembly-information"
+				hx-target="#generic-popup">
+				Save IV Info
+		</button>
+		<br>
+		<button id="polarity-test-button"
+				hx-post="/take_polarity_sweep/"
+				hx-include="#iv-basic-controls-form, #iv-advanced-controls-form"
+				hx-swap="innerHTML"
+				hx-disabled-elt="#iv-control-buttons button"
+				hx-target="this">
+				Run Polarity Test
+		</button>
+		<button id="export-iv-assembly-button"
+				hx-post="/add_iv_assembly_to_build_parts/"
+				hx-include="#iv-assembly-information-form"
+				hx-swap="beforeend"
+				hx-target="#actual-parts-container">
+				Add IV Assembly to Build Parts
+		</button>
+		<br>
+		<button class="important-button"
+				id="clear-iv-assembly-button"
+				hx-post="/clear_iv_assembly_information/"
+				hx-target="#iv-assembly-information-form"
+				hx-swap="outerHTML">
+			Clear IV Assembly
+		</button>
+	</div>
+</div>

@@ -1,0 +1,567 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+*{
+	font-family: 'Roboto', sans-serif;
+	font-size: small;
+}
+
+.selectable-text {
+	user-select: text;
+}
+
+.not-implemented-yet {
+	color: pink;
+	background-color: red;
+}
+
+.iv-spec-table-container {
+	margin-bottom: 10px;
+}
+
+.iv-spec-table-container table {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.full-page {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	max-height: none;
+}
+
+.navbar {
+	height: 5vh;
+	width: 100%;
+	order: 1;
+}
+
+.navbar ul {
+	height: 5vh;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	background-color: #0099ff;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.navbar li a {
+	color: black;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.navbar li a:hover {
+	color: gold;
+}
+
+.footer {
+	height: 5vh;
+	width: 100%;
+	order: 3;
+	background-color: #0099ff;
+	color: black;
+
+	text-align: center;
+	align-self: flex-end;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.content {
+	flex-grow: 2;
+	flex: 1;
+	order: 2;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+.build-page-container {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr) .25fr repeat(3, 1fr) .25fr repeat(7, 1fr) .25fr;
+	grid-template-rows: 5vh 1fr;
+	justify-content: start;
+	align-content: start;
+}
+
+.block-info-container {
+	grid-column-start: 1;
+	grid-column-end: 4;
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
+.bom-container {
+	grid-column-start: 5;
+	grid-column-end: 8;
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
+.full-build-container {
+	grid-column-start: 9;
+	grid-column-end: 16;
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
+.block-file-upload-form {
+	grid-row-start: 1;
+	grid-row-end: 2;
+	grid-column-start: 1;
+	grid-column-end: 8;
+}
+
+.build-file-upload-form {
+	grid-row-start: 1;
+	grid-row-end: 2;
+	grid-column-start: 9;
+	grid-column-end: 16;
+}
+
+
+.actual-bom-list > div > div:nth-child(even) {
+	background-color: lightblue;
+}
+
+.bom-list tr:nth-child(even)
+{
+	background-color: lightblue;
+}
+
+.bom-sub-list tr:nth-child(even)
+{
+	background-color: lightblue;
+}
+
+/* .bom-list td:nth-child(even), th:nth-child(even) {
+  background-color: gray;
+}
+
+.bom-sublist td:nth-child(even), th:nth-child(even) {
+  background-color: gray;
+}
+
+.actual-bom-list td:nth-child(even), th:nth-child(even) {
+  background-color: gray;
+} */
+
+.iv-page-container {
+	display: grid;
+	grid-template-rows: auto auto auto auto;
+	justify-content: start;
+	align-content: start;
+}
+
+.iv-gui-controls {
+	grid-row-start: 1;
+	grid-row-end: 2;
+	line-height: 1.8;
+}
+
+.iv-spec-table-container {
+	grid-row-start: 2;
+	grid-row-end: 3;
+}
+
+.iv-gui-controls details {
+	margin-bottom: 5px;
+}
+
+.iv-curve-information {
+	grid-row-start: 3;
+	grid-row-end: 4;
+
+}
+
+.iv-info {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.line-break {
+	flex-basis: 100%;
+	height: 10px;
+}
+
+.small-line-break {
+	flex-basis: 100%;
+	height: 5px;
+}
+
+.iv-curve-information table {
+	border: thin solid black;
+}
+
+.iv-control-buttons {
+	margin-bottom: 10px;
+}
+
+.iv-plot-container {
+	display: grid;
+	text-align: center;
+	grid-row-start: 4;
+	grid-row-end: 5;
+}
+
+.iv-plot-header-container {
+	display: flex;
+	justify-content: space-around;
+}
+
+.iv-figure {
+	width: 75%;
+	height: 75%;
+	margin: auto;
+	align-self: center;
+}
+
+.combined-page {
+	display: grid;
+	grid-template-columns: 9fr 5fr;
+}
+
+.combined-page .build-page-container {
+	grid-column-start: 1;
+	grid-column-end: 2;
+}
+
+.combined-page .iv-page-container {
+	grid-column-start: 2;
+	grid-column-end: 3;
+}
+
+.block-forms-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.block-form {
+	margin-bottom: 50px;
+}
+
+.actual-bom-list {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow-x: auto;
+}
+
+.actual-bom-list input {
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+input {
+	border-radius: 5px;
+	border: 1px solid black;
+}
+
+.part-row {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.part-row-line-1 {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+.part-row-line-2 {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	gap: 20px;
+}
+
+.diode-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.pcb-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.note-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+.note-input-container {
+	flex-grow: 1;
+}
+.note-input {
+	width: 90%;
+}
+
+.delete-row-button-container {
+	justify-self: flex-end;
+	order: 5;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+.delete-row-button {
+	background-color: transparent;
+}
+
+.part-row-part-quantity {
+	width: 5ch;
+	min-width: 50%;
+	max-width: 60%;
+}
+
+.diode-extra-number-input {
+	width: 7ch;
+}
+
+.feedback-form {
+	width: 500px;
+	margin: 50px auto;
+}
+
+.feedback-form-row {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 15px;
+}
+
+.feedback-form-row label {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.feedback-form-row input {
+	padding: 8px;
+	font-size: 14px;
+	width: 30px;
+}
+
+.feedback-form-row textarea {
+	padding: 8px;
+	font-size: 14px;
+	width: 100%;
+	height: 120px;
+	resize: none;
+}
+
+.feedback-submit-btn {
+	margin-top: 10px;
+	padding: 10px;
+	cursor: pointer;
+}
+
+.iv-assembly-information-form {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.8;
+}
+
+.iv-diode-information-line {
+	display: flex;
+	gap: 10px;
+}
+
+.iv-circuit-information-line {
+	display: flex;
+	gap: 10px;
+}
+
+.hidden-inputs {
+	border: none !important;
+}
+
+.important-button {
+	background-color: green;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: large;
+	cursor: pointer;
+	border-radius: 8px;
+}
+
+.important-button:disabled {
+	background-color: lightgreen;
+	color: white
+}
+
+button {
+	background-color: lightskyblue;
+	color: black;
+	border: none;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: small;
+	cursor: pointer;
+	border-radius: 8px;
+}
+
+button:disabled {
+	color: lightblue
+}
+
+button:enabled:hover {
+	text-decoration: underline;
+}
+
+.part-row-part-name {
+	width: 35ch;
+}
+
+.iv-number-input {
+	width: 7ch;
+}
+
+input[type="date"] {
+	width: 14ch;
+}
+
+.initials-input {
+	width: 9ch;
+}
+
+.build-name-input {
+	width: 22ch;
+}
+
+.lot-input-container {
+	display: flex;
+	flex-direction: row;
+	justify-content:space-between;
+}
+
+.custom-lot-input-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+.full-build-container {
+	flex-grow: 1;
+}
+
+.full-build-table-header {
+	width: 100%;
+}
+
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	z-index: 9999;
+}
+
+.modal {
+	background: white;
+	padding: 20px;
+	border-radius: 8px;
+	max-width: 250px;
+	width: 80%
+}
+
+.scroll-box {
+	border: 1px solid #ccc;
+	max-height: 300px;
+	overflow-y: auto;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 10px;
+}
+
+.path-option {
+	display: block;
+	margin-bottom: 8px;
+}
+
+.button-row {
+	display: flex;
+	justify-content: space-between;
+}
+
+.iv-upload-button-row {
+	display: flex;
+	justify-content: flex-start;
+	column-gap: 50px;
+}
+
+th {
+	font-size: large;
+	text-align: center;
+	align-self: center;
+}
+
+.iv-info table {
+	border: 1px solid black;
+	border-radius: 4px;
+}
+
+.spec-sheet-runcode-input {
+	width: 7ch;
+}
+
+.spec-sheet-runcode-input::-webkit-outer-spin-button,
+.spec-sheet-runcode-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.pcb-row {
+	flex-grow: 1;
+}
+
+.pcb-modifications-container {
+	width: 100%;
+}
+
+.pcb-modifications-input {
+	width: 85%;
+}
+
+.diode-indium-container {
+	flex-grow: 1;
+}
+
+.diode-indium-input {
+	width: 80%;
+}
+
+
+summary :is(h1, h2, h3, h4, h5, h6) {
+	display: inline;
+	font-size: 1.5rem;
+}
+
+summary:has(:is(h1, h2, h3, h4, h5, h6)) {
+	text-align: center;
+}
+
+.block-label {
+	display: block;
+}
+
+.block-input {
+	display: block;
+}
