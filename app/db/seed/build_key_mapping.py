@@ -92,10 +92,10 @@ def is_blank(value):
 PART_SLOTS_NEW_STYLE = [
     {"part_type": "DIODE",   "name_lot_key": "diode_1",   "quantity_key": "diode_1_chip_count"},
     {"part_type": "CIRCUIT", "name_lot_key": "circuit_1", "quantity": 1},
-    {"part_type": "FILTER",  "name_lot_key": "filter_1",  "quantity": 1},
+    {"part_type": "CIRCUIT",  "name_lot_key": "filter_1",  "quantity": 1},
     {"part_type": "DIODE",   "name_lot_key": "diode_2",   "quantity_key": "diode_2_chip_count"},
     {"part_type": "CIRCUIT", "name_lot_key": "circuit_2", "quantity": 1},
-    {"part_type": "FILTER",  "name_lot_key": "filter_2",  "quantity": 1},
+    {"part_type": "CIRCUIT",  "name_lot_key": "filter_2",  "quantity": 1},
     {"part_type": "PCB",     "name_lot_key": "pcb_info",  "quantity": 1},
     {"part_type": "MMIC",    "name_key": "mmic_name", "lot_key": "mmic_lot", "quantity": 1},
 ]
@@ -112,7 +112,7 @@ PART_SLOTS_NEW_STYLE = [
 PART_SLOTS_OLD_STYLE = [
     {"part_type": "DIODE",   "name_lot_key": "diode_1",   "quantity_key": "diode_1_chip_count"},
     {"part_type": "CIRCUIT", "name_lot_key": "circuit_1", "quantity": 1},
-    {"part_type": "FILTER",  "name_lot_key": "filter_1",  "quantity": 1},
+    {"part_type": "CIRCUIT",  "name_lot_key": "filter_1",  "quantity": 1},
     {"part_type": "DIODE",   "name_lot_key": "diode_2",   "quantity_key": "diode_2_chip_count"},
     {"part_type": "CIRCUIT", "name_lot_key": "circuit_2", "quantity": 1},
     {"part_type": "PCB",     "name_lot_key": "filter_2",  "quantity": 1, "ambiguous": True},

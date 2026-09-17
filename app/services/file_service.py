@@ -35,7 +35,6 @@ def save_block_file_section(canonical: dict, section: fr.Section, block_file_dir
     unfilled.
     """
     path = get_block_file_path(canonical, block_file_directory)
-    print(canonical)
 
     if os.path.isfile(path):
         with open(path, "r", encoding="utf-8") as f:
@@ -54,18 +53,22 @@ def save_block_file_section(canonical: dict, section: fr.Section, block_file_dir
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(new_lines))
 
-    print(path)
     return path
 
 
 def save_block_file(canonical: dict, block_file_directory: str) -> str:
+    """Full overwrite -- every line rendered fresh from canonical, so
+    canonical must be complete. That's true for every save from PB1 onward,
+    since those forms carry the whole block panel (and red-flag validation
+    won't let inspection through blank). Only the inspection-only save uses
+    save_block_file_section instead."""
     path = get_block_file_path(canonical, block_file_directory)
 
     new_lines = [fr.render_new_line(template, canonical) for template in fr.BLOCK_FILE_TEMPLATE]
 
     with open(path, "w", encoding="utf-8") as f:
-            f.write("\n".join(new_lines))
-    
+        f.write("\n".join(new_lines))
+
     return path
 
 
@@ -203,3 +206,30 @@ def delete_file(path: str) -> None:
     including it in case IV is first."""
     if path and os.path.isfile(path):
         os.remove(path)
+
+
+def _normalized(path: str) -> str:
+    """normcase + abspath, so a same-file comparison can't be fooled by
+    Windows' case-insensitivity or by one side being relative. The build file
+    name is .lower()'d at render time while a path already in the DB may not
+    be, which is exactly the case a bare != would get wrong."""
+    return os.path.normcase(os.path.abspath(path)) if path else ""
+
+
+def delete_stale_file(old_path: str, new_path: str) -> str:
+    """Deletes old_path IF it exists and is genuinely a different file from
+    new_path. Returns the path deleted, or None if there was nothing to do.
+
+    This is the cleanup half of a build-file rename: the build file's name
+    comes from the build name, which changes at every stage (PB1 name -> PB2
+    name -> full build name), so each save writes a NEW file and the previous
+    stage's file has to go. Deliberately never touches new_path, however the
+    two strings happen to be spelled."""
+    if not old_path:
+        return None
+    if _normalized(old_path) == _normalized(new_path):
+        return None
+    if not os.path.isfile(old_path):
+        return None
+    os.remove(old_path)
+    return old_path

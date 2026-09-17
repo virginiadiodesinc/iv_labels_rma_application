@@ -33,13 +33,13 @@
             {% set include_selector = '#inspection-info, #block-info' %}
         {% elif route == 'save_pb1_info' %}
             {% set post_url = '/save_pb1_info/' %}
-            {% set include_selector = '#pb1-info, #block-info, #inspection-info' %}
+            {% set include_selector = '#pb1-info, #block-info, #inspection-info, #full-build-form' %}
         {% elif route == 'save_pb2_info' %}
             {% set post_url = '/save_pb2_info/' %}
-            {% set include_selector = '#pb2-info, #block-info, #inspection-info' %}
+            {% set include_selector = '#pb2-info, #block-info, #inspection-info, #full-build-form' %}
         {% elif route == 'save_block_info' %}
             {% set post_url = '/save_block_info/' %}
-            {% set include_selector = '#block-info, #inspection-info, #pb1-info, #pb2-info' %}
+            {% set include_selector = '#block-info, #inspection-info, #pb1-info, #pb2-info, #full-build-form' %}
         {% elif route == 'save_build_info' %}
             {% set post_url = '/save_build_info/' %}
             {% set include_selector = '#full-build-form, #block-info, #inspection-info, #pb1-info, #pb2-info' %}

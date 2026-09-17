@@ -110,7 +110,7 @@
 }
 
 .actual-bom-list > div > div:nth-child(odd) {
-	background-color: lightgray;
+	background-color: whitesmoke;
 }
 
 .bom-list tr:nth-child(even)
@@ -125,12 +125,12 @@
 
 .bom-list tr:nth-child(odd)
 {
-	background-color: lightgray;
+	background-color: whitesmoke;
 }
 
 .bom-sub-list tr:nth-child(odd)
 {
-	background-color: lightgray;
+	background-color: whitesmoke;
 }
 
 .bom-list-form th {
@@ -170,11 +170,11 @@
 
 .border-left-side {
 	flex: 1;
-	border-right: solid lightgray;
+	border-right: solid gray;
 }
 
 .border-right-side {
-	flex: 3;
+	flex: 1;
 	background-color: white;
 }
 

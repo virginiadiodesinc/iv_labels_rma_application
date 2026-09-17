@@ -7,8 +7,17 @@ for the field-name mapping instead of hand-listing columns per route.
 
 from app.services import field_registry as fr
 from app.db.database import db_session
-from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity
+from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity, Note_Type
 from app.db import queries
+
+
+def get_block_and_build_info(canonical: dict):
+    block_id = fr.build_block_id(canonical)
+    filters = {"block_id": block_id}
+    block = queries.get_table_entries(db_session, Build_Info, **filters)[0]
+    parts = queries.get_table_entries(db_session, Build_Parts, **filters)
+    notes = queries.get_table_entries(db_session, Notes, **filters)
+    return block, parts, notes
 
 
 def get_all_block_revisions(canonical: dict):
@@ -20,7 +29,20 @@ def get_all_block_revisions(canonical: dict):
     revision_letters = []
     for entry in block_revision_entries:
         revision_letters.append(entry.block_revision)
+    revision_letters.sort()
     return revision_letters
+
+
+def get_all_block_revisions_from_partial_block_id(partial_block_id):
+    kwargs = {"block_id": partial_block_id}
+
+    block_revision_entries = queries.get_table_entries_like(db_session, Build_Info, **kwargs)
+    revision_letters = []
+    for entry in block_revision_entries:
+        revision_letters.append(entry.block_revision)
+    revision_letters.sort()
+    return revision_letters
+
 
 def stage_upsert_build_info(canonical: dict, **extra_columns):
     """extra_columns is for things that aren't part of the form-sourced
@@ -56,8 +78,17 @@ def stage_replace_build_parts_and_notes(canonical: dict, parts_list: list, notes
     for part in parts_list:
         entry = queries.add_table_entry(db_session, Build_Parts, block_id=block_id, **part)
         new_entries.append(entry)
-    for note in notes_list:
-        entry = queries.add_table_entry(db_session, Notes, block_id=block_id, **note)
+    for index, note in enumerate(notes_list):
+        note_type = None
+        if 	note["type"].lower() ==  "generic":
+            note_type = Note_Type.GENERIC
+        elif note["type"].lower() ==  "current_test":
+            note_type = Note_Type.CURRENT_TEST
+        elif note["type"].lower() ==  "rework_summary":
+            note_type = Note_Type.REWORK_SUMMARY
+        note_with_proper_type = note.copy()
+        note_with_proper_type["type"] = note_type
+        entry = queries.add_table_entry(db_session, Notes, block_id=block_id, **note_with_proper_type)
         new_entries.append(entry)
     return new_entries
 

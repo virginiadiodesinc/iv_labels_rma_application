@@ -91,8 +91,8 @@ def populate_info_from_build_file():
 			{"part_name": diode_2_name, "quantity": diode_2_quantity, "part_type": "DIODE", "part_lot": diode_2_lot},
 			{"part_name": circuit_2_name, "quantity": 1, "part_type": "CIRCUIT", "part_lot": circuit_2_lot},
 			{"part_name": pcb_name, "quantity": 1, "part_type": "PCB", "part_lot": pcb_lot},
-			{"part_name": filter_1_name, "quantity": 1, "part_type": "FILTER", "part_lot": filter_1_lot},
-			{"part_name": filter_2_name, "quantity": 1, "part_type": "FILTER", "part_lot": filter_2_lot},
+			{"part_name": filter_1_name, "quantity": 1, "part_type": "CIRCUIT", "part_lot": filter_1_lot},
+			{"part_name": filter_2_name, "quantity": 1, "part_type": "CIRCUIT", "part_lot": filter_2_lot},
 			{"part_name": mmic_name, "quantity": 1, "part_type": "MMIC", "part_lot": mmic_lot}
 		]
 

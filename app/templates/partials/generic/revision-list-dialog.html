@@ -21,6 +21,8 @@
             {% else %}
                 {% if missing_forms %}
                     <p>Sorry, please input both a Block Engraving and Serial Number to get saved Revisions</p>
+                    {% else %}
+                    <p>Sorry, no revisions were found for the following Block Engraving and Serial Number</p>
                 {% endif %}
             {% endif %}
 

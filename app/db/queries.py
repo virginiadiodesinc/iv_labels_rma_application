@@ -23,6 +23,14 @@ def get_table_entries(db_session, model, **filters):
 			query = query.where(getattr(model, attribute) == value)
 	return db_session.execute(query).scalars().all()
 
+# READ (LIKE)
+def get_table_entries_like(db_session, model, **filters):
+	query = select(model)
+	for attribute, value in filters.items():
+		if hasattr(model, attribute):
+			query = query.where(getattr(model, attribute).startswith(value))
+	return db_session.execute(query).scalars().all()
+
 # UPDATE
 def update_table_entry(db_session, model, entry_id, **updates):
 	entry = db_session.get(model, entry_id)

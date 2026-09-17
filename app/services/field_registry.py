@@ -189,23 +189,41 @@ FIELDS: list[FieldSpec] = [
     FieldSpec("additional_info", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="additional_information", form_name="iv-additional-info"),
     FieldSpec("temperature", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="temperature"),
     # --- part related fields (some overlap with IV here) ---
+    # The canonical names here stay "part_"-prefixed because several of them
+    # (temperature, reverse_breakdown_voltage) would otherwise collide with
+    # IV_PARAMETERS canonical names in BY_CANONICAL -- a part's temperature
+    # and an IV sweep's temperature are different things that happen to share
+    # a word. db_column carries the real (unprefixed) build_parts column, per
+    # models.py.
+    #
+    # NOTE: parts do NOT currently flow through canonical_to_db_kwargs --
+    # parts_service.parts_from_form builds one dict per row keyed by REAL
+    # column names already, and stage_replace_build_parts_and_notes splats
+    # those straight into add_table_entry. These specs are therefore
+    # documentation for now; if parts ever get routed through
+    # canonical_to_db_kwargs, the mapping is already correct here.
     # ALL PARTS
     FieldSpec("part_name", Section.BUILD_PARTS, str, db_model="Build_Parts"),
     FieldSpec("part_lot", Section.BUILD_PARTS, str, db_model="Build_Parts"),
-    FieldSpec("part_quantity", Section.BUILD_PARTS, str, db_model="Build_Parts"),
+    FieldSpec("part_type", Section.BUILD_PARTS, str, db_model="Build_Parts"),
+    FieldSpec("part_quantity", Section.BUILD_PARTS, int, db_model="Build_Parts", db_column="quantity"),
     # ONLY PCB
-    FieldSpec("part_modifications", Section.BUILD_PARTS, str, db_model="Build_Parts"),
-    # POTENTIALLY MULTIPLE
-    FieldSpec("part_serial_number", Section.BUILD_PARTS, str, db_model="Build_Parts"),
+    FieldSpec("part_modifications", Section.BUILD_PARTS, str, db_model="Build_Parts", db_column="modifications"),
     # ONLY DIODES
-    FieldSpec("part_temperature", Section.BUILD_PARTS, str, db_model="Build_Parts"),
-    FieldSpec("part_reverse_breakdown_voltage", Section.BUILD_PARTS, str, db_model="Build_Parts"),
-    FieldSpec("part_indium", Section.BUILD_PARTS, str, db_model="Build_Parts"),
+    FieldSpec("part_temperature", Section.BUILD_PARTS, str, db_model="Build_Parts", db_column="temperature"),
+    FieldSpec("part_reverse_breakdown_voltage", Section.BUILD_PARTS, str, db_model="Build_Parts", db_column="reverse_breakdown_voltage"),
+    FieldSpec("part_indium", Section.BUILD_PARTS, str, db_model="Build_Parts", db_column="indium"),
     FieldSpec("subassembly_tag", Section.BUILD_PARTS, str, db_model="Build_Parts"),
+    # part_serial_number had a FieldSpec but has no build_parts column in
+    # models.py -- dropped rather than left pointing at nothing. Add the
+    # column first if it's actually wanted.
 
     # --- note related fields ---
-    FieldSpec("note_text", Section.NOTES, str, db_model="Notes"),
-    FieldSpec("note_type", Section.NOTES, str, db_model="Notes"),
+    # models.py's Notes columns are literally `note` and `type`, and
+    # notes_from_form already emits those keys -- db_column makes that
+    # explicit instead of implied.
+    FieldSpec("note_text", Section.NOTES, str, db_model="Notes", db_column="note"),
+    FieldSpec("note_type", Section.NOTES, str, db_model="Notes", db_column="type"),
 
 ]
 
@@ -301,6 +319,12 @@ def build_block_id(canonical: dict) -> str:
     queries.py, because it's domain logic about what identifies a block --
     queries.py should stay agnostic about that."""
     return f"{canonical['block_engraving']} {canonical['block_serial_number']} {canonical['block_revision']}"
+
+def build_partial_block_id(canonical: dict) -> str:
+    """The composite primary key Build_Info actually uses. Lives here, not in
+    queries.py, because it's domain logic about what identifies a block --
+    queries.py should stay agnostic about that."""
+    return f"{canonical['block_engraving']} {canonical['block_serial_number']}"
 
 
 # ---------------------------------------------------------------------------
@@ -405,6 +429,37 @@ def iv_identity_as_block_identity(canonical: dict) -> dict:
         "block_serial_number": canonical.get("iv_block_serial_number"),
         "block_revision": canonical.get("iv_block_revision"),
     }
+
+
+# Which canonical field plays the role of "the build name" for each stage of
+# a block's life. All three stages produce a build file the exact same way --
+# only the field the name comes from changes -- so this is a lookup, not three
+# functions.
+BUILD_NAME_KEYS: dict[Section, str] = {
+    Section.PB1: "pb1_build_name",
+    Section.PB2: "pb2_build_name",
+    Section.FULL_BUILD: "full_build_name",
+}
+
+
+def with_build_name_from(canonical: dict, build_name_key: str) -> dict:
+    """Returns a COPY of canonical whose `full_build_name` is taken from
+    `build_name_key` -- so a PB1 save renders its build file under the PB1
+    name without anything else having to know that's what's happening.
+
+    Use this ONLY for rendering the build file. The returned dict must never
+    reach stage_upsert_build_info: full_build_name is a real Build_Info
+    column, and writing the PB1 name into it would corrupt the record that
+    the PB2 and full-build stages later load from.
+
+    full_build_name_with_suffix is dropped on the way out, because it's
+    derived from the OLD name -- leaving a stale one behind would silently
+    name the file after the wrong stage. enrich_with_build_suffix (called by
+    file_service.save_build_file) recomputes it from the new name."""
+    canonical = dict(canonical)
+    canonical["full_build_name"] = canonical.get(build_name_key)
+    canonical.pop("full_build_name_with_suffix", None)
+    return canonical
 
 
 def _format_time_12h(hour: int, minute: int) -> str:
@@ -567,9 +622,11 @@ BUILD_FILE_TEMPLATE: list[LineTemplate] = [
 # a redundant copy of it, same idea as the line templates above.
 # ---------------------------------------------------------------------------
 
+
 def block_file_name(canonical: dict) -> str:
     """Matches the old write_block_file naming: '<engraving> <sn+rev>.txt', lowercased."""
     return f"{canonical.get('block_engraving') or ''} {_block_sn(canonical)}.txt".lower()
+
 
 def build_file_name(canonical: dict) -> str:
     """Matches the old write_block_file naming: '<build_name> <sn+rev>.txt', lowercased."""

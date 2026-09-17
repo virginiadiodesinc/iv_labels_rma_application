@@ -29,6 +29,15 @@
 					value="{{iv_data.build_name | upper if iv_data and iv_data.build_name else ''}}"
 					>
 		</label>
+		<button 
+			class="important-button"
+			id="open-iv-button"
+			hx-post="/select_iv_from_db/"
+			hx-target="#generic-popup"
+			hx-swap="outerHTML"
+			hx-include="#iv-assembly-information-form">
+			Select IV from DB
+		</button>
 		<button
 			hx-post="/import_block_identifiers_to_iv/"
 			hx-include="#block-info, #full-build-name-input"

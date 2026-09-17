@@ -41,14 +41,22 @@ FULL_BUILD_LAYOUTS = {
 
 MULTI_LINE_PART_TYPES = {"DIODE", "PCB"}
 LIMITED_CHARACTER_FIELDS = {"INDIUM_INPUT": 15, "NOTE_INPUT": 50, "PCB_MODIFICATIONS_INPUT": 50}
-PART_TYPES_WITH_LOTS = {"DIODE", "PCB", "MMIC"}
-NON_PRINTED_PART_TYPES = {"BCMESH", "CONNECTOR", "MA PARTS", "MISC", "SP OTHER", "CABLE", "FILTER", "INVENTORY", "PMP"}
+PART_TYPES_WITH_LOTS = {"DIODE", "PCB", "MMIC", "BCMESH"}
+NON_PRINTED_PART_TYPES = {"CONNECTOR", "MA PARTS", "MISC", "SP OTHER", "CABLE", "FILTER", "INVENTORY", "PMP"}
+NON_PRINTED_PART_NAME_SUBSTRINGS = {"-TL", "TLINE"}
 
 
 def limit_input_characters(input_string, character_limit):
 	if len(input_string) > character_limit:
 		input_string =  input_string[0:(character_limit - 3)] + "..."
 	return input_string
+
+def block_sn_excluding_a(form_data):
+	block_sn = form_data.get("block-serial-number-input", "")
+	revision = form_data.get("block-revision-input", "")
+	if revision.lower() != "a":
+		block_sn = block_sn + revision
+	return block_sn
 
 
 def print_engine(label_name: str, label_field_populator: callable, form_data: dict, label_preparer: Optional[Callable] = None):
@@ -115,7 +123,7 @@ def populate_inspection_label_fields(label_text, form_data: dict):
 	@return label_text Return value of type (string)
 	"""
 	label_text.SetField('BLOCK_ENGRAVING_INPUT', form_data.get("block-engraving-input", ""))
-	label_text.SetField('BLOCK_SN_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
+	label_text.SetField('BLOCK_SN_INPUT', block_sn_excluding_a(form_data))
 	label_text.SetField('BLOCK_DATE_INPUT', dc.iso_date_to_labview(form_data.get("inspection-date-input", "")))
 	label_text.SetField('PREBUILD_INIT_INPUT', form_data.get("inspection-initials-input", ""))
 
@@ -132,7 +140,7 @@ def populate_pb1_label_fields(label_text, form_data: dict):
 	@return label_text Return value of type (string)
 	"""
 	label_text.SetField('BUILD_NAME_INPUT', form_data.get("pb1-build-name-input", ""))
-	label_text.SetField('BLOCK_SN_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
+	label_text.SetField('BLOCK_SN_INPUT', block_sn_excluding_a(form_data))
 	label_text.SetField('BLOCK_DATE_INPUT', dc.iso_date_to_labview(form_data.get("pb1-date-input", "")))
 	label_text.SetField('PREBUILD_INIT_INPUT', form_data.get("pb1-initials-input", ""))
 
@@ -149,7 +157,7 @@ def populate_pb2_label_fields(label_text, form_data: dict):
 	@return label_text Return value of type (string)
 	"""
 	label_text.SetField('BUILD_NAME_INPUT', form_data.get("pb2-build-name-input", ""))
-	label_text.SetField('BLOCK_SN_INPUT', form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", ""))
+	label_text.SetField('BLOCK_SN_INPUT', block_sn_excluding_a(form_data))
 	label_text.SetField('BLOCK_DATE_INPUT', dc.iso_date_to_labview(form_data.get("pb2-date-input", "")))
 	label_text.SetField('PREBUILD_INIT_INPUT', form_data.get("pb2-initials-input", ""))
 	label_text.SetField('INSPECTOR_INPUT', form_data.get("pb2-inspection-initials-input", ""))
@@ -202,6 +210,15 @@ def _parse_full_build_rows(form_data: dict):
 		if part_type in NON_PRINTED_PART_TYPES:
 			continue
 
+		excluded_substring_found = False
+		for substring in NON_PRINTED_PART_NAME_SUBSTRINGS:
+			if substring in part:
+				excluded_substring_found = True
+				break
+
+		if excluded_substring_found:
+			continue
+
 		row = {"kind": "part", "part": part, "lot": lot, "type": part_type, "quantity": quantity, "slots": 1}
 
 		if part_type == "DIODE":
@@ -222,7 +239,7 @@ def _parse_full_build_rows(form_data: dict):
 		rows.append({"kind": "note", "note": note, "type": note_type, "slots": 1})
 
 	lv_style_build_name = su.get_build_name_with_suffix(form_data.get("full-build-name-input"), form_data.get("block-engraving-input"))
-	lv_style_block_serial_number = form_data.get("block-serial-number-input", "") + form_data.get("block-revision-input", "")
+	lv_style_block_serial_number = block_sn_excluding_a(form_data)
 	lv_style_build_name_with_sn_and_rev = lv_style_build_name + " " + lv_style_block_serial_number
 
 	header = {
