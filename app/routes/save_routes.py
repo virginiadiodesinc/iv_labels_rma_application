@@ -40,7 +40,12 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
     if errors:
         return render_template("partials/generic/red-flag-error-message.html", errors=errors), 200
 
-    yellow_flags = vyf.check_yellow_flags(fr.with_build_name_from(canonical, build_name_key), yellow_flag_checks)
+    flag_ctx = vyf.FlagContext(
+        canonical=fr.with_build_name_from(canonical, build_name_key),
+        parts=parts_list or [],
+        notes=notes_list or [],
+    )
+    yellow_flags = vyf.check_yellow_flags(flag_ctx, yellow_flag_checks)
     yellow_flags_found = vyf.any_flag_raised(yellow_flags)
     if not confirmed:
         return render_template(
@@ -163,7 +168,7 @@ def save_iv_info():
     if errors:
         return render_template("partials/generic/red-flag-error-message.html", errors=errors), 200
 
-    yellow_flags = vyf.check_yellow_flags(canonical, vyf.IV_YELLOW_FLAG_CHECKS)
+    yellow_flags = vyf.check_yellow_flags(vyf.FlagContext(canonical), vyf.IV_YELLOW_FLAG_CHECKS)
     yellow_flags_found = vyf.any_flag_raised(yellow_flags)
     if not confirmed:
         return render_template(

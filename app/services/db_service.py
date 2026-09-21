@@ -104,15 +104,6 @@ def stage_add_iv_info(canonical: dict) -> object:
     return queries.add_table_entry(db_session, IV_Info, **kwargs)
 
 
-def stage_add_iv_points(canonical: dict) -> object:
-    """canonical must already have 'iv_id' merged in -- the orchestrator
-    sets this right after stage_add_iv_info runs, since add_table_entry's
-    flush() assigns the PK before this is called."""
-    kwargs = fr.canonical_to_db_kwargs(canonical, "IV_Points")
-    kwargs["iv_id"] = canonical["iv_id"]
-    return queries.add_table_entry(db_session, IV_Points, **kwargs)
-
-
 def stage_upsert_iv_info(canonical: dict, iv_file_path: str) -> object:
     """Keyed by the computed file path, not a business identity like
     Build_Info's upsert or a bare delete-and-reinsert like Build_Parts --

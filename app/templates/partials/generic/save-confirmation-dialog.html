@@ -12,7 +12,7 @@
         <ul>
             {% for yellow_flag_bool, yellow_flag_message in yellow_flag_dict.values() %}
                 {% if yellow_flag_bool %}
-                    <li>{{ yellow_flag_message }}</li>
+                    <li>{{ yellow_flag_message | safe }}</li>
                 {% endif %}
             {% endfor %}
         </ul>

@@ -189,5 +189,18 @@
 				"PYTHONPATH": "${workspaceFolder}"
 			}
 		},
+		{
+			"name": "DB Modification",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.db.alembic_script",
+			"args": [
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
 	]
 }

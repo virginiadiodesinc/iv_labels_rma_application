@@ -1,0 +1,15 @@
+<p>The following parts differ from the BOM</p>
+<table class="bom-comparison-table">
+    <tr>
+        <th>Part Name</th>
+        <th>BOM Qty</th>
+        <th>Actual Qty</th>
+    </tr>
+    {% for part_name, dict in bom_comparison.items() %}
+    <tr>
+        <td>{{ part_name }}</td>
+        <td>{{ dict['theoretical_quantity'] | int }}</td>
+        <td>{{ dict['actual_quantity'] | int }}</td>
+    </tr>
+    {% endfor %}
+</table>

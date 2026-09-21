@@ -530,8 +530,7 @@ input[type="date"] {
 	background: white;
 	padding: 20px;
 	border-radius: 8px;
-	max-width: 250px;
-	width: 80%
+	width: 20%;
 }
 
 .scroll-box {
@@ -637,4 +636,15 @@ summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 .iv-file-upload-form {
 	grid-column-start: 3;
 	grid-column-end: 4;
+}
+
+.bom-comparison-table {
+	border-collapse: collapse;
+	border: thin solid black;
+}
+
+.bom-comparison-table td {
+	text-align: center;
+	border-top: thin solid black;
+	border-bottom: thin solid black;
 }

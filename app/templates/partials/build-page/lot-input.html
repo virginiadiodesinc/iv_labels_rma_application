@@ -47,7 +47,7 @@
 				Other
 			</option>
 
-			{% set lot_list = lot_list if part and part.part_type != "MMIC" else lot_list | reverse %}
+			{% set lot_list = lot_list | reverse %}
 			{% for lot in lot_list %}
 				<option value="{{ lot }}"
 					{% if current_lot == lot %}selected{% endif %}>
