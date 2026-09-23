@@ -90,7 +90,6 @@ def validate_bom_matches(build_name, part_list):
             mismatched_parts_dict[part_name] = quantities
 
     message = render_template("partials/generic/bom_comparison.html", bom_comparison=mismatched_parts_dict)
-    print(part_comparison_dict, accurate_to_bom)
     return [accurate_to_bom, message]
 
 
@@ -194,17 +193,17 @@ FULL_BUILD_YELLOW_FLAG_CHECKS = _BLOCK_CHECKS + [
         lambda c: validate_parts_listed(c.parts),
     ),
     YellowFlagCheck(
-        "missing_rework_info_note",
+        "rework_info_note_missing",
         lambda c: validate_rework_info_note_added(c.notes),
         applies=is_reworked_revision,
     ),
     YellowFlagCheck(
-        "missing_current_test_note",
+        "current_test_note_missing",
         lambda c: validate_current_test_note_added(c.notes),
         applies=needs_current_test,
     ),
     YellowFlagCheck(
-        "bom_mismatch",
+        "mismatched_bom",
         lambda c: validate_bom_matches(c.canonical.get("full_build_name"), c.parts),
         ),
 ]

@@ -14,6 +14,11 @@ block_file_path is never touched here, so an existing block-seeded value is
 never overwritten by this pass. (And vice versa: seed_block_info.py never
 passes build_file_path.)
 
+PROTECTION: an existing Build_Info row with from_file != True was last
+saved through the app, so it is NOT overwritten -- and neither are its
+Build_Parts/Notes (one build = one unit). Those records are written to
+seed_build_protected.jsonl for review and deliberately never checkpointed.
+
 >>> block_id construction is shared with seed_block_info.py via
 >>> seed_shared.py -- see that module. Still a PLACEHOLDER pending the real
 >>> field_registry.build_block_id() logic.
@@ -41,6 +46,7 @@ DB_READY_PATH = OUTPUT_DIR / "db_ready_build_records.jsonl"
 SKIPPED_LOG_PATH = OUTPUT_DIR / "seed_build_skipped.jsonl"
 ERROR_LOG_PATH = OUTPUT_DIR / "seed_build_errors.jsonl"
 CHECKPOINT_PATH = OUTPUT_DIR / "seed_build_checkpoint.jsonl"
+PROTECTED_PATH = OUTPUT_DIR / "seed_build_protected.jsonl"
 
 REQUIRED_FIELDS = ["block_engraving", "block_serial_number", "block_revision"]
 BATCH_SIZE = 100  # smaller than block's 200 -- each build record does more work (info + parts + notes)
@@ -81,14 +87,19 @@ def append_checkpoint(checkpoint_file, source_path, source_mtime):
 def bulk_prefetch(batch):
     """ONE query each for existing Build_Info / Build_Parts / Notes rows
     covering the WHOLE batch, replacing 3 round-trip queries PER RECORD
-    with 3 queries per BATCH. Returns (existing_build_ids: set[str],
-    existing_parts_by_block: dict[str, list], existing_notes_by_block: dict[str, list])."""
+    with 3 queries per BATCH. Returns (existing_from_file_by_block:
+    dict[str, bool | None], existing_parts_by_block: dict[str, list],
+    existing_notes_by_block: dict[str, list]).
+
+    existing_from_file_by_block doubles as the existence check -- a
+    block_id being a KEY means the row exists; its VALUE is that row's
+    from_file, used by process_one_record to decide whether it's protected."""
     block_ids = [build_block_id(r["fields"]) for r in batch]  # block_id doesn't need date-coerced fields
 
-    existing_build_ids = set()
+    existing_from_file_by_block = {}
     if block_ids:
-        rows = db_session.execute(select(Build_Info.block_id).where(Build_Info.block_id.in_(block_ids))).all()
-        existing_build_ids = {row[0] for row in rows}
+        rows = db_session.execute(select(Build_Info.block_id, Build_Info.from_file).where(Build_Info.block_id.in_(block_ids))).all()
+        existing_from_file_by_block = {row[0]: row[1] for row in rows}
 
     existing_parts_by_block = defaultdict(list)
     existing_notes_by_block = defaultdict(list)
@@ -98,7 +109,7 @@ def bulk_prefetch(batch):
         for entry in db_session.execute(select(Notes).where(Notes.block_id.in_(block_ids))).scalars().all():
             existing_notes_by_block[entry.block_id].append(entry)
 
-    return existing_build_ids, existing_parts_by_block, existing_notes_by_block
+    return existing_from_file_by_block, existing_parts_by_block, existing_notes_by_block
 
 
 def read_db_ready_records():
@@ -173,20 +184,29 @@ def replace_parts_and_notes(block_id, parts, notes, existing_parts, existing_not
         queries.add_table_entry(db_session, Notes, block_id=block_id, **coerce_note(note))
 
 
-def process_one_record(record, dry_run, existing_build_ids, existing_parts_by_block, existing_notes_by_block):
+def process_one_record(record, dry_run, existing_from_file_by_block, existing_parts_by_block, existing_notes_by_block):
     """Upserts Build_Info, then replaces its Build_Parts/Notes wholesale.
-    Returns ("added" | "updated" | "would_upsert", block_id)."""
+    Returns ("added" | "updated" | "protected" | "would_upsert", block_id).
+
+    PROTECTED: if the existing Build_Info row was last written by the app
+    (from_file is not True), the WHOLE record is skipped -- Build_Info,
+    Build_Parts, and Notes alike. A build is treated as one cohesive unit,
+    so the check happens before ANY write, not just the Build_Info one."""
     fields = coerce_dates(record["fields"])
     block_id = build_block_id(fields)
 
     if dry_run:
         return "would_upsert", block_id
 
-    existed_before = block_id in existing_build_ids
+    existed_before = block_id in existing_from_file_by_block
+
+    if existed_before and seed_shared.is_protected(existing_from_file_by_block[block_id]):
+        return "protected", block_id
 
     kwargs = dict(fields)
     kwargs["block_id"] = block_id
     kwargs["build_file_path"] = record["source_path"]  # NEVER block_file_path -- see module docstring
+    kwargs["from_file"] = True
 
     if existed_before:
         queries.update_table_entry(db_session, Build_Info, block_id, **kwargs)
@@ -204,37 +224,55 @@ def process_one_record(record, dry_run, existing_build_ids, existing_parts_by_bl
     return ("updated" if existed_before else "added"), block_id
 
 
-def run_batch(batch, dry_run, error_log, checkpoint_file):
-    added = updated = errors = 0
+def log_protected(protected_file, source_path, block_id):
+    protected_file.write(json.dumps({"source_path": source_path, "block_id": block_id}) + "\n")
+    protected_file.flush()
+
+
+def run_batch(batch, dry_run, error_log, checkpoint_file, protected_file):
+    """Protected records are LOGGED but never CHECKPOINTED -- so they get
+    re-evaluated every run. If a reviewed row is flipped back to
+    from_file = True, the next run picks the file up without needing
+    --force or an mtime change."""
+    added = updated = errors = protected = 0
     if dry_run:
-        existing_build_ids, existing_parts_by_block, existing_notes_by_block = set(), {}, {}
+        existing_from_file_by_block, existing_parts_by_block, existing_notes_by_block = {}, {}, {}
     else:
-        existing_build_ids, existing_parts_by_block, existing_notes_by_block = bulk_prefetch(batch)
+        existing_from_file_by_block, existing_parts_by_block, existing_notes_by_block = bulk_prefetch(batch)
 
     try:
+        results = []
         for record in batch:
             status, block_id = process_one_record(
-                record, dry_run, existing_build_ids, existing_parts_by_block, existing_notes_by_block
+                record, dry_run, existing_from_file_by_block, existing_parts_by_block, existing_notes_by_block
             )
+            results.append((record, status, block_id))
             if status == "added":
                 added += 1
             elif status == "updated":
                 updated += 1
             elif status == "would_upsert":
                 added += 1  # dry-run: lumped together, doesn't distinguish add/update
+            elif status == "protected":
+                protected += 1
         if not dry_run:
             queries.commit_db_changes(db_session)
-            for record in batch:
-                append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
-        return added, updated, errors
+            # Logging/checkpointing happens only AFTER a successful commit,
+            # so a mid-batch failure doesn't double-log in the fallback below.
+            for record, status, block_id in results:
+                if status == "protected":
+                    log_protected(protected_file, record["source_path"], block_id)
+                else:
+                    append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
+        return added, updated, errors, protected
     except Exception:
         if not dry_run:
             queries.roll_back_db_changes(db_session)
-        added = updated = errors = 0
+        added = updated = errors = protected = 0
         for record in batch:
             try:
                 status, block_id = process_one_record(
-                    record, dry_run, existing_build_ids, existing_parts_by_block, existing_notes_by_block
+                    record, dry_run, existing_from_file_by_block, existing_parts_by_block, existing_notes_by_block
                 )
                 if status == "added":
                     added += 1
@@ -242,9 +280,14 @@ def run_batch(batch, dry_run, error_log, checkpoint_file):
                     updated += 1
                 elif status == "would_upsert":
                     added += 1
+                elif status == "protected":
+                    protected += 1
                 if not dry_run:
-                    queries.commit_db_changes(db_session)
-                    append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
+                    if status == "protected":
+                        log_protected(protected_file, record["source_path"], block_id)
+                    else:
+                        queries.commit_db_changes(db_session)
+                        append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
             except Exception as row_error:
                 if not dry_run:
                     queries.roll_back_db_changes(db_session)
@@ -255,7 +298,7 @@ def run_batch(batch, dry_run, error_log, checkpoint_file):
                     "error_type": type(row_error).__name__,
                     "fields": record["fields"],
                 }, default=str) + "\n")
-        return added, updated, errors
+        return added, updated, errors, protected
 
 
 def main():
@@ -293,22 +336,25 @@ def main():
             print(f"  {p}")
         print()
 
-    total_added = total_updated = total_errors = 0
+    total_added = total_updated = total_errors = total_protected = 0
 
     with open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log, \
-         open(CHECKPOINT_PATH, "a", encoding="utf-8") as checkpoint_file:
+         open(CHECKPOINT_PATH, "a", encoding="utf-8") as checkpoint_file, \
+         open(PROTECTED_PATH, "w", encoding="utf-8") as protected_file:  # "w": never checkpointed, so rebuilt fresh each run
         for i in range(0, len(clean_records), BATCH_SIZE):
             batch = clean_records[i : i + BATCH_SIZE]
-            added, updated, errors = run_batch(batch, args.dry_run, error_log, checkpoint_file)
+            added, updated, errors, protected = run_batch(batch, args.dry_run, error_log, checkpoint_file, protected_file)
             total_added += added
             total_updated += updated
             total_errors += errors
-            print(f"Batch {i // BATCH_SIZE + 1}: +{added} added, {updated} updated, {errors} errors")
+            total_protected += protected
+            print(f"Batch {i // BATCH_SIZE + 1}: +{added} added, {updated} updated, {errors} errors, {protected} protected")
 
     label = "WOULD ADD" if args.dry_run else "ADDED"
     print()
     print(f"{label}: {total_added}")
     print(f"UPDATED (pre-existing block_id): {total_updated}")
+    print(f"PROTECTED ENTRIES: {total_protected} -> {PROTECTED_PATH}")
     print(f"ERRORS: {total_errors} -> {ERROR_LOG_PATH}")
     if problems:
         print(f"PREFLIGHT PROBLEMS (never attempted): {len(problems)}")

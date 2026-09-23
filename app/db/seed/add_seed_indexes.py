@@ -20,6 +20,7 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_iv_info_iv_file_path ON iv_info (iv_file_path)",
     "CREATE INDEX IF NOT EXISTS idx_build_parts_block_id ON build_parts (block_id)",
     "CREATE INDEX IF NOT EXISTS idx_notes_block_id ON notes (block_id)",
+    "CREATE INDEX IF NOT EXISTS idx_iv_info_block_id ON iv_info (build_id)"
 ]
 
 

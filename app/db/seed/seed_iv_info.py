@@ -27,6 +27,10 @@ and get caught by the normal per-row error handling below -- this warning
 log exists for the case where enforcement is off (common for SQLite) and
 the mismatch would otherwise be invisible.
 
+PROTECTION: an existing IV_Info row with from_file != True was last saved
+through the app, so it is NOT overwritten. Those records are written to
+seed_iv_protected.jsonl for review and deliberately never checkpointed.
+
 Run:
     python seed_iv_info.py --dry-run --limit 20
     python seed_iv_info.py
@@ -49,6 +53,7 @@ DB_READY_PATH = OUTPUT_DIR / "db_ready_iv_records.jsonl"
 ERROR_LOG_PATH = OUTPUT_DIR / "seed_iv_errors.jsonl"
 MISSING_BUILD_INFO_LOG_PATH = OUTPUT_DIR / "seed_iv_missing_build_info.jsonl"
 CHECKPOINT_PATH = OUTPUT_DIR / "seed_iv_checkpoint.jsonl"
+PROTECTED_PATH = OUTPUT_DIR / "seed_iv_protected.jsonl"
 
 IDENTITY_KEYS = ["block_engraving", "block_serial_number", "block_revision"]
 IV_REQUIRED_FIELDS = [k for k in mapping.REQUIRED_DB_KEYS if k not in IDENTITY_KEYS]
@@ -64,7 +69,8 @@ def bulk_prefetch(batch):
     replaces up to 2 round-trip queries PER RECORD with 2 queries per
     BATCH. At BATCH_SIZE=200 that's a ~400x reduction in round trips.
 
-    Returns (existing_iv_by_path: dict[str, int], existing_build_ids: set[str]).
+    Returns (existing_iv_by_path: dict[str, (iv_id, from_file)],
+    existing_build_ids: set[str]).
     """
     paths = [record["source_path"] for record in batch]
     block_ids = []
@@ -76,9 +82,9 @@ def bulk_prefetch(batch):
     existing_iv_by_path = {}
     if paths:
         rows = db_session.execute(
-            select(IV_Info.iv_file_path, IV_Info.iv_id).where(IV_Info.iv_file_path.in_(paths))
+            select(IV_Info.iv_file_path, IV_Info.iv_id, IV_Info.from_file).where(IV_Info.iv_file_path.in_(paths))
         ).all()
-        existing_iv_by_path = {row[0]: row[1] for row in rows}
+        existing_iv_by_path = {row[0]: (row[1], row[2]) for row in rows}
 
     existing_build_ids = set()
     if block_ids:
@@ -173,6 +179,9 @@ def coerce_polarity(fields):
 
 
 def process_one_record(record, dry_run, missing_build_info_log, existing_iv_by_path, existing_build_ids):
+    """Returns ("added" | "updated" | "protected" | "would_upsert", block_id).
+    The second value is ALWAYS block_id, whatever the status -- the IV's
+    own identity for review is its source_path, which the caller already has."""
     fields = coerce_dates(record["fields"])
     fields = coerce_polarity(fields)
     identity, iv_fields = extract_identity_and_iv_fields(fields)
@@ -183,6 +192,14 @@ def process_one_record(record, dry_run, missing_build_info_log, existing_iv_by_p
     if dry_run:
         return "would_upsert", block_id
 
+    existing = existing_iv_by_path.get(iv_file_path)
+    if existing is not None:
+        existing_iv_id, existing_from_file = existing
+        # Checked BEFORE the missing-Build_Info warning so protected
+        # records don't also add noise to that log.
+        if seed_shared.is_protected(existing_from_file):
+            return "protected", block_id
+
     if block_id not in existing_build_ids:
         missing_build_info_log.write(json.dumps({
             "source_path": iv_file_path,
@@ -191,18 +208,24 @@ def process_one_record(record, dry_run, missing_build_info_log, existing_iv_by_p
 
     iv_fields["build_id"] = block_id
     iv_fields["iv_file_path"] = iv_file_path
+    iv_fields["from_file"] = True
 
-    existing_iv_id = existing_iv_by_path.get(iv_file_path)
-    if existing_iv_id is not None:
+    if existing is not None:
         queries.update_table_entry(db_session, IV_Info, existing_iv_id, **iv_fields)
         return "updated", block_id
-    else:
-        queries.add_table_entry(db_session, IV_Info, **iv_fields)
-        return "added", block_id
+    queries.add_table_entry(db_session, IV_Info, **iv_fields)
+    return "added", block_id
 
 
-def run_batch(batch, dry_run, error_log, missing_build_info_log, checkpoint_file):
-    added = updated = errors = 0
+def log_protected(protected_file, source_path, block_id):
+    protected_file.write(json.dumps({"source_path": source_path, "block_id": block_id}) + "\n")
+    protected_file.flush()
+
+
+def run_batch(batch, dry_run, error_log, missing_build_info_log, checkpoint_file, protected_file):
+    """Protected records are LOGGED but never CHECKPOINTED -- see
+    seed_build_info.run_batch for why."""
+    added = updated = errors = protected = 0
     existing_iv_by_path, existing_build_ids = ({}, set()) if dry_run else bulk_prefetch(batch)
     # NOTE: prefetched once, at batch start -- if the same iv_file_path
     # somehow appears twice within one batch, the second occurrence won't
@@ -211,23 +234,32 @@ def run_batch(batch, dry_run, error_log, missing_build_info_log, checkpoint_file
     # batch shouldn't occur), just not airtight in that edge case.
 
     try:
+        results = []
         for record in batch:
             status, block_id = process_one_record(
                 record, dry_run, missing_build_info_log, existing_iv_by_path, existing_build_ids
             )
+            results.append((record, status, block_id))
             if status in ("added", "would_upsert"):
                 added += 1
             elif status == "updated":
                 updated += 1
+            elif status == "protected":
+                protected += 1
         if not dry_run:
             queries.commit_db_changes(db_session)
-            for record in batch:
-                append_checkpoint(checkpoint_file, record["source_path"])
-        return added, updated, errors
+            # Logging/checkpointing happens only AFTER a successful commit,
+            # so a mid-batch failure doesn't double-log in the fallback below.
+            for record, status, block_id in results:
+                if status == "protected":
+                    log_protected(protected_file, record["source_path"], block_id)
+                else:
+                    append_checkpoint(checkpoint_file, record["source_path"])
+        return added, updated, errors, protected
     except Exception:
         if not dry_run:
             queries.roll_back_db_changes(db_session)
-        added = updated = errors = 0
+        added = updated = errors = protected = 0
         for record in batch:
             try:
                 status, block_id = process_one_record(
@@ -237,9 +269,14 @@ def run_batch(batch, dry_run, error_log, missing_build_info_log, checkpoint_file
                     added += 1
                 elif status == "updated":
                     updated += 1
+                elif status == "protected":
+                    protected += 1
                 if not dry_run:
-                    queries.commit_db_changes(db_session)
-                    append_checkpoint(checkpoint_file, record["source_path"])
+                    if status == "protected":
+                        log_protected(protected_file, record["source_path"], block_id)
+                    else:
+                        queries.commit_db_changes(db_session)
+                        append_checkpoint(checkpoint_file, record["source_path"])
             except Exception as row_error:
                 if not dry_run:
                     queries.roll_back_db_changes(db_session)
@@ -250,7 +287,7 @@ def run_batch(batch, dry_run, error_log, missing_build_info_log, checkpoint_file
                     "error_type": type(row_error).__name__,
                     "fields": record["fields"],
                 }, default=str) + "\n")
-        return added, updated, errors
+        return added, updated, errors, protected
 
 
 def main():
@@ -285,25 +322,28 @@ def main():
             print(f"  {p}")
         print()
 
-    total_added = total_updated = total_errors = 0
+    total_added = total_updated = total_errors = total_protected = 0
 
     with open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log, \
          open(MISSING_BUILD_INFO_LOG_PATH, "w", encoding="utf-8") as missing_build_info_log, \
-         open(CHECKPOINT_PATH, "a", encoding="utf-8") as checkpoint_file:
+         open(CHECKPOINT_PATH, "a", encoding="utf-8") as checkpoint_file, \
+         open(PROTECTED_PATH, "w", encoding="utf-8") as protected_file:  # "w": never checkpointed, so rebuilt fresh each run
 
         for i in range(0, len(clean_records), BATCH_SIZE):
             batch = clean_records[i : i + BATCH_SIZE]
-            added, updated, errors = run_batch(batch, args.dry_run, error_log, missing_build_info_log, checkpoint_file)
+            added, updated, errors, protected = run_batch(batch, args.dry_run, error_log, missing_build_info_log, checkpoint_file, protected_file)
             total_added += added
             total_updated += updated
             total_errors += errors
-            print(f"Batch {i // BATCH_SIZE + 1}: +{added} added, {updated} updated, {errors} errors")
+            total_protected += protected
+            print(f"Batch {i // BATCH_SIZE + 1}: +{added} added, {updated} updated, {errors} errors, {protected} protected")
 
     label = "WOULD ADD" if args.dry_run else "ADDED"
     print()
     print(f"{label}: {total_added}")
     print(f"UPDATED (pre-existing iv_file_path): {total_updated}")
     print(f"ERRORS: {total_errors} -> {ERROR_LOG_PATH}")
+    print(f"PROTECTED ENTRIES: {total_protected} -> {PROTECTED_PATH}")
     print(f"MISSING BUILD_INFO (inserted anyway, FK target not found): see {MISSING_BUILD_INFO_LOG_PATH}")
     if problems:
         print(f"PREFLIGHT PROBLEMS (never attempted): {len(problems)}")

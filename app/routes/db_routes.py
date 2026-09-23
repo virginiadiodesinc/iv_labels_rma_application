@@ -295,15 +295,7 @@ def select_iv_from_db():
     iv_list = get_table_entries(db_session, IV_Info, build_id=build_id)
     for iv in iv_list:
         iv.iv_path_stem = Path(iv.iv_file_path).stem
-        iv_info_dict = {
-                    column.name: getattr(iv, column.name)
-                    for column in iv.__table__.columns
-                }
 
-    # Passing the actual rows now, not just the path stems -- the template
-    # needs both: iv.iv_id for the option's VALUE, the stem for what's
-    # DISPLAYED. This is the one change that makes populate_iv_from_db (and
-    # delete) simple.
     return render_template("partials/iv-page/select-iv-from-db.html", iv_list=iv_list, missing_forms=missing_forms)
 
 

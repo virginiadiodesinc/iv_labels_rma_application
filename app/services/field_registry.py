@@ -37,7 +37,7 @@ class Section(Enum):
     PB1 = "pb1"
     PB2 = "pb2"
     FULL_BUILD = "full_build"
-    YELLOW_FLAG = "yellow_flag"
+    YELLOW_FLAG = "yellow_flags"
     IV_PARAMETERS = "iv_parameters"
     BUILD_PARTS = "build_parts"
     NOTES = "notes"
@@ -119,12 +119,19 @@ FIELDS: list[FieldSpec] = [
 
     # --- yellow flags ---
     # canonical name doubles as the Yellow_Flags column name unless overridden
+    FieldSpec("flagged", Section.YELLOW_FLAG, bool, db_model="Build_Info"),
     FieldSpec("unlisted_block_name", Section.YELLOW_FLAG, bool,
                 db_model="Yellow_Flags", callable_name="validate_block_name_listed"),
     FieldSpec("unlisted_build_name", Section.YELLOW_FLAG, bool,
                 db_model="Yellow_Flags",  callable_name="validate_build_name_listed"),
     FieldSpec("mismatched_bom", Section.YELLOW_FLAG, bool,
                 db_model="Yellow_Flags",  callable_name="validate_bom_matches"),
+    FieldSpec("current_test_note_missing", Section.YELLOW_FLAG, bool,
+                db_model="Yellow_Flags",  callable_name="validate_current_test_note_added"),
+    FieldSpec("rework_info_note_missing", Section.YELLOW_FLAG, bool,
+                db_model="Yellow_Flags",  callable_name="validate_rework_info_note_added"),
+    FieldSpec("no_parts_listed", Section.YELLOW_FLAG, bool,
+                db_model="Yellow_Flags",  callable_name="validate_parts_listed"),
 
     # --- IV parameters ---
     FieldSpec("points_per_decade", Section.IV_PARAMETERS, int, db_model="IV_Info", form_name="iv-points-per-decade"),
@@ -174,7 +181,7 @@ FIELDS: list[FieldSpec] = [
     FieldSpec("iv_diode_lot", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="diode_lot"),
     FieldSpec("iv_circuit_name", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="circuit"),
     FieldSpec("iv_circuit_lot", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="circuit_lot"),
-    FieldSpec("iv_assembly_number", Section.IV_PARAMETERS, int, db_model="IV_Info", db_column="assembly_number", form_name="iv-assembly-number"),
+    FieldSpec("iv_assembly_number", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="assembly_number", form_name="iv-assembly-number"),
     FieldSpec("iv_date", Section.IV_PARAMETERS, date, db_model="IV_Info"),
 
     # --- IV identity -- separate canonical names from block_engraving/etc.
@@ -276,6 +283,11 @@ def canonical_from_form(form) -> dict:
             result["iv_block_revision"] = "A"
 
     return result
+
+def yellow_flag(canonical: dict) -> dict:
+    canonical = dict(canonical)
+    canonical["flagged"] = True
+    return canonical
 
 def merge_yellow_flags(canonical: dict, yellow_flag_dict: dict) -> dict:
     """yellow_flag_dict is {key: [flag_is_raised, message]}, from

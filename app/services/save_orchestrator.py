@@ -127,6 +127,22 @@ def _save_files_and_info(
     entry.block_file_path = block_file_path
     entry.build_file_path = build_file_path
 
+    if "flagged" in canonical and canonical["flagged"] == True:
+        try:
+            db_service.stage_upsert_yellow_flags(canonical)
+        except Exception as e:
+            traceback.print_exc()
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="db yellow flags", error=e)
+    else:
+        try:
+            db_service.stage_delete_yellow_flags(canonical)
+        except Exception as e:
+            traceback.print_exc()
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="db yellow flags", error=e)
+
+
     try:
         db_service.commit_db_changes()
     except Exception as e:

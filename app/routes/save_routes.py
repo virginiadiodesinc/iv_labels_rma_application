@@ -36,7 +36,9 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
 
     errors = vrf.validate_info(canonical, red_flag_checks)
     if collects_parts:
-        errors.extend(vrf.validate_all_lots_chosen(parts_list))
+        errors.extend(vrf.validate_all_lots_chosen(parts_list)), 
+        errors.extend(vrf.validate_no_blank_parts(parts_list)), 
+        errors.extend(vrf.validate_no_blank_notes(notes_list))
     if errors:
         return render_template("partials/generic/red-flag-error-message.html", errors=errors), 200
 
@@ -56,7 +58,11 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
             print_label=print_label
         ), 200
 
-    canonical = fr.merge_yellow_flags(canonical, yellow_flags)
+    if yellow_flags_found:
+        canonical = fr.yellow_flag(canonical)
+        canonical = fr.merge_yellow_flags(canonical, yellow_flags)
+
+    print(yellow_flags)
 
     if collects_parts:
         result = orchestrator_fn(canonical, parts_list, notes_list)

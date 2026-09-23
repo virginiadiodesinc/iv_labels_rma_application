@@ -7,7 +7,7 @@ for the field-name mapping instead of hand-listing columns per route.
 
 from app.services import field_registry as fr
 from app.db.database import db_session
-from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity, Note_Type
+from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity, Note_Type, Yellow_Flags
 from app.db import queries
 
 
@@ -54,6 +54,7 @@ def stage_upsert_build_info(canonical: dict, **extra_columns):
     kwargs = fr.canonical_to_db_kwargs(canonical, "Build_Info")
     kwargs["block_id"] = block_id
     kwargs.update(extra_columns)
+    kwargs["from_file"] = False
     return queries.upsert_table_entry(db_session, Build_Info, block_id, **kwargs)
 
 
@@ -101,6 +102,7 @@ def stage_add_iv_info(canonical: dict) -> object:
     kwargs = fr.canonical_to_db_kwargs(canonical, "IV_Info")
     kwargs["build_id"] = fr.build_block_id_from_iv(canonical)
     kwargs["polarity"] = Polarity.POSITIVE if canonical.get("polarity") == "+" else Polarity.NEGATIVE
+    kwargs["from_file"] = False
     return queries.add_table_entry(db_session, IV_Info, **kwargs)
 
 
@@ -122,6 +124,7 @@ def stage_upsert_iv_info(canonical: dict, iv_file_path: str) -> object:
     kwargs["build_id"] = fr.build_block_id_from_iv(canonical)
     kwargs["polarity"] = Polarity.POSITIVE if canonical.get("polarity") == "+" else Polarity.NEGATIVE
     kwargs["iv_file_path"] = iv_file_path
+    kwargs["from_file"] = False
 
     if existing:
         entry = existing[0]
@@ -151,18 +154,38 @@ def stage_delete_iv_info(iv_id):
     return entry
 
 
-def stage_delete_iv_points(iv_id) -> list:
-    points = queries.get_table_entries(db_session, IV_Points, iv_id=iv_id)
-    for point in points:
-        queries.delete_table_entry(db_session, IV_Points, point.point_id)
-    return points
-
-
 def get_iv_info_by_id(iv_id):
     """Direct PK lookup -- IV_Info.iv_id IS the primary key, so this is the
     one thing that should ever be used to name a specific IV row. Replaces
     the old query-by-build_id-then-scan-for-matching-path-stem pattern."""
     return db_session.get(IV_Info, iv_id)
+
+
+def stage_upsert_yellow_flags(canonical: dict) -> object:
+    block_id = fr.build_block_id(canonical)
+    kwargs = fr.canonical_to_db_kwargs(canonical, "Yellow_Flags")
+    kwargs["block_id"] = block_id
+
+    existing = queries.get_table_entries(db_session, Yellow_Flags, block_id=block_id)
+
+    if existing:
+        entry = existing[0]
+        entry = queries.update_table_entry(db_session, Yellow_Flags, entry.block_id, **kwargs)
+    else:
+        entry = queries.add_table_entry(db_session, Yellow_Flags, **kwargs)
+    return entry
+
+
+def stage_delete_yellow_flags(canonical: dict) -> object:
+    block_id = fr.build_block_id(canonical)
+
+    existing = queries.get_table_entries(db_session, Yellow_Flags, block_id=block_id)
+    
+    if existing:
+        entry = existing[0]
+        return db_session.delete(entry)
+    else:
+        return
 
 
 def commit_db_changes():

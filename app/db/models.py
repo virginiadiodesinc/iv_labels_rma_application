@@ -34,6 +34,9 @@ class Build_Info(Base):
 	build_file_path = Column(String)
 	# VERIFICATION FLAG
 	flagged = Column(Boolean, nullable=False, default=False)
+	# HOW SAVED
+	from_file = Column(Boolean)
+
 
 class Build_Parts(Base):
 	__tablename__ = "build_parts"
@@ -49,9 +52,11 @@ class Build_Parts(Base):
 	indium = Column(String)
 	modifications = Column(String)
 
+
 class Polarity(enum.Enum):
 	POSITIVE = "positive"
 	NEGATIVE = "negative"
+
 
 class IV_Info(Base):
 	__tablename__ = "iv_info"
@@ -84,11 +89,14 @@ class IV_Info(Base):
 	voltage_up_mv = Column(String)
 	voltage_down_mv = Column(String)
 	current_ua = Column(String)
+	from_file = Column(Boolean)
+
 
 class Note_Type(enum.Enum):
 	GENERIC = "generic"
 	CURRENT_TEST = "current_test"
 	REWORK_SUMMARY = "rework_summary"
+
 
 class Notes(Base):
 	__tablename__ = "notes"
@@ -97,6 +105,7 @@ class Notes(Base):
 	type = Column(Enum(Note_Type), nullable=False)
 	note = Column(String, nullable=False)
 
+
 class Yellow_Flags(Base):
 	__tablename__ = 'yellow_flags'
 	block_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
@@ -104,6 +113,10 @@ class Yellow_Flags(Base):
 	mismatched_bom = Column(Boolean)
 	unlisted_block_name = Column(Boolean)
 	unlisted_build_name = Column(Boolean)
+	current_test_note_missing = Column(Boolean)
+	rework_info_note_missing = Column(Boolean)
+	no_parts_listed = Column(Boolean)
+
 
 class Feedback(Base):
 	__tablename__ = 'feedback'

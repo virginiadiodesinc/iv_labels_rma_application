@@ -58,6 +58,21 @@ def validate_all_lots_chosen(parts_list: list[dict]) -> list[str]:
             errors.append(f"{part['part_name']} has no selected lot. Please select something (including NA or Unknown) for the lot value.")
     return errors
 
+
+def validate_no_blank_parts(parts_list: list[dict]) -> list[str]:
+    for part in parts_list:
+        if part['part_name'].strip() == "":
+            return(["There is at least 1 empty part field. Please delete the part row or add a part name and lot to it."])
+    return []
+
+
+def validate_no_blank_notes(notes_list: list[dict]) -> list[str]:
+    for note in notes_list:
+        if note['note'].strip() == "":
+            return(["There is at least 1 empty note field. Please delete the note or add text to it."])
+    return []
+
+
 def validate_iv_lots_chosen(iv_parts_dict: dict) -> list[str]:
     errors = []
     if iv_parts_dict["iv_diode_lot"] == "Choose":

@@ -20,5 +20,5 @@ def check_block_revisions():
     partial_block_id = fr.build_partial_block_id(canonical)
 
     revision_letter_list = db_service.get_all_block_revisions_from_partial_block_id(partial_block_id)
-    
+
     return render_template("partials/generic/revision-list-dialog.html", revision_letter_list=revision_letter_list, missing_forms=missing_forms)

@@ -165,6 +165,7 @@ def insert_one(record, dry_run, existing_block_ids):
         Build_Info,
         block_id=block_id,
         block_file_path=record["source_path"],
+        from_file=True,
         **fields,
     )
     return "added", block_id

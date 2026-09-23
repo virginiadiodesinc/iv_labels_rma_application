@@ -1,5 +1,6 @@
 """
-Shared helpers used by BOTH seed_block_info.py and seed_build_info.py.
+Shared helpers used by seed_block_info.py, seed_build_info.py, and
+seed_iv_info.py.
 
 The reason this exists as its own module rather than being duplicated in
 each script: build_block_id() MUST return identical output for the block
@@ -39,3 +40,12 @@ def find_missing_required(fields, required_fields):
     0.0 / False values (e.g. reverse_breakdown_current == 0.0) as missing,
     since those are falsy in Python but perfectly valid data."""
     return [key for key in required_fields if key not in fields]
+
+
+def is_protected(existing_from_file):
+    """True if an EXISTING row must not be overwritten by a file seed.
+    `is not True` (rather than `== False`) deliberately treats NULL as
+    protected too -- a row whose provenance is unknown shows up in the
+    protected log for review instead of being silently clobbered.
+    Shared by build + IV seeding so the rule can't drift between them."""
+    return existing_from_file is not True
