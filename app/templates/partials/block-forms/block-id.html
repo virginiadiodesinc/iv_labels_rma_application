@@ -52,7 +52,8 @@
 					hx-post="/search_block_revisions"
 					hx-include="#block-info"
 					hx-target="#generic-popup"
-					hx-swap="outerHTML">	
+					hx-swap="outerHTML"
+					hx-disabled-elt="#block-forms-container button">	
 					Search Revisions in DB
 				</button>
 			</td>
@@ -64,8 +65,7 @@
 	class="important-button"
 	hx-post="/populate_block_info_from_db"
 	hx-include="#block-info"
-	hx-target="#block-forms-container"
-	hx-swap="innerHTML">	
+	hx-swap="none">
 	Populate Block/Build Information
 </button>
 <div class="small-line-break"></div>

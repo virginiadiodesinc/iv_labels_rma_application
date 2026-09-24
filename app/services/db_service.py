@@ -14,7 +14,7 @@ from app.db import queries
 def get_block_and_build_info(canonical: dict):
     block_id = fr.build_block_id(canonical)
     filters = {"block_id": block_id}
-    block = queries.get_table_entries(db_session, Build_Info, **filters)[0]
+    block = queries.get_table_entries(db_session, Build_Info, **filters)[0] if queries.get_table_entries(db_session, Build_Info, **filters) else None
     parts = queries.get_table_entries(db_session, Build_Parts, **filters)
     notes = queries.get_table_entries(db_session, Notes, **filters)
     return block, parts, notes

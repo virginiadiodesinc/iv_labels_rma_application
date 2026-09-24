@@ -1,0 +1,22 @@
+<div 
+	hx-swap-oob="true"
+	id="generic-popup"
+	class="modal-overlay">
+	<div class="modal">
+		{% if missing_forms %}
+			<p>
+				Please input at least a Block Engraving and Serial Number in order to search the database for Block/Build information.
+			</p>
+		{% else %}
+			<p>
+				Sorry, no Block/Build information was found with the input Block Engraving, Serial Number, and Revision.
+			</p>
+		{% endif %}
+		<button
+			hx-post="/cancel_generic_dialog/"
+			hx-target="#generic-popup"
+			hx-swap="outerHTML">
+			Cancel
+		</button>
+	</div>
+</div>
