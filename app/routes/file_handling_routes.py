@@ -1037,8 +1037,9 @@ def get_diode_spec_sheet():
 		runcode_form = request.form
 		runcode = runcode_form.get("spec-sheet-runcode-input")
 		html_table = dss.get_html_table_from_runcode(runcode)
+		file_path = dss.get_file_path_from_runcode(runcode)
 
-		return render_template("partials/iv-page/iv-spec-table.html", runcode=runcode, html_table=html_table)
+		return render_template("partials/iv-page/iv-spec-table.html", runcode=runcode, html_table=html_table, file_path=file_path)
 	
 	except:
 		print("Sorry, something went wrong with pulling the diode spec sheet.")

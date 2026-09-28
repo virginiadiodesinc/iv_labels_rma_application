@@ -51,6 +51,8 @@ import traceback
 import os
 
 
+current_iv_file_directory = config.iv_file_directory
+
 @dataclass
 class SaveResult:
     success: bool
@@ -238,7 +240,8 @@ def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list
         db_service.roll_back_db_changes()
         return SaveResult(success=False, failure_cause="db build info", error=e)
 
-    iv_file_path = file_service.choose_iv_file_path(canonical, config.iv_file_directory)
+    global current_iv_file_directory
+    iv_file_path, current_iv_file_directory = file_service.choose_iv_file_path(canonical, current_iv_file_directory)
 
     try:
         iv_entry = db_service.stage_upsert_iv_info(canonical, iv_file_path)

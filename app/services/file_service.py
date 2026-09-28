@@ -111,7 +111,8 @@ def choose_iv_file_path(canonical: dict, iv_file_directory: str) -> str:
         directory=iv_file_directory
         )
     selected_path = str(Path(selected_path[0]))
-    return selected_path
+    current_iv_file_directory = str(Path(selected_path[0]).parent)
+    return selected_path, current_iv_file_directory
 
 
 def save_iv_file(canonical: dict, vup_list: list, vdown_list: list, isource_list: list, iv_file_path: str) -> str:

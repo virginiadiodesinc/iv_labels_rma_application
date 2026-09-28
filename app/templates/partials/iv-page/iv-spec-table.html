@@ -23,7 +23,12 @@
     <div class="small-line-break"></div>
     <details open>
         <summary>Diode Spec Sheet</summary>
-        {{ html_table | safe }}
+        <div id="spec-table-text-container" class="selectable-text">
+            {{ html_table | safe }}
+        </div>
+        <p id="iv-spec-file-link" class="selectable-text" href="{{ file_path }}">
+            {{ file_path }}
+        </p>
         <button id="spec-sheet-clear-button"
                 hx-post="/clear_diode_spec_sheet/"
                 hx-swap="innerHTML"
