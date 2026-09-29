@@ -101,7 +101,7 @@ def import_diode_info_from_iv():
 		if diode_info[part_field] and diode_info[part_field].isnumeric():
 			diode_info[part_field] = round(diode_info[part_field], 2)
 
-	print("D", diode_info)
+
 
 	return render_template("partials/build-page/diode-row.html", part=diode_info)
 
@@ -129,9 +129,6 @@ def add_iv_assembly_to_build_parts():
 		if diode_info[part_field] and diode_info[part_field].isnumeric():
 			diode_info[part_field] = round(diode_info[part_field], 2)
 
-	print("C", circuit_info)
-	print("D", diode_info)
-
 	rows = []
 	rows.append(
 			render_template("partials/build-page/part-row.html", part=diode_info)
@@ -145,8 +142,6 @@ def add_iv_assembly_to_build_parts():
 @build_bp.post("/import_block_identifiers_to_iv/")
 def import_block_identifiers_to_iv():
 	block_build_identifiers = request.form
-
-	print(block_build_identifiers)
 
 	iv_data = {
 		"block_name": block_build_identifiers.get("block-engraving-input", ""),

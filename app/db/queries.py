@@ -55,9 +55,7 @@ def delete_table_entry(db_session, model, entry_id):
 
 # UPSERT (ADD IF NEW, UPDATE IF NOT)
 def upsert_table_entry(db_session, model, entry_id, **data):
-	print(data)
 	entry = db_session.get(model, entry_id)
-	print(entry)
 	if not entry:
 		entry = add_table_entry(db_session, model, **data)
 	else:
