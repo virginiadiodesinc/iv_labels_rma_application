@@ -116,6 +116,7 @@ def take_iv():
 
 		fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
 		fig.update_traces(mode='lines+markers')
+		fig.update_layout(autosize=True, margin=dict(t=5))
 
 		iv_curve = {} 
 		iv_curve["figure"] = fig.to_html(full_html=False)
@@ -183,6 +184,7 @@ def get_empty_plot():
 
 	fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_y=True)
 	fig.update_traces(mode='lines+markers')
+	fig.update_layout(autosize=True, margin=dict(t=5))
 
 	iv_curve = {} 
 	iv_curve["figure"] = fig.to_html(full_html=False)
@@ -195,17 +197,16 @@ def get_empty_plot():
 def adjust_plot_scaling():
 	plot_info = request.form
 
-	voltages = plot_info.get("iv-measurement-values", "").split(",") 
-
 	df = pd.DataFrame({
-		"Voltage (V)": [round(float(point), 2) for point in plot_info.get("iv-measurement-values", "").split(",") if point],
-		"Current (uA)": [round(float(point), 2) for point in plot_info.get("iv-source-values", "").split(",") if point]
+		"Voltage (V)": [float(point) for point in plot_info.get("iv-measurement-values", "").split(",") if point],
+		"Current (uA)": [float(point) for point in plot_info.get("iv-source-values", "").split(",") if point]
 	})
 
 	logarithmic = plot_info.get("plot-scaling-type", "") == "log"
 
 	fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_y=logarithmic)
 	fig.update_traces(mode='lines+markers')
+	fig.update_layout(autosize=True, margin=dict(t=5))
 
 	iv_curve = {"figure": fig.to_html(full_html=False)}
 

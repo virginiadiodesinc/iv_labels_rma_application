@@ -1,7 +1,7 @@
 <form id="iv-info" name="iv-info" class="iv-info">
 	<table class="curve-fit-parameters-table">
 		<tr>
-			<th>Diode IV Curve Fit Parameters</th>
+			<th>Curve Fit Parameters</th>
 		</tr>
 		<tr>
 			<td>Rs (1/2)</td>
@@ -70,6 +70,8 @@
 		</tr>
 	</table>
 
+	<div class="small-line-break"></div>
+
 	<table class="series-resistance-table">
 		<tr>
 			<td>Rs 4pt</td>
@@ -97,7 +99,7 @@
 		</tr>
 	</table>
 
-	<div class="line-break"></div>
+	<div class="small-line-break"></div>
 
 	<table class="reverse-breakdown-table">
 		<tr>
@@ -121,6 +123,9 @@
 
 	<table class="heat-test-table">
 		<tr>
+			<th>Temperature</th>
+		</tr>
+		<tr>
 			<td>Pass Heat</td>
 			<td>{{iv_data.pass_heat if iv_data and iv_data.pass_heat is not none else '0.0'}}</td>
 			<td>
@@ -133,12 +138,9 @@
 		</tr>
 	</table>
 
-	<div class="line-break"></div>
+	<div class="small-line-break"></div>
 
 	<table class="landmark-numbers-table" id="landmark-numbers-table">
-		<tr>
-			<th>Landmark Numbers</th>
-		</tr>
 		<tr>
 			<td></td>
 			<td>V (mV)</td>
@@ -176,9 +178,6 @@
 		</tr>
 	</table>
 		<table class ="landmark-numbers-table-2" id="landmark-numbers-table-2">
-		<tr>
-			<th>Landmark Numbers</th>
-		</tr>
 		<tr>
 			<td>Imax (mA)</td>
 			<td>{{(iv_data.max_current|int) if iv_data and iv_data.max_current is not none else ''}}</td>

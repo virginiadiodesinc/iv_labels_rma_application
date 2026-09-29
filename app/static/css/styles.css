@@ -321,6 +321,7 @@ input {
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
+	row-gap: 2px;
 }
 
 .part-row-line-1 {
@@ -332,7 +333,6 @@ input {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	gap: 20px;
 }
 
 .diode-row {
@@ -590,15 +590,6 @@ th {
 .pcb-modifications-input {
 	width: 85%;
 }
-
-.diode-indium-container {
-	flex-grow: 1;
-}
-
-.diode-indium-input {
-	width: 80%;
-}
-
 
 summary :is(h1, h2, h3, h4, h5, h6) {
 	display: inline;

@@ -1,1 +1,3 @@
-{{iv_curve["figure"] | safe if iv_curve and iv_curve["figure"] else "Loading plot..."}}
+<div id="iv-figure" class="iv-figure" hx-swap-oob="true">
+    {{iv_curve["figure"] | safe if iv_curve and iv_curve["figure"] else "Loading plot..."}}
+</div>

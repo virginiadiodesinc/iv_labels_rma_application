@@ -2,12 +2,8 @@
 	class="iv-plot-container"
 	hx-get="/get_empty_plot"
 	hx-trigger="load"
-	hx-swap="innerHTML"
+	hx-swap="outerHTML"
 	hx-target="#iv-plot">
-
-	<div id="iv-loading" class="htmx-indicator">
-		Loading IV...
-	</div>
 
 	<div id="iv-plot-subcontainer">
 		<h2 id="iv-plot-title" class="iv-plot-title">Diode IV Curve (A,V)</h2>

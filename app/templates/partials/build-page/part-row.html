@@ -43,6 +43,9 @@
 			</button>
 		</div>
 	</div>
+
+	<div class="small-line-break"></div>
+
 	<div class="part-row-line-2">
 		<div class="lot-container">
 			{% if part or (build and build.part_name)%}
@@ -72,6 +75,11 @@
 				</select>
 			</label>
 		</div>
+	</div>
+
+	<div class="small-line-break"></div>
+
+	<div class="part-row-line-3">
 		<div class="diode-row"
 			{% set is_diode = (part and part.part_type == "DIODE") %}
 			{% if not is_diode %}style="display:none"{% endif %}>
