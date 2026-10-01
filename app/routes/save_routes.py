@@ -62,8 +62,6 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
         canonical = fr.yellow_flag(canonical)
         canonical = fr.merge_yellow_flags(canonical, yellow_flags)
 
-    print(yellow_flags)
-
     if collects_parts:
         result = orchestrator_fn(canonical, parts_list, notes_list)
     else:
@@ -105,7 +103,7 @@ def save_pb1_info():
     return _handle_save(
         "save_pb1_info",
         [vrf.validate_block_identification, vrf.validate_inspection_info, vrf.validate_pb1_info],
-        vyf.FULL_BUILD_YELLOW_FLAG_CHECKS,
+        vyf.PREBUILD_YELLOW_FLAG_CHECKS,
         save_orchestrator.save_pb1_info,
         print_fn=print_service.print_pb1_label,
         collects_parts=True,
@@ -118,7 +116,7 @@ def save_pb2_info():
     return _handle_save(
         "save_pb2_info",
         [vrf.validate_block_identification, vrf.validate_inspection_info, vrf.validate_pb2_info],
-        vyf.FULL_BUILD_YELLOW_FLAG_CHECKS,
+        vyf.PREBUILD_YELLOW_FLAG_CHECKS,
         save_orchestrator.save_pb2_info,
         print_fn=print_service.print_pb2_label,
         collects_parts=True,
@@ -162,7 +160,6 @@ def save_build_info():
 @save_bp.post("/save_iv_info/")
 def save_iv_info():
     canonical = fr.canonical_from_form(request.form)
-    print(canonical)
     confirmed = request.form.get("confirmed") == "true"
 
     iv_parts = parts_service.iv_parts_from_form(request.form)

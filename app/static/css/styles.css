@@ -95,7 +95,7 @@
 	grid-column-end: 4;
 }
 
-.bom-container {
+.search-container {
 	grid-column-start: 5;
 	grid-column-end: 8;
 }
@@ -588,7 +588,10 @@ th {
 }
 
 .pcb-modifications-input {
-	width: 85%;
+	field-sizing: content;
+	min-height: 1em; /* Gives it an initial height */
+	width: 40.5em;
+	resize: none; /* Prevents the user from manually resizing and breaking the flow */
 }
 
 summary :is(h1, h2, h3, h4, h5, h6) {
@@ -639,3 +642,16 @@ summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 	border-top: thin solid black;
 	border-bottom: thin solid black;
 }
+
+.note-text-area {
+	field-sizing: content;
+	min-height: 1em; /* Gives it an initial height */
+	width: 25.25em;
+	resize: none; /* Prevents the user from manually resizing and breaking the flow */
+}
+
+.label-around-text-area {
+	display: inline-flex;
+	gap: .25em;
+}
+

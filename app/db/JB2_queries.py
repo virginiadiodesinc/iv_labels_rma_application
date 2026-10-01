@@ -33,6 +33,75 @@ def get_Build_Name_List(user_input):
 
     return parts_found
 
+
+def get_part_list(part_name, part_type):
+    conn = pyodbc.connect(
+        'DRIVER={ODBC Driver 18 for SQL Server};'
+        'SERVER=10.1.10.31,1433;'
+        'DATABASE=VDI-JB2;'
+        'UID=python;'
+        r'PWD=3s0brK09%iPS$6o9^h%W;'
+        'Encrypt=yes;TrustServerCertificate=yes;'
+    )
+
+    cursor = conn.cursor()
+
+    type_condition = ""
+    if part_type != "ANY":
+        type_condition = "AND Estim.ProdCode LIKE '%" + part_type + "%'"
+
+    sql_part_query =  "SELECT DISTINCT " \
+                            "   Estim.PartNo " \
+                            "FROM " \
+                            "   Estim " \
+                            "WHERE " \
+                            "   Estim.PartNo LIKE '%"+part_name+"%'" \
+                            "   AND Estim.ProdCode IS NOT NULL AND Estim.ProdCode != '' AND Estim.ProdCode != 'Component'" \
+                            "" + type_condition + "" \
+                            ";"
+
+    cursor.execute(sql_part_query)
+
+    parts_found = []
+
+    for row in cursor.fetchall():
+        parts_found.append(row)
+
+    # print(parts_found)
+
+    return parts_found
+
+def get_part_info(part_name):
+    conn = pyodbc.connect(
+        'DRIVER={ODBC Driver 18 for SQL Server};'
+        'SERVER=10.1.10.31,1433;'
+        'DATABASE=VDI-JB2;'
+        'UID=python;'
+        r'PWD=3s0brK09%iPS$6o9^h%W;'
+        'Encrypt=yes;TrustServerCertificate=yes;'
+    )
+
+    cursor = conn.cursor()
+
+    sql_part_query = """
+                    SELECT 
+                        Estim.PartNo, 
+                        Estim.ProdCode 
+                    FROM
+                        Estim
+                    WHERE
+                        Estim.PartNo = ?;
+                    """
+    
+    cursor.execute(sql_part_query, (part_name,))
+
+    parts_found = []
+
+    for row in cursor.fetchall():
+        parts_found.append(row)
+
+    return parts_found[0]
+
 def get_BOM(build_name):
     category_pattern = re.compile(r'^([\w, ]*):')
 

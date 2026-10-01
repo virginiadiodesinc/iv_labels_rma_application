@@ -11,12 +11,13 @@
 		</label>
 	</div>
 	<div>
-		<label>
+		<label class="label-around-text-area">
 			Note:
-			<input type="text" 
+			<textarea type="text"
+					cols="50"
 					name="note"
-					size="40"
-					value="{{note.note if note and note.note else ''}}">
+					value="{{note.note if note and note.note else ''}}"
+					class="note-text-area"></textarea>
 		</label>
 	</div>
 	<div class="delete-row-button-container">

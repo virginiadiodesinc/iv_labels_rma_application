@@ -1,10 +1,10 @@
 <div id="actual-bom-container" class="actual-bom-list" hx-swap-oob="true">
-	<div id="actual-parts-container">
+	<div id="actual-parts-container" class="actual-parts-container">
 		{% for part in parts %}
 			{% include "partials/build-page/part-row.html" %}
 		{% endfor %}
 	</div>
-	<div id="actual-notes-container">
+	<div id="actual-notes-container" class="actual-parts-container">
 		{% for note in notes %}
 			{% include "partials/build-page/note-row.html" %}
 		{% endfor %}

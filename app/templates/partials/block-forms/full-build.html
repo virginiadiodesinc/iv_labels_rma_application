@@ -16,7 +16,7 @@
 		hx-target="#actual-parts-container"
 		hx-swap="beforeend"
 		>
-		Add Custom Part
+		Add Blank Part
 	</button>
 
 	<button
@@ -31,16 +31,6 @@
 	</button>
 
 	<button
-		id="clear-build-parts-button"
-		name="clear-build-parts-button"
-		hx-get="/clear_build_parts"
-		hx-target="#actual-bom-container"
-		hx-swap="innerHTML"
-		>
-		Clear Build List
-	</button>
-
-	<button
 		class="important-button"
 		id="save-build-button"
 		name="save-build-button"
@@ -51,6 +41,17 @@
 		hx-swap="outerHTML"
 		>
 		Save/Print Build Info
+	</button>
+
+	<button
+		class="important-button"
+		id="clear-build-parts-button"
+		name="clear-build-parts-button"
+		hx-get="/clear_build_parts"
+		hx-target="#actual-bom-container"
+		hx-swap="innerHTML"
+		>
+		Clear Build List
 	</button>
 
 	<div class="line-break"></div>

@@ -12,9 +12,9 @@
 					id="component-name" 
 					name="component-name" 
 					hx-get="/search_jb2_components/"
-					hx-target="#search-results"
+					hx-target="#bom-search-results"
 					hx-trigger="keyup changed delay:500ms"
-					list="search-results"
+					list="bom-search-results"
 					oninput="this.value = this.value.toUpperCase();"
 					value="{{ populated_build_name if populated_build_name else '' }}"
 				>
@@ -23,4 +23,6 @@
 	</table>
 </form>
 
-{% include "partials/search/bom-suggestion-results.html" %}
+<datalist id="bom-search-results">
+	{% include "partials/search/search-suggestion-results.html" %}
+</datalist>

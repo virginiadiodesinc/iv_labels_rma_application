@@ -85,6 +85,39 @@ def add_part_rows_from_bom():
 	return "".join(rows)
 
 
+@build_bp.post("/add_part_row_from_searched_part/")
+def add_part_row_from_searched_part():
+	"""Adds all selected rows from JB2-queried BOM to build part list
+	
+	This function adds all selected rows from the BOM lookup (selected by checkboxes)
+	to the build part list
+
+	@return rows Return value of type (string of multiple template partials)
+	"""
+
+	part_name = request.form.get(f"searched_part_name")
+	part_type = request.form.get(f"searched_part_type")
+
+	part_info = {
+					"part_name": part_name, 
+					"quantity": 1, 
+					"part_type": part_type, 
+					"part_lot": ""
+				}
+
+	return render_template("partials/build-page/part-row.html", part=part_info)
+
+
+@build_bp.post("/clear_bom_search/")
+def clear_bom_search():
+	return render_template("partials/search/bom-parts-list.html")
+
+
+@build_bp.post("/clear_part_search/")
+def clear_part_search():
+	return render_template("partials/search/searched-part-list.html")
+
+
 @build_bp.post("/import_diode_info_from_iv/")
 def import_diode_info_from_iv():
 	iv_parts_list = parts_service.parts_from_form(request.form)

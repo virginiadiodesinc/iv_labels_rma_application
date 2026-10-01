@@ -10,12 +10,42 @@ def search_jb2_components():
 	This function searches JB2 for all built components including the string entered in the BOM search field.
 	This is effectively for search suggestions/auto-complete.
 
-	@return bom-suggestion-results Return value of type (template partial)
+	@return search-suggestion-results Return value of type (template partial)
 	"""
 	component_name = request.args.get("component-name")
 	results = jb2.get_Build_Name_List(component_name)
 	
-	return render_template("partials/search/bom-suggestion-results.html", search_results=results)
+	return render_template("partials/search/search-suggestion-results.html", search_results=results)
+
+@jb2_bp.get("/search_jb2_parts/")
+def search_jb2_parts():
+	"""Searches JB2 parts
+	
+	This function searches JB2 for all parts including the string entered in the BOM search field and the type entered via the dropdown.
+	This is effectively for search suggestions/auto-complete.
+
+	@return search-suggestion-results Return value of type (template partial)
+	"""
+	part_name = request.args.get("searched-part-name")
+	part_type = request.args.get("searched-part-type")
+	results = jb2.get_part_list(part_name, part_type)
+	
+	return render_template("partials/search/search-suggestion-results.html", search_results=results)
+
+@jb2_bp.get("/get_individual_jb2_part_info/")
+def get_individual_jb2_part_info():
+	"""Searches JB2 parts
+	
+	This function searches JB2 for all parts including the string entered in the BOM search field and the type entered via the dropdown.
+	This is effectively for search suggestions/auto-complete.
+
+	@return search-suggestion-results Return value of type (template partial)
+	"""
+	part_name = request.args.get("searched-part-name")
+	part = jb2.get_part_info(part_name)
+	part_info = {"part_name": part[0], "part_type": part[1]}
+	
+	return render_template("partials/search/searched-part-list.html", searched_part=part_info)
 
 @jb2_bp.get("/get_jb2_bom_from_build_name/")
 def get_jb2_bom_from_build_name():
@@ -51,7 +81,7 @@ def get_jb2_bom_from_build_name():
 		if (index > 0):
 			sub_part["starting_index"] += len(sub_parts[index-1]["sub_parts"])
 
-	return render_template("partials/build-page/bom-list.html", build_name=build_name, bom_parts=parts, sub_parts=sub_parts)
+	return render_template("partials/search/bom-parts-list.html", build_name=build_name, bom_parts=parts, sub_parts=sub_parts)
 
 @jb2_bp.get("/search_part_lots/")
 def search_part_lots():

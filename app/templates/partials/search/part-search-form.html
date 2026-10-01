@@ -1,0 +1,65 @@
+<form>
+	<table>
+		<tr>
+			<th>SINGLE PART SEARCH</th>
+		</tr>
+		<tr>
+			<td>
+				<label for="searched-part-name">NAME:</label>
+				<input
+					type="text"
+					class="build-name-input"
+					id="searched-part-name" 
+					name="searched-part-name" 
+					hx-get="/search_jb2_parts/"
+					hx-target="#part-search-results"
+					hx-trigger="keyup changed delay:500ms"
+					list="part-search-results"
+					hx-include="#searched-part-type"
+					oninput="this.value = this.value.toUpperCase();"
+					value="{{ searched_part_name if searched_part_name else '' }}"
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="searched-part-type">TYPE:</label>
+				<select
+					name="searched-part-type" id ="searched-part-type">
+					{% for type in ['ANY', 'CIRCUIT', 'DIODE', 'FILTER MESH', 'MMIC', 'PCB', 'VAC', 
+					'BCMESH', 'CONNECTOR', 'MA PARTS', 'MISC', 'SP OTHER',
+					 'CABLE', 'FILTER', 'INVENTORY', 'PMP'] %}
+						<option>{{ type }}</option>
+					{% endfor %}
+				</select>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<button 
+	id="part-info-lookup-button"
+	hx-get="/get_individual_jb2_part_info/"
+	hx-include="#searched-part-name"
+	hx-target="#searched-part-list-form"
+	hx-swap-oob="true"
+>
+	Get Part Info
+</button>
+
+<button 
+	id="clear-part-search-button"
+	hx-post="/clear_part_search/"
+	hx-target="#searched-part-list-form"
+	_="on click set #searched-part-name's value to '' then set #searched-part-type's value to 'ANY'"
+>
+	Clear Part Search
+</button>
+
+<datalist id="part-search-results">
+	{% include "partials/search/search-suggestion-results.html" %}
+</datalist>
+
+<form id="searched-part-list-form" name="searched-part-list-form" class="bom-list-form">
+	{% include "partials/search/searched-part-list.html" %}
+</form>

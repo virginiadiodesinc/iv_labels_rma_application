@@ -1,0 +1,27 @@
+{% if searched_part %}
+	<table id="searched-part-table" class="bom-list" colspan="3">
+		<tr class="bom-part-row"
+			data-part-name="{{searched_part['part_name']}}"
+			data-part-type="{{searched_part['part_type']}}">
+			<td class="selectable-text bom-part-name">{{ searched_part["part_name"] }}</td>
+			<td class="searched-part-type">{{ searched_part["part_type"] }}</td>
+				<input type="hidden"
+					name="searched_part_name"
+					value="{{ searched_part['part_name'] }}">
+
+				<input type="hidden"
+					name="searched_part_type"
+					value="{{ searched_part['part_type'] }}">
+			</td>
+		</tr>
+	</table>
+	<button
+		id="add-searched-part-button"
+		name="add-bom-parts-button"
+		hx-swap="beforeend"
+		hx-post="/add_part_row_from_searched_part/"
+		hx-include="#searched-part-list-form"
+		hx-target="#actual-parts-container">
+		Add Part to Build List
+	</button>
+{% endif %}
