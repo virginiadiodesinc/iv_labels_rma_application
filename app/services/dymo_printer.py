@@ -240,7 +240,7 @@ def _parse_full_build_rows(form_data: dict):
 
 	lv_style_build_name = su.get_build_name_with_suffix(form_data.get("full-build-name-input"), form_data.get("block-engraving-input"))
 	lv_style_block_serial_number = block_sn_excluding_a(form_data)
-	lv_style_build_name_with_sn_and_rev = lv_style_build_name + " " + lv_style_block_serial_number
+	lv_style_build_name_with_sn_and_rev = lv_style_build_name + " B" + lv_style_block_serial_number
 
 	header = {
 		"build_name": lv_style_build_name_with_sn_and_rev,

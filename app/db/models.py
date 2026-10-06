@@ -96,6 +96,9 @@ class Note_Type(enum.Enum):
 	GENERIC = "generic"
 	CURRENT_TEST = "current_test"
 	REWORK_SUMMARY = "rework_summary"
+	FAST_CART_NUMBER = "fast_cart_number"
+	JOB_NUMBER = "job_number"
+	CAPA_NUMBER = "capa_number"
 
 
 class Notes(Base):

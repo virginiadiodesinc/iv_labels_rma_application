@@ -87,6 +87,12 @@ def stage_replace_build_parts_and_notes(canonical: dict, parts_list: list, notes
             note_type = Note_Type.CURRENT_TEST
         elif note["type"].lower() ==  "rework_summary":
             note_type = Note_Type.REWORK_SUMMARY
+        elif note["type"].lower() ==  "fast_cart_number":
+            note_type = Note_Type.FAST_CART_NUMBER
+        elif note["type"].lower() ==  "capa_number":
+            note_type = Note_Type.CAPA_NUMBER
+        elif note["type"].lower() ==  "job_number":
+            note_type = Note_Type.JOB_NUMBER
         note_with_proper_type = note.copy()
         note_with_proper_type["type"] = note_type
         entry = queries.add_table_entry(db_session, Notes, block_id=block_id, **note_with_proper_type)

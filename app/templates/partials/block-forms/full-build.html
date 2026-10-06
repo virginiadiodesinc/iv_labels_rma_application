@@ -50,6 +50,7 @@
 		hx-get="/clear_build_parts"
 		hx-target="#actual-bom-container"
 		hx-swap="innerHTML"
+		hx-on:htmx:after-request="colorBOMAndActualParts()"
 		>
 		Clear Build List
 	</button>

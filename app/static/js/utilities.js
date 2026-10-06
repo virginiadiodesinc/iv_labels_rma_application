@@ -1,7 +1,7 @@
 const PART_TYPE_ORDER = ["MMIC", "DIODE", "PCB", "CIRCUIT", "FILTER MESH", "VAC",
 						 "MA PARTS", "MISC", "CONNECTOR", "BCMESH", "SP OTHER",
 						"FILTER", "CABLE", "INVENTORY", "PMP", "NA"];
-const NOTE_TYPE_ORDER = ["REWORK_SUMMARY", "CURRENT_TEST", "PCB_DEVIATIONS", "INDIUM", "TEMPERATURE", "GENERIC"];
+const NOTE_TYPE_ORDER = ["REWORK_SUMMARY", "CURRENT_TEST", "FAST_CART_NUMBER", "CAPA_NUMBER", "JOB_NUMBER", "GENERIC"];
 const ILLEGAL_FILENAME_CHARACTERS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
 const PART_TYPES_WITH_UNIMPORTANT_LOTS = ["MISC", "CONNECTOR"];
 
@@ -41,6 +41,107 @@ function sortNotesContainer() {
 	if (alreadySorted) return;
 
 	sorted.forEach(row => container.appendChild(row));
+}
+
+
+function colorBOMAndActualParts() {
+	const bomPartsContainer = document.getElementById("bom-list-form")
+	const actualPartsContainer = document.getElementById("actual-parts-container")
+	const bomPartsRows = Array.from(bomPartsContainer.querySelectorAll(".bom-part-row"))
+	const actualPartsRows = Array.from(actualPartsContainer.querySelectorAll(".part-row"))
+
+	partQuantityComparison = {}
+
+	bomPartsRows.forEach((row) => {
+		const partName = row.getAttribute('data-part-name')
+		const theoreticalQuantity = parseInt(row.getAttribute('data-part-quantity'), 10)
+
+		if (partName in partQuantityComparison) {
+
+			partQuantityComparison[partName]["theoreticalQuantity"] +=  theoreticalQuantity
+
+		}
+		else {
+			partQuantityComparison[partName] = {}
+			partQuantityComparison[partName]["theoreticalQuantity"] = theoreticalQuantity
+			partQuantityComparison[partName]["actualQuantity"] = 0
+		}
+	});
+
+	actualPartsRows.forEach((row) => {
+		const partName = row.querySelector(".part-row-part-name").value
+		const actualQuantity = parseInt(row.querySelector(".part-row-part-quantity").value, 10)
+
+		if (partName in partQuantityComparison) {
+
+			partQuantityComparison[partName]["actualQuantity"] += actualQuantity
+
+		}
+		else {
+			partQuantityComparison[partName] = {}
+			partQuantityComparison[partName]["actualQuantity"] = actualQuantity
+			partQuantityComparison[partName]["theoreticalQuantity"] = 0
+		}
+	});
+
+	if (actualPartsRows && bomPartsRows && actualPartsRows.length > 0 && bomPartsRows.length > 0) {
+
+		bomPartsRows.forEach((row) => {
+			const partName = row.getAttribute('data-part-name')
+			const quantityElem = row.querySelector(".bom-part-quantity")
+			for (const [part, quantities] of Object.entries(partQuantityComparison)) {
+				if (partName == part) {
+					if (quantities["theoreticalQuantity"] != quantities["actualQuantity"]) {
+						if (quantities["actualQuantity"] != 0) {
+
+							quantityElem.classList.add("mismatched-part-row");
+						}
+						else {
+							row.classList.add("mismatched-part-row");
+						}
+					}
+					else {
+						row.classList.remove("mismatched-part-row");
+						quantityElem.classList.remove("mismatched-part-row");
+					}
+					break;
+				}
+			}
+		});
+
+		actualPartsRows.forEach((row) => {
+			const partName = row.querySelector(".part-row-part-name").value
+			const quantityElem = row.querySelector(".part-row-quantity-container")
+
+			for (const [part, quantities] of Object.entries(partQuantityComparison)) {
+				if (partName == part) {
+					if (quantities["theoreticalQuantity"] != quantities["actualQuantity"]) {
+						if (quantities["theoreticalQuantity"] != 0) {
+							quantityElem.classList.add("mismatched-part-row");
+						}
+						else {
+							row.classList.add("mismatched-part-row");
+						}
+					}
+					else {
+						row.classList.remove("mismatched-part-row");
+						quantityElem.classList.remove("mismatched-part-row");
+					}
+					break;
+				}
+			}
+		});
+	}
+	else {
+		bomPartsRows.forEach((row) => {
+			row.classList.remove("mismatched-part-row");
+			row.querySelector(".bom-part-quantity").classList.remove("mismatched-part-row")
+		})
+		actualPartsRows.forEach((row) => {
+			row.classList.remove("mismatched-part-row");
+			row.querySelector(".part-row-quantity-container").classList.remove("mismatched-part-row")
+		})
+	}
 }
 
 
@@ -105,6 +206,16 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.body.addEventListener("change", (e) => {
 		const root = e.target
 		const select = e.target.closest("select[name='part_type']");
+		const buildList = e.target.closest(".actual-parts-container");
+		const note_type = e.target.closest(".actual-notes-container");
+
+		if (buildList) {
+			colorBOMAndActualParts();
+		}
+
+		if (note_type) {
+			sortNotesContainer();
+		}
 
 		if (!select) {
 			if (root.getAttribute('name') === 'lot-select' || root.getAttribute('name') === 'custom-lot-input') {
@@ -142,6 +253,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		sortPartsContainer();
+		sortNotesContainer();
+		colorBOMAndActualParts();
 	});
 });
 
@@ -151,7 +264,7 @@ function addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound) {
 
 	confirmButton.disabled = true;
 
-	totalTime = 3000;
+	totalTime = 5000;
 	interval = 100;
 
 	timeElapsed = 0;
