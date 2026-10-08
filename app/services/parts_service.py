@@ -102,10 +102,11 @@ def _classify_circuit_or_filter(part_name: str):
         return "circuit"
     if suffix.startswith("F"):
         return "filter"
-    return None  # doesn't match either convention -- dropped, not a guess
+    else:
+        return "circuit"
 
 
-def assign_parts_to_build_slots(parts: list) -> dict:
+def assign_parts_and_notes_to_build_slots(parts: list, notes: list) -> dict:
     """Returns slot-name -> rendered string, meant to be merged into
     canonical before BUILD_FILE_TEMPLATE renders -- same pattern as
     merge_yellow_flags: compute a dict elsewhere, merge it in, then every
@@ -113,6 +114,15 @@ def assign_parts_to_build_slots(parts: list) -> dict:
     slots = {}
     diodes, circuits, filters = [], [], []
     mmic = pcb = None
+
+    note_index = 0
+    for note in notes:
+        if note_index > 6:
+            break
+        note_text = note["note"]
+        note_key = "notes" if note_index == 0 else f"notes{note_index}"
+        slots[note_key] = note_text
+        note_index += 1
 
     for part in parts:
         ptype = part["part_type"]
@@ -124,8 +134,7 @@ def assign_parts_to_build_slots(parts: list) -> dict:
                 circuits.append(part)
             elif classification == "filter":
                 filters.append(part)
-            # else: CIRCUIT-typed but matched neither Z nor F -- dropped
-        elif ptype == "MMIC" and mmic is None:
+        elif ptype == "MMIC" and (mmic is None or "TSC" in part["part_name"]):
             mmic = part
         elif ptype == "PCB" and pcb is None:
             pcb = part
@@ -134,8 +143,8 @@ def assign_parts_to_build_slots(parts: list) -> dict:
     if len(diodes) >= 1:
         slots["diode1"] = _format_part_lot(diodes[0])
         slots["qty_chips1"] = str(diodes[0].get("quantity", ""))
-        slots["indium"] = diodes[0].get("indium", "")
-        slots["Vbr"] = diodes[0].get("reverse_breakdown_voltage", "")
+        slots["indium"] = diodes[0].get("indium", "NA")
+        slots["Vbr"] = diodes[0].get("reverse_breakdown_voltage", "NA")
     if len(diodes) >= 2:
         slots["diode2"] = _format_part_lot(diodes[1])
         slots["qty_chips2"] = str(diodes[1].get("quantity", ""))

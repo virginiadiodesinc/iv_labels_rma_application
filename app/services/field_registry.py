@@ -611,7 +611,7 @@ BUILD_FILE_TEMPLATE: list[LineTemplate] = [
     LineTemplate(12, [Field("Vbr")]),
     LineTemplate(13, [Field("MMIC")]),
     LineTemplate(14, [Field("MMIC_lot")]),
-    LineTemplate(15, [Field("notes")]),        # mapping from note-row entries -- still open, see chat
+    LineTemplate(15, [Field("notes")]),        
     LineTemplate(16, [Field("PCB")]),
     LineTemplate(17, [Field("filter1")]),
     LineTemplate(18, [Field("diode2")]),
@@ -619,7 +619,7 @@ BUILD_FILE_TEMPLATE: list[LineTemplate] = [
     LineTemplate(20, [Field("full_build_initials")]),   # assembly_initials2 -- same value as row 8
     LineTemplate(21, [Field("full_build_date")]),        # assembly_date2 -- same value as row 9
     LineTemplate(22, [Field("circuit2")]),
-    LineTemplate(23, [Field("notes1")]),       # mapping from note-row entries -- still open, see chat
+    LineTemplate(23, [Field("notes1")]),       
     LineTemplate(24, [Field("notes2")]),
     LineTemplate(25, [Field("notes3")]),
     LineTemplate(26, [Field("notes4")]),

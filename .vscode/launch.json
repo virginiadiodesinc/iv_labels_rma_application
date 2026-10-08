@@ -202,5 +202,18 @@
 				"PYTHONPATH": "${workspaceFolder}"
 			}
 		},
+		{
+			"name": "Keithley 2611B Tester",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "app.services.smu_2611_tester",
+			"args": [
+			],
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}"
+			}
+		},
 	]
 }

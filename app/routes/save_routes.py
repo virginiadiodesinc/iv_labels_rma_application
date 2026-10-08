@@ -32,7 +32,7 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
         # BUILD_FILE_TEMPLATE can render them as ordinary Field tokens.
         # canonical_to_db_kwargs filters by db_model, so these never leak
         # into the Build_Info upsert.
-        canonical.update(parts_service.assign_parts_to_build_slots(parts_list))
+        canonical.update(parts_service.assign_parts_and_notes_to_build_slots(parts_list, notes_list))
 
     errors = vrf.validate_info(canonical, red_flag_checks)
     if collects_parts:
