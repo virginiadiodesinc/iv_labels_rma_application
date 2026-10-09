@@ -24,6 +24,14 @@ PART_FIELDS = [
     ("modifications", "pcb-modifications-input", str),
 ]
 
+IMPORTANT_MMIC_SUBSTRINGS = [
+    "TSC",
+    "T04",
+    "APP",
+    "ALP",
+    "ALN"
+]
+
 
 def _resolve_lots(form) -> list:
     """lot-select holds each row's dropdown choice (a real historical lot, or
@@ -106,13 +114,25 @@ def _classify_circuit_or_filter(part_name: str):
         return "circuit"
 
 
+def sort_parts_by_priority(parts: list, priorities: list, priority_function: callable):
+    return sorted(parts, key=lambda part: priority_function(part, priorities))
+
+
+def prioritize_part_by_substring(part: dict, priorities: list):
+    for index, priority in enumerate(priorities):
+        if priority in part["part_name"]:
+            return index
+    return len(priorities)
+
+
+
 def assign_parts_and_notes_to_build_slots(parts: list, notes: list) -> dict:
     """Returns slot-name -> rendered string, meant to be merged into
     canonical before BUILD_FILE_TEMPLATE renders -- same pattern as
     merge_yellow_flags: compute a dict elsewhere, merge it in, then every
     slot is just an ordinary Field("diode1") etc. token at render time."""
     slots = {}
-    diodes, circuits, filters = [], [], []
+    diodes, circuits, filters, mmics, pcbs, extras = [], [], [], [], [], []
     mmic = pcb = None
 
     note_index = 0
@@ -134,11 +154,12 @@ def assign_parts_and_notes_to_build_slots(parts: list, notes: list) -> dict:
                 circuits.append(part)
             elif classification == "filter":
                 filters.append(part)
-        elif ptype == "MMIC" and (mmic is None or "TSC" in part["part_name"]):
-            mmic = part
-        elif ptype == "PCB" and pcb is None:
-            pcb = part
-        # else: any other type, or a 3rd+ MMIC/PCB -- dropped from the file
+        elif ptype == "MMIC":
+            mmics.append(part)
+        elif ptype == "PCB":
+            pcbs.append(part)
+        else:
+            extras.append(part)
 
     if len(diodes) >= 1:
         slots["diode1"] = _format_part_lot(diodes[0])
@@ -159,10 +180,28 @@ def assign_parts_and_notes_to_build_slots(parts: list, notes: list) -> dict:
     if len(filters) >= 2:
         slots["filter2"] = _format_part_lot(filters[1])
 
-    if mmic:
-        slots["MMIC"] = mmic["part_name"]
-        slots["MMIC_lot"] = mmic["part_lot"]
-    if pcb:
-        slots["PCB"] = _format_part_lot(pcb)
+    if mmics:
+        mmics = sort_parts_by_priority(mmics, IMPORTANT_MMIC_SUBSTRINGS, prioritize_part_by_substring)
+        slots["MMIC"] = mmics[0]["part_name"]
+        slots["MMIC_lot"] = mmics[0]["part_lot"]
+    if pcbs:
+        slots["PCB"] = _format_part_lot(pcbs[0])
+
+    if len(mmics) >= 2:
+        extras = mmics[1:] + extras
+    if len(pcbs) >= 2:
+        extras = pcbs[1:] + extras
+    if len(diodes) >= 3:
+        extras = diodes[2:] + extras
+    if len(circuits) >= 3:
+        extras = circuits[2:] + extras
+
+    for extra in extras:
+        if note_index <= 6:
+            note_key = "notes" if note_index == 0 else f"notes{note_index}"
+            slots[note_key] = _format_part_lot(extra)
+            note_index += 1
+        else:
+            break
 
     return slots

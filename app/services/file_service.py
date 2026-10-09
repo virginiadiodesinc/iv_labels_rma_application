@@ -16,6 +16,10 @@ from pathlib import Path
 
 current_iv_file_directory = config.iv_file_directory
 
+BUILD_FILE_MAX_CHARACTER_COUNTS = [
+    54, 15, 10, 7, 10, 130, 44, 3, 8, 16, 48, 24, 24, 26, 26, 50, 48, 48, 44, 3, 8, 16, 48, 24, 24, 26, 26, 50, 48, 48
+]
+
 def get_block_file_path(canonical: dict, block_file_directory: str) -> str:
     return os.path.join(block_file_directory, fr.block_file_name(canonical))
 
@@ -71,6 +75,15 @@ def save_block_file(canonical: dict, block_file_directory: str) -> str:
 
     return path
 
+def truncate_file_lines(lines: list, max_character_counts: list):
+    print(len(lines), len(max_character_counts))
+    for index, line in enumerate(lines):
+        max_character_count = max_character_counts[index]
+        if len(line) > max_character_count:
+            truncated_line = line[0:max_character_count - 2] + "..."
+            lines[index] = truncated_line
+    return lines
+
 
 
 def save_build_file(canonical: dict, build_file_directory: str) -> str:
@@ -78,9 +91,10 @@ def save_build_file(canonical: dict, build_file_directory: str) -> str:
     path = get_build_file_path(canonical, build_file_directory)
 
     new_lines = [fr.render_new_line(template, canonical) for template in fr.BUILD_FILE_TEMPLATE]
+    truncated_file_lines = truncate_file_lines(new_lines, BUILD_FILE_MAX_CHARACTER_COUNTS)
 
     with open(path, "w", encoding="utf-8") as f:
-        f.write("\n".join(new_lines))
+        f.write("\n".join(truncated_file_lines))
         
     return path
 
