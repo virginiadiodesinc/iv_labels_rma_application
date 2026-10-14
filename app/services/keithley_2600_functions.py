@@ -459,23 +459,33 @@ class SMU_2611B():
 		measure_values_down: a list of voltage values measured across the diode during ramp down current.
 		"""
 
-		self.inst.write('display.screen = display.SMUA')
-		self.inst.write('display.smua.measure.func = display.MEASURE_DCVOLTS')
-		self.inst.write('smua.measure.autorangei = smua.AUTORANGE_ON')
-		self.inst.write('format.data = format.ASCII')
-		self.inst.write('smua.nvbuffer1.clear()')
-		self.inst.write('smua.nvbuffer1.appendmode = 1')
-		self.inst.write('smua.nvbuffer1.collectsourcevalues = 1')
-		self.inst.write('smua.measure.delay = smua.DELAY_AUTO')
-		self.inst.write('smua.source.highc = smua.ENABLE')
+		delay = "smua.DELAY_AUTO" if self.default_delay else self.user_sweep_delay
+		config_command = """
+						display.screen = display.SMUA
+						display.smua.measure.func = display.MEASURE_DCVOLTS
+						smua.measure.autorangei = smua.AUTORANGE_ON
+						format.data = format.ASCII
+						smua.nvbuffer1.clear()
+						smua.nvbuffer1.appendmode = 1
+						smua.nvbuffer1.collectsourcevalues = 1
+		"""
+
+
+		extra_command = f"""
+						smua.measure.delay = {delay}
+		"""
+
+		self.inst.write(config_command)
+		self.inst.write(extra_command)
+
 
 		self.inst.write(f'smua.source.limitv = {self.compliance_voltage}')
-		self.inst.write(f'SweepILogMeasureV(smua, {self.minimum_current}, {self.maximum_current}, 0, {self.total_points})')
+		self.inst.write(f'SweepILogMeasureV(smua, {self.minimum_current}, {self.maximum_current}, .5, {self.total_points})')
 		currents = self.inst.query_ascii_values('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1.sourcevalues)')
 		voltages = self.inst.query_ascii_values('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1.readings)')
 		print(currents, voltages)
 
-		self.inst.write(f'SweepILogMeasureV(smua, {self.maximum_current}, {self.minimum_current}, .075, {self.total_points})')
+		self.inst.write(f'SweepILogMeasureV(smua, {self.maximum_current}, {self.minimum_current}, .5, {self.total_points})')
 		currents = self.inst.query_ascii_values('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1.sourcevalues)')
 		voltages = self.inst.query_ascii_values('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1.readings)')
 		print(currents, voltages)

@@ -354,7 +354,7 @@ class SMU_K236():
 			self.integration_time = 0.01667
 		elif option == 'Medium':
 			self.S_command = 'S1' #4ms
-			self.integration_time = 0.04
+			self.integration_time = 0.004
 		elif option == 'Fast':
 			self.S_command = 'S0' #416usec
 			self.integration_time = 0.000416
