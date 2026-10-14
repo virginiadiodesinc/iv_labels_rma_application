@@ -24,6 +24,7 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
     confirmed = request.form.get("confirmed") == "true"
     print_label = request.form.get("print_label") == "true"
 
+
     parts_list = notes_list = None
     if collects_parts:
         parts_list = parts_service.parts_from_form(request.form)
@@ -126,8 +127,6 @@ def save_pb2_info():
 
 @save_bp.post("/save_block_info/")
 def save_block_info():
-    """Now identical to save_build_info -- see the note in save_orchestrator.
-    Safe to delete along with its UI entry point."""
     return _handle_save(
         "save_block_info",
         [
@@ -137,6 +136,7 @@ def save_block_info():
         ],
         vyf.FULL_BUILD_YELLOW_FLAG_CHECKS,
         save_orchestrator.save_block_info,
+        print_fn=print_service.print_all_labels,
         collects_parts=True,
     )
 

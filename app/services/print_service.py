@@ -46,3 +46,9 @@ def print_pb2_label(pb2_info):
 	"""
 
 	printer.print_engine("pb2.label", printer.populate_pb2_label_fields, pb2_info)
+
+def print_all_labels(block_build_info):
+	print_block_inspection(block_build_info)
+	print_pb1_label(block_build_info)
+	print_pb2_label(block_build_info)
+	print_full_build(block_build_info)
