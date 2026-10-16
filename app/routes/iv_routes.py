@@ -17,7 +17,7 @@ def take_iv():
 	translated_settings = {
 		# BASIC SETTINGS
 		"compliance_voltage": float(SMU_controls.get("compliance-voltage")),
-		"polarity": SMU_controls.get("polarity"),
+		"polarity": SMU_controls.get("polarity", "-"),
 		"maximum_current": SMU_controls.get("maximum-current") + "mA",
 		"reverse_polarity_start_current": SMU_controls.get("reverse-current"),
 		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance"),
@@ -106,13 +106,14 @@ def take_iv():
 		voltage_down_values = [str(abs(float(value) / 1000.0)) for value in process_dict['Vdown (mV)']]
 		voltage_avg_values = [str(abs(((float(up) + float(down)) / 2) / 1000.0)) for up, down in zip(voltage_up_values, voltage_down_values)]
 
-		truncated_source_values = ["{:.2f}".format(float(value) / 1000.0) for value in source_values]
+		truncated_source_values = ["{:.2f}".format(float(value)) for value in source_values]
 		truncated_voltage_values = ["{:.2f}".format(float(value)) for value in voltage_avg_values]
 
 		df = pd.DataFrame({
 			"Current (uA)": truncated_source_values,
 			"Voltage (V)": truncated_voltage_values
 		})
+
 
 		fig = px.scatter(df, x="Voltage (V)", y="Current (uA)", labels={"x": "Voltage (V)", "y": "Current (uA)"}, title=None, log_x=False, log_y=True)
 		fig.update_traces(mode='lines+markers')
@@ -124,7 +125,7 @@ def take_iv():
 		iv_curve["iv_measurement_values"] = ",".join(voltage_avg_values)
 		iv_curve["iv_voltage_up"] = ",".join(voltage_up_values)
 		iv_curve["iv_voltage_down"] = ",".join(voltage_down_values)
-		iv_curve["polarity"] = SMU_controls.get("polarity", "")
+		iv_curve["polarity"] = SMU_controls.get("polarity", "-")
 		iv_curve["points_per_decade"] = SMU_controls.get("points-per-decade", "")
 
 		if heat_test:
@@ -147,7 +148,7 @@ def take_polarity_sweep():
 	translated_settings = {
 		# BASIC SETTINGS
 		"compliance_voltage": float(SMU_controls.get("compliance-voltage")),
-		"polarity": SMU_controls.get("polarity"),
+		"polarity": SMU_controls.get("polarity", "-"),
 		"maximum_current": SMU_controls.get("maximum-current") + "mA",
 		"reverse_polarity_start_current": SMU_controls.get("reverse-current"),
 		"reverse_compliance_voltage": SMU_controls.get("reverse-compliance"),

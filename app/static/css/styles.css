@@ -661,3 +661,90 @@ summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 .mismatched-part-row {
 	background-color: orangered !important;
 }
+
+
+/* CHECKBOX */
+
+.main-toggle {
+	position: relative;
+	display: block;
+	width: 34px;
+	height: 17px;
+	cursor: pointer;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.main-checkbox {
+	display: none;
+}
+
+.main-track {
+	position: relative;
+	top: -0.7px;
+	width: 100%;
+	height: 100%;
+	border: 1px solid black;
+	border-radius: 5px;
+}
+
+.main-knob {
+	position: absolute;
+
+	top: -0.7px; 
+	width: 17px;
+	height: 17px;
+
+	background-color: red;
+	border: 1px solid black;
+	border-radius: 5px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+}
+
+.main-checkbox:checked ~ .main-knob {
+	transform: translate(17px, 0);
+	background-color: green;
+}
+
+.toggle-container {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-right: 10px;
+	height: 15px;
+}
+
+.polarity-knob {
+	background-color: lightblue;
+}
+
+.polarity-checkbox:checked ~ .main-knob {
+	background-color: lightblue;
+}
+
+.polarity-knob::after {
+	content: "-";
+	color: black;
+	font-weight: bold;
+	font-size: large;
+}
+
+.polarity-checkbox:checked ~ .main-knob::after {
+	content: "+";
+	color: black;
+	font-weight: bold;
+	font-size: large;
+}
+
+.iv-basic-controls-form > label, .iv-advanced-controls-form > label {
+	margin-right: 10px;
+}
+
+
+
+
+

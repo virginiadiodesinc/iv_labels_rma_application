@@ -8,8 +8,8 @@ build_file_directory = os.path.abspath('K:/build')
 heat_data_directory = os.path.abspath('I:/Heat Data')
 iv_spec_directory = os.path.abspath('V:/Production/Inventory/General/SpecialDiodeMarks')
 
-block_list_file = os.path.join(app_root_directory, 'services', 'block_engravings.csv')
-build_list_file = os.path.join(app_root_directory, 'services', 'build_list.csv')
+block_list_file = os.path.abspath('W:/Python3/IV and Labels/build_block_lists/block_engravings.csv')
+build_list_file = os.path.abspath('W:/Python3/IV and Labels/build_block_lists/build_list.csv')
 
 default_keithley_settings = {
 	# BASIC SETTINGS

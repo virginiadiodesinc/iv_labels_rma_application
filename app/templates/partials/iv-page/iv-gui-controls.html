@@ -1,13 +1,13 @@
 <div id="iv-gui-controls" class="iv-gui-controls">
 
-	<details open id="iv-assembly-information">
+	<details open id="iv-assembly-information" class="iv-assembly-information">
 		<summary><h1>IV ASSEMBLY INFORMATION</h1></summary>
 		{% include "partials/iv-page/iv-assembly-information.html" %}
 	</details>
 
 	<details open>
 		<summary><h1>IV BASIC CONTROLS</h1></summary>
-		<form id="iv-basic-controls-form">
+		<form id="iv-basic-controls-form" class="iv-basic-controls-form">
 			<label> Compliance Voltage (V)
 				<input 
 						class="iv-number-input"
@@ -25,22 +25,28 @@
 						max="5"
 						name="maximum-current">
 			</label>
-			<label> Polarity
-				<select name="polarity">
-					<option value="+" 
-					{% if current_settings and current_settings.polarity == '+' %}
-						selected
-					{% endif %}>+</option>
-					<option value="-" 
-					{% if current_settings and current_settings.polarity == '-' %}
-						selected
-					{% endif %}>-</option>
-				</select>
-			</label>
+			<div class="toggle-container">
+				<span>Polarity</span>
+				<label class="main-toggle">
+					<input class="main-checkbox polarity-checkbox" 
+						type="checkbox" 
+						name="polarity" 
+						id="polarity" 
+						value="+"
+						checked="{{ True if current_settings and current_settings.polarity == '+' }}">
+					<div class="main-track polarity-track"></div>
+					<div class="main-knob polarity-knob"></div>
+				</label>
+			</div>
 			<br>
-			<label> Reverse Breakdown Test
-				<input type="checkbox" name="reverse-breakdown-test">
-			</label>
+			<div class="toggle-container">
+				<span>Reverse Breakdown Test</span>
+				<label class="main-toggle">
+					<input class="main-checkbox" type="checkbox" name="reverse-breakdown-test" id="reverse-breakdown-test">
+					<div class="main-track"></div>
+					<div class="main-knob"></div>
+				</label>
+			</div>
 			<label> Reverse Current (uA)
 				<input 
 						class="iv-number-input"
@@ -62,14 +68,20 @@
 
 	<details>
 		<summary><h1>IV ADVANCED CONTROLS</h1></summary>
-		<form id="iv-advanced-controls-form">
-			<label> Default Delay
-				<input type="checkbox"
+		<form id="iv-advanced-controls-form" class="iv-advanced-controls-form">
+			<div class="toggle-container">
+				<span>Default Delay</span>
+				<label class="main-toggle">
+					<input type="checkbox"
+						class="main-checkbox"
 						id="default-delay"
-						checked = {{ True if current_settings and current_settings.default_delay == 'on'}}
+						checked ="{{ True if current_settings and current_settings.polarity == '+'}}"
 						name="default-delay"
 						value="on">
-			</label>
+					<div class="main-track"></div>
+					<div class="main-knob"></div>
+				</label>
+			</div>
 			<label> Sweep Delay (mse)
 				<input 
 						class="iv-number-input"

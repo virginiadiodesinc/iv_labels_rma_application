@@ -38,13 +38,13 @@ def validate_parts_listed(part_list):
 
 
 def validate_current_test_note_added(note_list):
-    current_test_note_added = any(note["type"] == "current_test" for note in note_list)
+    current_test_note_added = any(note["type"].lower() == "current_test" for note in note_list)
     message = "This build is supposed to receive a current test but has no current test note listed" if not current_test_note_added else ""
     return [current_test_note_added, message]
 
 
 def validate_rework_info_note_added(note_list):
-    rework_info_note_added = any(note["type"] == "rework_info" for note in note_list)
+    rework_info_note_added = any(note["type"].lower() == "rework_summary" for note in note_list)
     message = "This build is some revision beyond the first but has no rework info note listed" if not rework_info_note_added else ""
     return [rework_info_note_added, message]
 
