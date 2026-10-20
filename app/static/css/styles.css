@@ -719,11 +719,11 @@ summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 }
 
 .polarity-knob {
-	background-color: lightblue;
+	background-color: lightskyblue;
 }
 
 .polarity-checkbox:checked ~ .main-knob {
-	background-color: lightblue;
+	background-color: lightskyblue;
 }
 
 .polarity-knob::after {

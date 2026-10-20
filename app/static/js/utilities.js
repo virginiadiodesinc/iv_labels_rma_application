@@ -278,6 +278,12 @@ function addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound) {
 		clearInterval(timerInterval)
 		confirmButton.disabled = false;
 		confirmButton.textContent = 'Confirm'
+		
+		const suffixInput = document.getElementById('custom-build-suffix')
+		if (suffixInput) {
+			disableConfirmButtonIfSuffixInputEmpty()
+			suffixInput.addEventListener('input', disableConfirmButtonIfSuffixInputEmpty)
+		}
 	}, totalTime);
 };
 
@@ -321,3 +327,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 });
+
+function disableConfirmButtonIfSuffixInputEmpty() {
+	const confirmButton = document.getElementById('save-confirm-button')
+	const suffixInput = document.getElementById('custom-build-suffix')
+
+	if (suffixInput) {
+		if (suffixInput.value.trim() !== '') {
+			confirmButton.disabled = false;
+		} else {
+			confirmButton.disabled = true;
+		}
+	} else {
+		confirmButton.disabled = true;
+	}
+}

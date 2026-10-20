@@ -284,19 +284,19 @@ def confirm_save_pb2_info():
         add_table_entry(db_session, Build_Info, **new_entry)
         return "", 200
     
-@db_bp.post("/select_iv_from_db/")
-def select_iv_from_db():
-    build_info = request.form
-    canonical = fr.canonical_from_form(request.form)
-    build_id = fr.build_block_id_from_iv(canonical)
+# @db_bp.post("/select_iv_from_db/")
+# def select_iv_from_db():
+#     build_info = request.form
+#     canonical = fr.canonical_from_form(request.form)
+#     build_id = fr.build_block_id_from_iv(canonical)
 
-    missing_forms = not (build_info.get("iv-block-engraving", "") and build_info.get("iv-block-sn", ""))
+#     missing_forms = not (build_info.get("iv-block-engraving", "") and build_info.get("iv-block-sn", ""))
 
-    iv_list = get_table_entries(db_session, IV_Info, build_id=build_id)
-    for iv in iv_list:
-        iv.iv_path_stem = Path(iv.iv_file_path).stem
+#     iv_list = get_table_entries(db_session, IV_Info, build_id=build_id)
+#     for iv in iv_list:
+#         iv.iv_path_stem = Path(iv.iv_file_path).stem
 
-    return render_template("partials/iv-page/select-iv-from-db.html", iv_list=iv_list, missing_forms=missing_forms)
+#     return render_template("partials/iv-page/select-iv-from-db.html", iv_list=iv_list, missing_forms=missing_forms)
 
 
 @db_bp.post("/populate_iv_from_db/")

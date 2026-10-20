@@ -238,7 +238,7 @@ def _parse_full_build_rows(form_data: dict):
 	for note, note_type in zip(notes, note_types):
 		rows.append({"kind": "note", "note": note, "type": note_type, "slots": 1})
 
-	lv_style_build_name = su.get_build_name_with_suffix(form_data.get("full-build-name-input"), form_data.get("block-engraving-input"))
+	lv_style_build_name = su.get_build_name_with_suffix(form_data.get("full-build-name-input"), form_data.get("block-engraving-input"), form_data.get("custom-build-suffix"))
 	lv_style_block_serial_number = block_sn_excluding_a(form_data)
 	lv_style_build_name_with_sn_and_rev = lv_style_build_name + " B" + lv_style_block_serial_number
 

@@ -19,7 +19,7 @@
 			id="full-build-initials-input" 
 			name="full-build-initials-input" 
 			size="10"
-			oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+			oninput="this.value = this.value.toUpperCase();"
 			value="{{block.full_build_initials if block and block.full_build_initials else ''}}"
 		>
 	</td>

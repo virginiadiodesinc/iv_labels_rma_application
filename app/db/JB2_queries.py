@@ -245,17 +245,29 @@ def get_Lots(BOM_input):
 
     cursor = conn.cursor()
 
+    # sql_lots_query =    "SELECT DISTINCT " \
+    #                     "   ReceiverDet.LotNo " \
+    #                     "FROM " \
+    #                     "   ReceiverDet " \
+    #                     "INNER JOIN Materials " \
+    #                     "   ON ReceiverDet.PartNo = Materials.SubPartNo " \
+    #                     "WHERE " \
+    #                     "   Materials.SubPartNo LIKE '"+BOM_input+"' AND " \
+    #                     "   ReceiverDet.LotNo NOT LIKE '' AND " \
+    #                     "   ReceiverDet.LotNo NOT LIKE '<Multiple>' AND " \
+    #                     "   ReceiverDet.LotNo IS NOT NULL;"
+
     sql_lots_query =    "SELECT DISTINCT " \
-                        "   ReceiverDet.LotNo " \
-                        "FROM " \
-                        "   ReceiverDet " \
-                        "INNER JOIN Materials " \
-                        "   ON ReceiverDet.PartNo = Materials.SubPartNo " \
-                        "WHERE " \
-                        "   Materials.SubPartNo LIKE '"+BOM_input+"' AND " \
-                        "   ReceiverDet.LotNo NOT LIKE '' AND " \
-                        "   ReceiverDet.LotNo NOT LIKE '<Multiple>' AND " \
-                        "   ReceiverDet.LotNo IS NOT NULL;"
+                            "   BinLocations.LotNumber " \
+                            "FROM " \
+                            "   BinLocations " \
+                            "INNER JOIN Estim " \
+                            "   ON BinLocations.PartNo = Estim.PartNo " \
+                            "WHERE " \
+                            "   Estim.PartNo LIKE '"+BOM_input+"' AND " \
+                            "   BinLocations.LotNumber NOT LIKE '' AND " \
+                            "   BinLocations.LotNumber NOT LIKE '<Multiple>' AND " \
+                            "   BinLocations.LotNumber IS NOT NULL;"
          
     cursor.execute(sql_lots_query)
 

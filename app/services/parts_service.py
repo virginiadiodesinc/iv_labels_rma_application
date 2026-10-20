@@ -13,15 +13,18 @@ Two jobs, kept separate:
 """
 
 # (canonical_key, form_name, value_type)
-PART_FIELDS = [
+REQUIRED_PART_FIELDS = [
     ("part_type", "part_type", str),
     ("part_name", "part", str),
     ("quantity", "quantity", int),
     ("subassembly_tag", "part-tag", str),
-    ("reverse_breakdown_voltage", "diode-row-reverse-voltage-input", str),
-    ("temperature", "diode-row-temperature-input", str),
-    ("indium", "diode-row-indium-input", str),
-    ("modifications", "pcb-modifications-input", str),
+]
+
+OPTIONAL_PART_FIELDS = [
+    ("reverse_breakdown_voltage", "diode-row-reverse-voltage-input", str, "DIODE"),
+    ("temperature", "diode-row-temperature-input", str, "DIODE"),
+    ("indium", "diode-row-indium-input", str, "DIODE"),
+    ("modifications", "pcb-modifications-input", str, "PCB"),
 ]
 
 IMPORTANT_MMIC_SUBSTRINGS = [
@@ -61,17 +64,36 @@ def parts_from_form(form) -> list:
     non-diode/non-pcb rows -- their default 'NA' values just ride along
     harmless for rows that don't use them)."""
     row_count = len(form.getlist("part"))
+    part_types = form.getlist("part_type")
     lot_values = _resolve_lots(form)
+
+    special_part_starting_indexes = {
+        "DIODE": part_types.index("DIODE"),
+        "PCB": part_types.index("PCB")
+    }
 
     parts = []
     for i in range(row_count):
         part = {}
-        for canonical, form_name, value_type in PART_FIELDS:
+        for canonical, form_name, value_type in REQUIRED_PART_FIELDS:
             values = form.getlist(form_name)
-            raw = values[i] if i < len(values) else ""
+            raw = values[i] if i < len(values) else None
             part[canonical] = int(raw) if (value_type is int and raw) else raw
+        
         part["part_lot"] = lot_values[i] if i < len(lot_values) else ""
         parts.append(part)
+
+    for i in range(row_count):
+        for canonical, form_name, value_type, relevant_part in OPTIONAL_PART_FIELDS:
+            relevant_index_modifier = special_part_starting_indexes[relevant_part]
+            values = form.getlist(form_name)
+            modified_index = i + relevant_index_modifier
+            raw = values[i] if i < len(values) else None
+            print(canonical, raw, i, modified_index)
+            if modified_index >= row_count:
+                continue
+            parts[modified_index][canonical] = int(raw) if (value_type is int and raw) else raw
+            
     return parts
 
 
@@ -186,6 +208,11 @@ def assign_parts_and_notes_to_build_slots(parts: list, notes: list) -> dict:
         slots["MMIC_lot"] = mmics[0]["part_lot"]
     if pcbs:
         slots["PCB"] = _format_part_lot(pcbs[0])
+        if pcbs[0]["modifications"] and note_index <= 6:
+            note_key = "notes" if note_index == 0 else f"notes{note_index}"
+            slots[note_key] = pcbs[0]["modifications"]
+            note_index += 1
+
 
     if len(mmics) >= 2:
         extras = mmics[1:] + extras

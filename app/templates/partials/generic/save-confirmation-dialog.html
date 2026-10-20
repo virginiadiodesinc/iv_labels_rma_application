@@ -52,7 +52,7 @@
             <button
                 id="save-confirm-button"
                 hx-post="{{ post_url }}"
-                hx-include="{{ include_selector }}"
+                hx-include="#custom-build-suffix, {{ include_selector }}"
                 hx-vals='{"confirmed": "true", "print_label": "{{print_label | string | lower}}"}'
                 hx-target="#generic-popup"
                 hx-swap="outerHTML">

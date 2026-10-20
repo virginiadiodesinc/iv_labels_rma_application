@@ -29,6 +29,14 @@
 					value="{{iv_data.build_name | upper if iv_data and iv_data.build_name else ''}}"
 					>
 		</label>
+		<button
+			hx-post="/import_block_identifiers_to_iv/"
+			hx-include="#block-info, #full-build-name-input"
+			hx-target="#iv-build-info-container"
+			hx-swap="innerHTML">
+			Get Block Identifiers from Build Side
+		</button>
+		<br>
 		<button 
 			class="important-button"
 			id="open-iv-button"
@@ -39,13 +47,26 @@
 			hx-disabled-elt="#iv-control-buttons button">
 			Search IVs in DB
 		</button>
-		<button
-			hx-post="/import_block_identifiers_to_iv/"
-			hx-include="#block-info, #full-build-name-input"
-			hx-target="#iv-build-info-container"
-			hx-swap="innerHTML">
-			Get Block Identifiers from Build Side
-		</button>
+		<span>
+			<label> Search By:
+				<select hx-preserve id="iv-search-by" name="iv-search-by" class="not-implemented-yet">
+					{% for search_option in ["Block ID", "Build Name", "Diode"] %}
+					<option value="{{ search_option }}">
+						{{ search_option }}
+					</option>
+					{% endfor %}
+				</select>
+			</label>
+			<label> Max Responses:
+				<select hx-preserve id="iv-search-max-responses" name="iv-search-max-responses" class="not-implemented-yet">
+					{% for max_response_count in [10, 25, 50] %}
+						<option value="{{ max_response_count }}">
+							{{ max_response_count }}
+						</option>
+					{% endfor %}
+				</select>
+			</label>
+		</span>
 	</div>
 	<div id="iv-part-information-container" class="iv-part-information-container">
 		<div class="iv-diode-information-line">

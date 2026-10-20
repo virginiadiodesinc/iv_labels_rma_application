@@ -75,6 +75,7 @@ FIELDS: list[FieldSpec] = [
               form_name="block-serial-number-input", db_model="Build_Info"),
     FieldSpec("block_revision", Section.IDENTITY, str,
               form_name="block-revision-input", db_model="Build_Info"),
+    FieldSpec("custom_build_suffix", Section.IDENTITY, str, form_name="custom-build-suffix"),
 
     # --- inspection ---
     FieldSpec("inspection_date", Section.INSPECTION, date,
@@ -651,6 +652,7 @@ def enrich_with_build_suffix(
     build_name_key: str = "full_build_name",
     block_engraving_key: str = "block_engraving",
     output_key: str = "full_build_name_with_suffix",
+    custom_suffix_key: str = "custom_build_suffix"
 ) -> dict:
     """Adds the suffixed build name by looking up the block engraving's
     suffix (old su.get_build_name_with_suffix, which reads block_engravings.csv).
@@ -666,9 +668,10 @@ def enrich_with_build_suffix(
     from block/build's per the Case B decision, so its enriched name needs
     its own key too, not a shared one."""
     canonical = dict(canonical)
+    custom_suffix = canonical.get(custom_suffix_key, "unknown")
     if canonical.get(build_name_key) and canonical.get(block_engraving_key):
         canonical[output_key] = lookup_fn(
-            canonical[build_name_key], canonical[block_engraving_key]
+            canonical[build_name_key], canonical[block_engraving_key], custom_suffix
         )
     return canonical
 

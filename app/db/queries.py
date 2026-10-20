@@ -21,6 +21,11 @@ def get_table_entries(db_session, model, **filters):
 	for attribute, value in filters.items():
 		if hasattr(model, attribute):
 			query = query.where(getattr(model, attribute) == value)
+
+	if 'limit' in filters:
+		result_limit = int(filters.get('limit'))
+		query = query.limit(result_limit)
+		
 	return db_session.execute(query).scalars().all()
 
 # READ (LIKE)

@@ -19,7 +19,19 @@ def validate_block_name_listed(block_engraving):
     with open(config.block_list_file) as f:
         full_csv_list = list(csv.reader(f))
     file_found = any(block_engraving.strip() == entry[0] for entry in full_csv_list)
-    message = "This block engraving was not found in the block engraving list" if not file_found else ""
+    message_text = "This block engraving was not found in the block engraving list. Please provide a suffix (without any additional underscores or other characters, eg: just R1)" if not file_found else ""
+    input = """
+                <input 
+                        class="custom-build-suffix"
+                        type="text" 
+                        id="custom-build-suffix"
+                        name="custom-build-suffix"
+                        oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+                        name="custom-build-suffix"
+                        size="10"
+                >
+    """
+    message = message_text + input
     return [file_found, message]
 
 
@@ -173,10 +185,6 @@ _BLOCK_CHECKS = [
 UNIVERSAL_BLOCK_YELLOW_FLAG_CHECKS = _BLOCK_CHECKS
 
 PREBUILD_YELLOW_FLAG_CHECKS = _BLOCK_CHECKS + [
-    YellowFlagCheck(
-        "unlisted_build_name",
-        lambda c: validate_build_name_listed(c.canonical.get("full_build_name") or ""),
-    ),
     YellowFlagCheck(
         "no_parts_listed",
         lambda c: validate_parts_listed(c.parts),
