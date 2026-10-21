@@ -258,34 +258,59 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 });
 
+
+let countdownInterval = null;
+let countdownTimeout = null;
+
+function clearConfirmTimer() {
+	if (countdownInterval !== null) {
+		clearInterval(countdownInterval);
+		countdownInterval = null;
+	}
+	if (countdownTimeout !== null) {
+		clearTimeout(countdownTimeout);
+		countdownTimeout = null;
+	}
+}
+
+
 function addTimerToConfirmPageIfYellowFlagsFound(yellowFlagsFound) {
+	clearConfirmTimer(); // kill anything left over from a previous popup
+
 	const confirmButton = document.getElementById('save-confirm-button');
-	if (!yellowFlagsFound) return;
+	if (!yellowFlagsFound || !confirmButton) return;
+
+	const totalTime = 5000;
+	const interval = 100;
+	let timeRemaining = totalTime;
 
 	confirmButton.disabled = true;
+	confirmButton.textContent = `Ready in ${(timeRemaining / 1000).toFixed(1)}s`;
 
-	totalTime = 5000;
-	interval = 100;
-
-	timeElapsed = 0;
-	timeRemaining = totalTime;
-	
-	timerInterval = setInterval(() => {
-		timeRemaining = timeRemaining - interval
-		confirmButton.textContent = `Ready in ${timeRemaining / 1000.0}s`
+	countdownInterval = setInterval(() => {
+		timeRemaining = Math.max(0, timeRemaining - interval);
+		confirmButton.textContent = `Ready in ${(timeRemaining / 1000).toFixed(1)}s`;
 	}, interval);
-	setTimeout(() => {
-		clearInterval(timerInterval)
+
+	countdownTimeout = setTimeout(() => {
+		clearConfirmTimer();
 		confirmButton.disabled = false;
-		confirmButton.textContent = 'Confirm'
-		
-		const suffixInput = document.getElementById('custom-build-suffix')
+		confirmButton.textContent = 'Confirm';
+
+		const suffixInput = document.getElementById('custom-build-suffix');
 		if (suffixInput) {
-			disableConfirmButtonIfSuffixInputEmpty()
-			suffixInput.addEventListener('input', disableConfirmButtonIfSuffixInputEmpty)
+			disableConfirmButtonIfSuffixInputEmpty();
+			suffixInput.addEventListener('input', disableConfirmButtonIfSuffixInputEmpty);
 		}
 	}, totalTime);
-};
+}
+
+
+document.addEventListener("htmx:beforeSwap", function (event) {
+	if (event.detail.target && event.detail.target.id === "generic-popup") {
+		clearConfirmTimer();
+	}
+});
 
 
 document.addEventListener("htmx:afterSwap", function (event) {
