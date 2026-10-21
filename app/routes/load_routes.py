@@ -22,10 +22,8 @@ def select_iv_from_db():
     build_id = fr.build_block_id_from_iv(canonical)
     iv_parts = parts_service.iv_parts_from_form(request.form)
     canonical.update(iv_parts)
-    build_name = canonical.get("iv_build_name", "")
-    diode_name = canonical.get("iv_diode_name", "")
-    print(canonical)
-    print(request.form)
+    build_name = canonical.get("iv_build_name") or ""
+    diode_name = canonical.get("iv_diode_name") or ""
 
     required_forms = {
         "Block ID": [build_info.get("iv-block-engraving", ""), build_info.get("iv-block-sn", "")],
@@ -33,7 +31,14 @@ def select_iv_from_db():
         "Diode": [diode_name]
     }
 
-    # missing_forms = not (build_info.get("iv-block-engraving", "") and build_info.get("iv-block-sn", ""))
+    missing_message_dict = {
+        "Block ID": "Please input a Block Engraving and Serial Number (with an optional Revision) in order to search the database for IVs.",
+        "Build Name": "Please input a Build Name in order to search the database for IVs. (This search method does not work yet.)",
+        "Diode": "Please input a Diode in order to search the database for IVs."
+    }
+
+    missing_forms_message = missing_message_dict[search_by]
+
     missing_forms = any(not form.strip() for form in required_forms[search_by])
     iv_list = []
     if not missing_forms:
@@ -47,7 +52,7 @@ def select_iv_from_db():
     for iv in iv_list:
         iv.iv_path_stem = Path(iv.iv_file_path).stem
 
-    return render_template("partials/iv-page/select-iv-from-db.html", iv_list=iv_list, missing_forms=missing_forms)
+    return render_template("partials/iv-page/select-iv-from-db.html", iv_list=iv_list, missing_forms=missing_forms, missing_forms_message=missing_forms_message)
 
 @load_bp.post("/populate_block_info_from_db")
 def populate_block_info_from_db():

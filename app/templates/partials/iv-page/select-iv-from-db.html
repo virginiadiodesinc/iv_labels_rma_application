@@ -24,11 +24,11 @@
                 {% else %}
                     {% if missing_forms %}
                         <p>
-                            Please input at least a Block Engraving and Serial Number in order to search the database for IV information.
+                            {{ missing_forms_message }}
                         </p>
                     {% else %}
                         <p>
-                            Sorry, no IVs were found with this Block Information.
+                            Sorry, no IVs were found with the provided forms.
                         </p>
                     {% endif %}
                 {% endif %}

@@ -68,8 +68,8 @@ def parts_from_form(form) -> list:
     lot_values = _resolve_lots(form)
 
     special_part_starting_indexes = {
-        "DIODE": part_types.index("DIODE"),
-        "PCB": part_types.index("PCB")
+        "DIODE": part_types.index("DIODE") if "DIODE" in part_types else 99,
+        "PCB": part_types.index("PCB") if "PCB" in part_types else 99
     }
 
     parts = []
