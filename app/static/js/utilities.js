@@ -335,6 +335,7 @@ function toggleSecretFileUploadContainer(fileUploadContainer, currentDisplayType
 	}
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
 	document.body.addEventListener("click", (event) => {
 
@@ -353,6 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 });
 
+
 function disableConfirmButtonIfSuffixInputEmpty() {
 	const confirmButton = document.getElementById('save-confirm-button')
 	const suffixInput = document.getElementById('custom-build-suffix')
@@ -367,3 +369,21 @@ function disableConfirmButtonIfSuffixInputEmpty() {
 		confirmButton.disabled = true;
 	}
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	const updateSlider = (slider) => {
+		const wrap = slider.closest('.slider-wrap');
+		const label = wrap.querySelector('.thumb-text');
+		const pct = (slider.value - slider.min) / (slider.max - slider.min);
+		wrap.style.setProperty('--pct', pct);
+		label.textContent = slider.value;
+	};
+
+	document.body.addEventListener('input', (event) => {
+		if (!event.target.matches('.slider')) return;
+		updateSlider(event.target);
+	});
+
+	document.querySelectorAll('.slider').forEach(updateSlider);
+});

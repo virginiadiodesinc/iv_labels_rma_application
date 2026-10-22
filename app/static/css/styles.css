@@ -744,7 +744,81 @@ summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 	margin-right: 10px;
 }
 
+.slider-container {
+	--thumb: 19px;          /* knob size */
+	--track-w: 125px;        /* slider width */
+	--border: 0px;          /* slider border */
 
+	margin-right: 10px;
+	display: inline-flex;
+	align-items: center;
+	height: 19px;
+}
 
+.slider-container > label {
+	height: 100%;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
 
+/* Positioning context for the number */
+.slider-wrap {
+	position: relative;
+	display: inline-block;
+	height: 100%;
+}
 
+.slider {
+	display: block;
+	margin: 0;
+	-webkit-appearance: none;
+	appearance: none;
+	width: var(--track-w);
+	height: 100%;
+	background: white;
+	border-radius: 2.5px;
+	border: 0px solid black !important;
+	box-shadow: inset 0 0 0 1px black;  /* replaces: border: var(--border) black solid; */
+	box-sizing: border-box;
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	box-sizing: border-box;
+	width: var(--thumb);
+	height: var(--thumb);
+	background: lightskyblue;
+	cursor: pointer;
+	border-radius: 2.5px;
+	border: 1px black solid;
+}
+
+.slider::-moz-range-thumb {
+	box-sizing: border-box;
+	width: var(--thumb);
+	height: var(--thumb);
+	background: lightskyblue;
+	cursor: pointer;
+	border-radius: 2.5px;
+	border: 1px black solid;
+}
+
+.thumb-text {
+	position: absolute;
+	top: 50%;
+	/* thumb center travels from (border + thumb/2) to (width - border - thumb/2) */
+	left: calc(
+		var(--border) + var(--thumb) / 2 +
+		(var(--track-w) - 2 * var(--border) - var(--thumb)) * var(--pct)
+	);
+	transform: translate(-50%, -50%);
+	color: black;
+	font-family: sans-serif;
+	font-size: 12px;
+	line-height: 1;
+	pointer-events: none; /* clicks fall through to the real thumb */
+	font-weight: bold;
+	font-size: large;
+}

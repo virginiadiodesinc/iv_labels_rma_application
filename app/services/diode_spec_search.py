@@ -123,6 +123,7 @@ def clean_spec_df(spec_df):
     spec_df = spec_df.dropna(axis=1, how='all')
     spec_df = spec_df.dropna(axis=0, how='all')
     spec_df = spec_df.fillna('')
+    spec_df = spec_df.apply(pd.to_numeric, errors='coerce').round(2).fillna(spec_df)
     return spec_df
 
 
