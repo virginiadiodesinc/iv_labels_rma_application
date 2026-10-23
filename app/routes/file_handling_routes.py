@@ -100,6 +100,8 @@ def populate_info_from_build_file():
 			part_name_without_whitespace = re.sub(r"\s+", "", part["part_name"]).lower()
 			if (part_name_without_whitespace == "" or part_name_without_whitespace == "na" or part_name_without_whitespace == "n/a"):
 				part_rows.remove(part)
+			if (not part["part_lot"]):
+				part["part_lot"] = "Unknown"
 
 		note_rows = []
 		for note in build_dict.get("notes", []):
@@ -116,7 +118,7 @@ def populate_info_from_build_file():
 			if (note_without_whitespace == "" or note_without_whitespace == "na" or note_without_whitespace == "n/a"):
 				note_rows.remove(note)
 
-		return render_template("partials/block-forms/build-file-population-response.html", block=build_dict, parts=part_rows, notes=note_rows, populated_build_name=build_dict["full_build_name"])
+		return render_template("partials/block-forms/block-and-build-population.html", block=build_dict, parts=part_rows, notes=note_rows)
 
 	return "No file uploaded", 204
 

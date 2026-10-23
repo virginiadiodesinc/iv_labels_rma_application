@@ -89,7 +89,6 @@ def parts_from_form(form) -> list:
             values = form.getlist(form_name)
             modified_index = i + relevant_index_modifier
             raw = values[i] if i < len(values) else None
-            print(canonical, raw, i, modified_index)
             if modified_index >= row_count:
                 continue
             parts[modified_index][canonical] = int(raw) if (value_type is int and raw) else raw

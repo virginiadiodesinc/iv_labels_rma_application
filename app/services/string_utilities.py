@@ -19,6 +19,8 @@
 # ' ' IS THE MOST COMMON SEPARATOR
 import pandas as pd
 
+from app import config
+
 def separate_part_and_lot(part_and_lot_text):
 	part_and_lot_text = part_and_lot_text.upper()
 	part = ""
@@ -86,10 +88,11 @@ def custom_lot_handler(parts_list, lots_list, custom_lots_list):
 
 def get_build_name_with_suffix(build_name, block_engraving, custom_build_suffix):
 	block_engraving_df_columns = ["Block_Engraving", "Build_Suffix"]
-	block_engraving_df = pd.read_csv('app/services/block_engravings.csv', names=block_engraving_df_columns, index_col=False)
+	block_engraving_df = pd.read_csv(config.block_list_file, names=block_engraving_df_columns, index_col=False)
+	block_engraving_df = block_engraving_df.map(lambda x: x.upper() if isinstance(x, str) else x)
 
-	if any(block_engraving_df.loc[block_engraving_df["Block_Engraving"] == block_engraving, "Build_Suffix"]):
-		build_revision_suffix = block_engraving_df.loc[block_engraving_df["Block_Engraving"].lower() == block_engraving.lower(), "Build_Suffix"].values[0]
+	if any(block_engraving_df.loc[block_engraving_df["Block_Engraving"] == block_engraving.upper(), "Build_Suffix"]):
+		build_revision_suffix = block_engraving_df.loc[block_engraving_df["Block_Engraving"] == block_engraving.upper(), "Build_Suffix"].values[0]
 	else:
 		if custom_build_suffix:
 			build_revision_suffix = custom_build_suffix

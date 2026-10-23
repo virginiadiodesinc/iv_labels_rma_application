@@ -131,8 +131,8 @@ def import_diode_info_from_iv():
 
 	for iv_field, part_field in iv_form_fields.items():
 		diode_info[part_field] = request.form.get(iv_field)
-		if diode_info[part_field] and diode_info[part_field].isnumeric():
-			diode_info[part_field] = round(diode_info[part_field], 2)
+		if diode_info[part_field] and diode_info[part_field].isnumeric() and diode_info[part_field] != "0.0":
+			diode_info[part_field] = round(float(diode_info[part_field]), 2)
 
 
 
@@ -151,6 +151,8 @@ def add_iv_assembly_to_build_parts():
 	diode_info = iv_parts_list[0]
 	diode_info["part_type"] = "DIODE"
 	diode_info["quantity"] = 1
+	diode_info["reverse_breakdown_voltage"] = request.form.get("reverse-voltage") if request.form.get("reverse-voltage") and request.form.get("reverse-voltage") != "0.0" else "NA"
+	diode_info["temperature"] = request.form.get("temperature") if request.form.get("temperature") else "NA"
 	
 	circuit_info = iv_parts_list[1]
 	circuit_info["part_type"] = "CIRCUIT"

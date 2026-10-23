@@ -18,7 +18,7 @@ CURRENT_TESTED_BUILDS_FILE = CONFIG_DIR / "current_tested_builds.txt"
 def validate_block_name_listed(block_engraving):
     with open(config.block_list_file) as f:
         full_csv_list = list(csv.reader(f))
-    file_found = any(block_engraving.lower() == entry[0].lower() for entry in full_csv_list)
+    file_found = any(block_engraving.upper() == entry[0].upper() for entry in full_csv_list)
     message_text = "This block engraving was not found in the block engraving list. Please provide a suffix (without any additional underscores or other characters, eg: just R1)" if not file_found else ""
     input = """
                 <input 
@@ -38,7 +38,7 @@ def validate_block_name_listed(block_engraving):
 def validate_build_name_listed(build_name):
     with open(config.build_list_file) as f:
         full_csv_list = list(csv.reader(f))
-    file_found = any(build_name.lower() == entry[0].lower() for entry in full_csv_list)
+    file_found = any(build_name.upper() == entry[0].upper() for entry in full_csv_list)
     message = "This build name was not found in the build name list" if not file_found else ""
     return [file_found, message]
 
@@ -79,7 +79,7 @@ def validate_bom_matches(build_name, part_list):
             "actual_quantity": 0
         }
         if part_name in part_comparison_dict:
-            part_name["theoretical_quantity"] = part_name["theoretical_quantity"] + part_representation["theoretical_quantity"]
+            part_representation["theoretical_quantity"] = part_representation["theoretical_quantity"] + part_representation["theoretical_quantity"]
         else:
             part_comparison_dict[part_name] = part_representation
 
