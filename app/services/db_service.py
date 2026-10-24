@@ -9,7 +9,7 @@ from app.services import field_registry as fr
 from app.db.database import db_session
 from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity, Note_Type, Yellow_Flags
 from app.db import queries
-
+import datetime
 
 def get_block_and_build_info(canonical: dict):
     block_id = fr.build_block_id(canonical)
@@ -55,6 +55,7 @@ def stage_upsert_build_info(canonical: dict, **extra_columns):
     kwargs["block_id"] = block_id
     kwargs.update(extra_columns)
     kwargs["from_file"] = False
+    kwargs["last_save_date"] = datetime.datetime.now()
     return queries.upsert_table_entry(db_session, Build_Info, block_id, **kwargs)
 
 

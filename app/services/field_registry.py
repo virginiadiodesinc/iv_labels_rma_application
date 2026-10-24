@@ -193,7 +193,7 @@ FIELDS: list[FieldSpec] = [
     FieldSpec("iv_block_engraving", Section.IV_PARAMETERS, str, form_name="iv-block-engraving"),
     FieldSpec("iv_block_serial_number", Section.IV_PARAMETERS, str, form_name="iv-block-sn"),
     FieldSpec("iv_block_revision", Section.IV_PARAMETERS, str, form_name="iv-block-revision"),
-    FieldSpec("iv_build_name", Section.IV_PARAMETERS, str, form_name="iv-build-name"),
+    FieldSpec("iv_build_name", Section.IV_PARAMETERS, str, form_name="iv-build-name", db_model="IV_Info", db_column="build_name"),
     FieldSpec("additional_info", Section.IV_PARAMETERS, str, db_model="IV_Info", db_column="additional_information", form_name="iv-additional-info"),
     FieldSpec("temperature", Section.IV_PARAMETERS, float, db_model="IV_Info", form_name="temperature"),
     # --- part related fields (some overlap with IV here) ---

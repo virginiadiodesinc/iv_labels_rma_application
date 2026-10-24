@@ -313,8 +313,6 @@ def populate_iv_from_db():
         for column in iv.__table__.columns
     }
 
-    build_name = Path(iv_info_dict['iv_file_path']).stem.split("_")[0]
-
     source_values = pp.clean_string_or_list_values(iv_info_dict['current_ua'], conversion_factor=-6)
     measure_values_up = pp.clean_string_or_list_values(iv_info_dict['voltage_up_mv'], conversion_factor=-3)
     measure_values_down = pp.clean_string_or_list_values(iv_info_dict['voltage_down_mv'], conversion_factor=-3)
@@ -374,7 +372,7 @@ def populate_iv_from_db():
         "temperature": iv_info_dict["temperature"],
         "additional_info": iv_info_dict["additional_information"],
         "points_per_decade": iv_info_dict["points_per_decade"],
-        "build_name": build_name,
+        "build_name": iv_info_dict["build_name"],
         "polarity": polarity_symbol
     }
 

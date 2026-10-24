@@ -49,7 +49,7 @@
 		</button>
 		<span>
 			<label> Search By:
-				<select hx-preserve id="iv-search-by" name="iv-search-by" class="not-implemented-yet">
+				<select hx-preserve id="iv-search-by" name="iv-search-by">
 					{% for search_option in ["Block ID", "Build Name", "Diode"] %}
 					<option value="{{ search_option }}">
 						{{ search_option }}
@@ -58,7 +58,7 @@
 				</select>
 			</label>
 			<label> Max Responses:
-				<select hx-preserve id="iv-search-max-responses" name="iv-search-max-responses" class="not-implemented-yet">
+				<select hx-preserve id="iv-search-max-responses" name="iv-search-max-responses">
 					{% for max_response_count in [10, 25, 50] %}
 						<option value="{{ max_response_count }}">
 							{{ max_response_count }}

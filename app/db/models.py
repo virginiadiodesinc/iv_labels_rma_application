@@ -34,8 +34,10 @@ class Build_Info(Base):
 	build_file_path = Column(String)
 	# VERIFICATION FLAG
 	flagged = Column(Boolean, nullable=False, default=False)
-	# HOW SAVED
+	# META INFO
 	from_file = Column(Boolean)
+	last_save_date = Column(DateTime)
+	audit_info = Column(String)
 
 
 class Build_Parts(Base):
@@ -61,6 +63,7 @@ class Polarity(enum.Enum):
 class IV_Info(Base):
 	__tablename__ = "iv_info"
 	build_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
+	build_name = Column(String)
 	iv_id = Column(Integer, primary_key=True, autoincrement=True)
 	diode = Column(String, nullable=False)
 	diode_lot = Column(String, nullable=False)

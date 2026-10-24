@@ -33,7 +33,7 @@ def select_iv_from_db():
 
     missing_message_dict = {
         "Block ID": "Please input a Block Engraving and Serial Number (with an optional Revision) in order to search the database for IVs.",
-        "Build Name": "Please input a Build Name in order to search the database for IVs. (This search method does not work yet.)",
+        "Build Name": "Please input a Build Name in order to search the database for IVs.",
         "Diode": "Please input a Diode in order to search the database for IVs."
     }
 
@@ -45,7 +45,7 @@ def select_iv_from_db():
         if search_by == "Block ID":
             iv_list = queries.get_table_entries(db_session, IV_Info, build_id=build_id, limit=int(max_responses))
         elif search_by == "Build Name":
-            iv_list = queries.get_table_entries(db_session, IV_Info, build_id=build_id, limit=int(max_responses))
+            iv_list = queries.get_table_entries(db_session, IV_Info, build_name=build_name, limit=int(max_responses))
         elif search_by == "Diode":
             iv_list = queries.get_table_entries(db_session, IV_Info, diode=diode_name, limit=int(max_responses))
         
