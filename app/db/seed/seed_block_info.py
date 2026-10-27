@@ -1,6 +1,13 @@
 """
 Stage 3 (block files): SEED Build_Info from db_ready_block_records.jsonl
 
+STUB ROWS: seed_iv_info.py creates a placeholder Build_Info row when an IV
+file shows up for a block/build with no info yet (uprevs). A stub is
+from_file=True with no block_file_path and no build_file_path
+(seed_shared.is_stub_row). When the real block record arrives, a stub is
+FILLED IN (status "filled_stub") instead of skipped. Every other existing
+row is still skipped as before.
+
 Behavior for this pass: ADD-ONLY. If a block_id already exists in Build_Info,
 it is SKIPPED, not overwritten -- per plan, the upcoming build-file seed is
 the one that upserts (and may legitimately overwrite block-derived fields
@@ -49,6 +56,7 @@ from sqlalchemy import select
 import argparse
 import datetime
 import json
+from collections import Counter
 
 from app.db.seed import block_key_mapping as mapping
 from app.db.seed import seed_shared
@@ -96,13 +104,17 @@ def append_checkpoint(checkpoint_file, source_path, source_mtime):
 
 
 def bulk_prefetch(batch):
-    """ONE query for existing block_ids covering the WHOLE batch, instead
-    of one db_session.get() per record."""
+    """ONE query covering the WHOLE batch. Returns
+    {block_id: (from_file, block_file_path, build_file_path)} -- enough to
+    tell "exists" from "exists but is only an IV-created stub"."""
     block_ids = [build_block_id(r["fields"]) for r in batch]
-    existing = set()
+    existing = {}
     if block_ids:
-        rows = db_session.execute(select(Build_Info.block_id).where(Build_Info.block_id.in_(block_ids))).all()
-        existing = {row[0] for row in rows}
+        rows = db_session.execute(
+            select(Build_Info.block_id, Build_Info.from_file, Build_Info.block_file_path, Build_Info.build_file_path)
+            .where(Build_Info.block_id.in_(block_ids))
+        ).all()
+        existing = {row[0]: (row[1], row[2], row[3]) for row in rows}
     return existing
 
 
@@ -150,75 +162,85 @@ def coerce_dates(fields):
     return coerced
 
 
-def insert_one(record, dry_run, existing_block_ids):
+def insert_one(record, dry_run, existing_rows):
+    """Returns ("added" | "filled_stub" | "skipped", block_id). Dry run
+    reports the same statuses but writes nothing."""
     fields = coerce_dates(record["fields"])
     block_id = build_block_id(fields)
+    last_save_date = seed_shared.compute_last_save_date(fields, record.get("source_mtime"))
 
-    if dry_run:
-        return "would_add", block_id
+    existing = existing_rows.get(block_id)
+    if existing is not None:
+        if not seed_shared.is_stub_row(*existing):
+            return "skipped", block_id
+        if not dry_run:
+            queries.update_table_entry(
+                db_session, Build_Info, block_id,
+                block_file_path=record["source_path"],
+                from_file=True,
+                last_save_date=last_save_date,
+                **fields,
+            )
+        return "filled_stub", block_id
 
-    if block_id in existing_block_ids:
-        return "skipped", block_id
-
-    queries.add_table_entry(
-        db_session,
-        Build_Info,
-        block_id=block_id,
-        block_file_path=record["source_path"],
-        from_file=True,
-        **fields,
-    )
+    if not dry_run:
+        queries.add_table_entry(
+            db_session,
+            Build_Info,
+            block_id=block_id,
+            block_file_path=record["source_path"],
+            from_file=True,
+            last_save_date=last_save_date,
+            **fields,
+        )
     return "added", block_id
 
 
 def run_batch(batch, dry_run, skipped_log, error_log, checkpoint_file):
     """Attempts the whole batch, commits once on success. On failure, rolls
-    back and retries row-by-row so only the true offender gets logged."""
-    added = skipped = errors = 0
-    existing_block_ids = set() if dry_run else bulk_prefetch(batch)
+    back and retries row-by-row so only the true offender gets logged.
+    Returns a Counter of statuses (+ "error")."""
+    counts = Counter()
+    existing_rows = bulk_prefetch(batch)  # read-only, so safe in dry run too
+
+    def finish(record, status, block_id):
+        if status == "skipped":
+            skipped_log.write(json.dumps({"block_id": block_id, "source_path": record["source_path"]}) + "\n")
+        append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
 
     try:
+        results = []
         for record in batch:
-            status, block_id = insert_one(record, dry_run, existing_block_ids)
-            if status in ("added", "would_add"):
-                added += 1
-            elif status == "skipped":
-                skipped += 1
-                skipped_log.write(json.dumps({"block_id": block_id, "source_path": record["source_path"]}) + "\n")
+            status, block_id = insert_one(record, dry_run, existing_rows)
+            results.append((record, status, block_id))
+            counts[status] += 1
         if not dry_run:
             queries.commit_db_changes(db_session)
-            for record in batch:
-                append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
-        return added, skipped, errors
+            for record, status, block_id in results:
+                finish(record, status, block_id)
+        return counts
     except Exception:
         if not dry_run:
             queries.roll_back_db_changes(db_session)
-        # Isolate: retry one at a time so only the actual bad record(s) are lost.
-        added = skipped = errors = 0
+        counts = Counter()
         for record in batch:
             try:
-                status, block_id = insert_one(record, dry_run, existing_block_ids)
-                if status in ("added", "would_add"):
-                    added += 1
-                    if not dry_run:
-                        queries.commit_db_changes(db_session)
-                        append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
-                elif status == "skipped":
-                    skipped += 1
-                    skipped_log.write(json.dumps({"block_id": block_id, "source_path": record["source_path"]}) + "\n")
-                    if not dry_run:
-                        append_checkpoint(checkpoint_file, record["source_path"], record["source_mtime"])
+                status, block_id = insert_one(record, dry_run, existing_rows)
+                if not dry_run:
+                    queries.commit_db_changes(db_session)
+                    finish(record, status, block_id)
+                counts[status] += 1
             except Exception as row_error:
                 if not dry_run:
                     queries.roll_back_db_changes(db_session)
-                errors += 1
+                counts["error"] += 1
                 error_log.write(json.dumps({
                     "source_path": record["source_path"],
                     "error": str(row_error),
                     "error_type": type(row_error).__name__,
                     "fields": record["fields"],
                 }, default=str) + "\n")
-        return added, skipped, errors
+        return counts
 
 
 def main():
@@ -259,7 +281,7 @@ def main():
               f"fix block_key_mapping.py's FIELD_NAME_MAP / REQUIRED_DB_KEYS and rerun transform first.)")
         print()
 
-    total_added = total_skipped = total_errors = 0
+    totals = Counter()
 
     with open(SKIPPED_LOG_PATH, "w", encoding="utf-8") as skipped_log, \
          open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log, \
@@ -267,17 +289,17 @@ def main():
 
         for i in range(0, len(clean_records), BATCH_SIZE):
             batch = clean_records[i : i + BATCH_SIZE]
-            added, skipped, errors = run_batch(batch, args.dry_run, skipped_log, error_log, checkpoint_file)
-            total_added += added
-            total_skipped += skipped
-            total_errors += errors
-            print(f"Batch {i // BATCH_SIZE + 1}: +{added} added, {skipped} skipped, {errors} errors")
+            counts = run_batch(batch, args.dry_run, skipped_log, error_log, checkpoint_file)
+            totals.update(counts)
+            print(f"Batch {i // BATCH_SIZE + 1}: +{counts['added']} added, {counts['filled_stub']} stubs filled, "
+                  f"{counts['skipped']} skipped, {counts['error']} errors")
 
-    label = "WOULD ADD" if args.dry_run else "ADDED"
+    prefix = "WOULD BE " if args.dry_run else ""
     print()
-    print(f"{label}: {total_added}")
-    print(f"SKIPPED (already existed): {total_skipped}")
-    print(f"ERRORS: {total_errors} -> {ERROR_LOG_PATH}")
+    print(f"{prefix}ADDED: {totals['added']}")
+    print(f"{prefix}STUBS FILLED (placeholder from an IV seed, now has real block data): {totals['filled_stub']}")
+    print(f"SKIPPED (already existed): {totals['skipped']}")
+    print(f"ERRORS: {totals['error']} -> {ERROR_LOG_PATH}")
     print(f"SKIPPED LOG: {SKIPPED_LOG_PATH}")
     if column_problems:
         print(f"PREFLIGHT PROBLEMS (never attempted): {len(column_problems)}")

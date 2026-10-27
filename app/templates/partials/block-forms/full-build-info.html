@@ -1,3 +1,5 @@
+{% from "macros/search-suggestions.html" import part_search_attributes %}
+
 <tr>
 	<td>
 		<label for="full-build-name-input">BUILD NAME:</label>
@@ -9,7 +11,11 @@
 			size="20"
 			oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 			value="{{block.full_build_name if block and block.full_build_name else ''}}"
-		>
+			{{ part_search_attributes('COMPONENT', 'full-build-name-search-results') }}
+			>
+			<datalist id="full-build-name-search-results">
+				{% include "partials/search/search-suggestion-results.html" %}
+			</datalist>
 	</td>
 	<td>
 		<label for="full-build-initials-input">BUILD INITIALS:</label>

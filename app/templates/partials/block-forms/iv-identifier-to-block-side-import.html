@@ -1,3 +1,5 @@
+{% from "macros/search-suggestions.html" import part_search_attributes %}
+
 <form 	
 	id="block-info" 
 	hx-get="/get_jb2_bom_from_build_name/" 
@@ -17,7 +19,11 @@
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					size="25"
 					value="{{block.block_engraving if block and block.block_engraving else ''}}"
+					{{ part_search_attributes('BLOCK', 'block-search-results') }}
 				>
+				<datalist id="block-search-results">
+					{% include "partials/search/search-suggestion-results.html" %}
+				</datalist>
 			</td>
 		</tr>
 		<tr>
@@ -35,8 +41,9 @@
 		</tr>
 		<tr>
 			<td>
-				<label for="block-revision-input">BLOCK REVISION:</label>
+				<label for="block-revision-input" class="block-label">BLOCK REVISION:</label>
 				<input 
+					class="block-input"
 					type="text" 
 					id="block-revision-input" 
 					name="block-revision-input"
@@ -46,13 +53,14 @@
 					value="{{block.block_revision if block and block.block_revision else ''}}"
 				>
 			</td>
-			<td id="revision-check-cell">
+			<td id="revision-search-cell">
 				<button
-					hx-post="/check_block_revisions/"
+					hx-post="/search_block_revisions"
 					hx-include="#block-info"
 					hx-target="#generic-popup"
-					hx-swap="outerHTML">	
-					Check Revisions in DB
+					hx-swap="outerHTML"
+					hx-disabled-elt="#block-forms-container button">	
+					Search Revisions in DB
 				</button>
 			</td>
 		</tr>

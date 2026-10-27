@@ -1,3 +1,5 @@
+{% from "macros/search-suggestions.html" import part_search_attributes %}
+
 <form 	
 	id="block-info" 
 	hx-get="/get_jb2_bom_from_build_name/" 
@@ -17,7 +19,11 @@
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					size="25"
 					value="{{block.block_engraving if block and block.block_engraving else ''}}"
+					{{ part_search_attributes('BLOCK', 'block-search-results') }}
 				>
+				<datalist id="block-search-results">
+					{% include "partials/search/search-suggestion-results.html" %}
+				</datalist>
 			</td>
 		</tr>
 		<tr>

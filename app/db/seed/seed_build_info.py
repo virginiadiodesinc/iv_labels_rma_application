@@ -9,6 +9,10 @@ per block_id (delete existing, insert fresh) -- same pattern as
 db_service.stage_replace_build_parts_and_notes, since their real identity
 is "all rows for this block_id," not any single row.
 
+STUB ROWS: a placeholder Build_Info row created by seed_iv_info.py has
+from_file=True, so it is NOT protected -- this pass fills it in like any
+other file-seeded row.
+
 IMPORTANT: only build_file_path is ever passed in the Build_Info kwargs --
 block_file_path is never touched here, so an existing block-seeded value is
 never overwritten by this pass. (And vice versa: seed_block_info.py never
@@ -207,6 +211,8 @@ def process_one_record(record, dry_run, existing_from_file_by_block, existing_pa
     kwargs["block_id"] = block_id
     kwargs["build_file_path"] = record["source_path"]  # NEVER block_file_path -- see module docstring
     kwargs["from_file"] = True
+
+    kwargs["last_save_date"] = seed_shared.compute_last_save_date(fields, record.get("source_mtime"))
 
     if existed_before:
         queries.update_table_entry(db_session, Build_Info, block_id, **kwargs)

@@ -13,7 +13,7 @@
 					name="searched-part-name" 
 					hx-get="/search_jb2_parts/"
 					hx-target="#part-search-results"
-					hx-trigger="keyup changed delay:500ms"
+					hx-trigger="input changed delay:500ms"
 					list="part-search-results"
 					hx-include="#searched-part-type"
 					oninput="this.value = this.value.toUpperCase();"

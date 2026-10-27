@@ -1,0 +1,9 @@
+{% macro part_search_attributes(part_type, results_id) -%}
+    hx-get="{{ url_for('jb2.search_jb2_parts') }}"
+    hx-trigger="input changed delay:500ms"
+    hx-target="#{{ results_id }}"
+    list="{{ results_id }}"
+    hx-vals='{{ {"searched-part-type": part_type}|tojson }}'
+    hx-params="searched-part-type"
+    hx-on::config-request="event.detail.parameters['searched-part-name'] = this.value"
+{%- endmacro %}

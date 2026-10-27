@@ -32,6 +32,7 @@ def search_jb2_parts():
 	
 	return render_template("partials/search/search-suggestion-results.html", search_results=results)
 
+
 @jb2_bp.get("/get_individual_jb2_part_info/")
 def get_individual_jb2_part_info():
 	"""Searches JB2 parts

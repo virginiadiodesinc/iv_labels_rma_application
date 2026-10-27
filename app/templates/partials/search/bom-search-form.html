@@ -13,7 +13,7 @@
 					name="component-name" 
 					hx-get="/search_jb2_components/"
 					hx-target="#bom-search-results"
-					hx-trigger="keyup changed delay:500ms"
+					hx-trigger="input changed delay:500ms"
 					list="bom-search-results"
 					oninput="this.value = this.value.toUpperCase();"
 					value="{{ populated_build_name if populated_build_name else '' }}"

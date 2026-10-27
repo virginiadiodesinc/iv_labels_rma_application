@@ -49,6 +49,8 @@ def get_part_list(part_name, part_type):
     type_condition = ""
     if part_type != "ANY":
         type_condition = "AND Estim.ProdCode LIKE '%" + part_type + "%'"
+    else:
+        type_condition = "AND Estim.ProdCode != 'Component'"
 
     sql_part_query =  "SELECT DISTINCT " \
                             "   Estim.PartNo " \
@@ -56,7 +58,7 @@ def get_part_list(part_name, part_type):
                             "   Estim " \
                             "WHERE " \
                             "   Estim.PartNo LIKE '%"+part_name+"%'" \
-                            "   AND Estim.ProdCode IS NOT NULL AND Estim.ProdCode != '' AND Estim.ProdCode != 'Component'" \
+                            "   AND Estim.ProdCode IS NOT NULL AND Estim.ProdCode != ''" \
                             "" + type_condition + "" \
                             ";"
 

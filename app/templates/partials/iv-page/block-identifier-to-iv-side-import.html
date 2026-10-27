@@ -1,10 +1,16 @@
+{% from "macros/search-suggestions.html" import part_search_attributes %}
+
 <div id="iv-build-info-container" class="iv-build-info-container">
     <label> Block Engraving
         <input type="text"
                 oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
                 name="iv-block-engraving"
                 value="{{iv_data.block_name | upper if iv_data and iv_data.block_name else ''}}"
-                >
+                {{ part_search_attributes('BLOCK', 'iv-block-search-results') }}
+            >
+        <datalist id="iv-block-search-results">
+            {% include "partials/search/search-suggestion-results.html" %}
+        </datalist>
     </label>
     <label> Block Serial Number
         <input type="text"
@@ -26,7 +32,11 @@
                 oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
                 name="iv-build-name"
                 value="{{iv_data.build_name | upper if iv_data and iv_data.build_name else ''}}"
-                >
+                {{ part_search_attributes('COMPONENT', 'iv-build-name-search-results') }}
+        >
+        <datalist id="iv-build-name-search-results">
+            {% include "partials/search/search-suggestion-results.html" %}
+        </datalist>
     </label>
     <button
         hx-post="/import_block_identifiers_to_iv/"

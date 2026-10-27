@@ -1,3 +1,5 @@
+{% from "macros/search-suggestions.html" import part_search_attributes %}
+
 <form id="iv-assembly-information-form" class="iv-assembly-information-form">
 	<div id="iv-build-info-container" class="iv-build-info-container">
 		<label> Block Engraving
@@ -5,7 +7,11 @@
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-block-engraving"
 					value="{{iv_data.block_name | upper if iv_data and iv_data.block_name else ''}}"
-					>
+					{{ part_search_attributes('BLOCK', 'iv-block-search-results') }}
+				>
+				<datalist id="iv-block-search-results">
+					{% include "partials/search/search-suggestion-results.html" %}
+				</datalist>
 		</label>
 		<label> Block Serial Number
 			<input type="text"
@@ -27,7 +33,11 @@
 					oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
 					name="iv-build-name"
 					value="{{iv_data.build_name | upper if iv_data and iv_data.build_name else ''}}"
-					>
+					{{ part_search_attributes('COMPONENT', 'iv-build-name-search-results') }}
+			>
+			<datalist id="iv-build-name-search-results">
+				{% include "partials/search/search-suggestion-results.html" %}
+			</datalist>
 		</label>
 		<button
 			hx-post="/import_block_identifiers_to_iv/"
@@ -77,7 +87,7 @@
 							id="iv-diode-name"
 							value="{{iv_data.diode if iv_data and iv_data.diode else ''}}"
 							hx-get="/search_part_lots/"
-							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
+							hx-trigger="{% if suppress_lot_search %}input changed delay:300ms{% else %}revealed, input changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
 							hx-include="closest .iv-diode-information-line"
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
@@ -100,7 +110,7 @@
 							id="iv-circuit-name"
 							value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}"
 							hx-get="/search_part_lots/"
-							hx-trigger="{% if suppress_lot_search %}keyup changed delay:300ms{% else %}revealed, keyup changed delay:300ms{% endif %}"
+							hx-trigger="{% if suppress_lot_search %}input changed delay:300ms{% else %}revealed, input changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
 							hx-include="closest .iv-circuit-information-line"
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">

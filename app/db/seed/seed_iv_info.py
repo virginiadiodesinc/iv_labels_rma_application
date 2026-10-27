@@ -17,15 +17,15 @@ used for block/build seeding). They're stripped out of the kwargs before
 anything gets passed to IV_Info(**data), or the ORM would raise on an
 unexpected keyword argument.
 
-BUILD_INFO EXISTENCE: build_id is a foreign key, but a missing target
-isn't treated as fatal here -- the IV measurement still has value even if
-its Build_Info row hasn't been seeded yet (or never will be, for old/bad
-block data). A missing match is logged to seed_iv_missing_build_info.jsonl
-as a soft warning; the insert is still attempted. If the DB actually
-enforces the FK constraint, a genuinely broken reference will still raise
-and get caught by the normal per-row error handling below -- this warning
-log exists for the case where enforcement is off (common for SQLite) and
-the mismatch would otherwise be invisible.
+BUILD_INFO STUBS: IVs routinely exist BEFORE their block/build info (an
+uprev B -> C has IVs for C long before C's block/build files exist). If an
+IV's block_id has no Build_Info row, a minimal STUB row is created first
+(identity fields only, from_file=True, no file paths, last_save_date from
+the IV file's mtime), so the FK is always satisfiable. Stubs are appended to
+seed_iv_stubbed_build_info.jsonl as a review list of "revs awaiting real
+info". seed_block_info.py / seed_build_info.py later fill a stub in (it is
+from_file=True, so it's not protected); if someone has already saved the
+row in the app, it's from_file=False and protected as usual.
 
 PROTECTION: an existing IV_Info row with from_file != True was last saved
 through the app, so it is NOT overwritten. Those records are written to
@@ -44,6 +44,7 @@ from sqlalchemy import select
 import argparse
 import datetime
 import json
+from collections import Counter
 
 from app.db.seed import iv_key_mapping as mapping
 from app.db.seed import seed_shared
@@ -51,7 +52,7 @@ from app.db.seed import seed_shared
 OUTPUT_DIR = Path("W:/Python3/IV and Labels/database/seed")
 DB_READY_PATH = OUTPUT_DIR / "db_ready_iv_records.jsonl"
 ERROR_LOG_PATH = OUTPUT_DIR / "seed_iv_errors.jsonl"
-MISSING_BUILD_INFO_LOG_PATH = OUTPUT_DIR / "seed_iv_missing_build_info.jsonl"
+STUBBED_BUILD_INFO_LOG_PATH = OUTPUT_DIR / "seed_iv_stubbed_build_info.jsonl"
 CHECKPOINT_PATH = OUTPUT_DIR / "seed_iv_checkpoint.jsonl"
 PROTECTED_PATH = OUTPUT_DIR / "seed_iv_protected.jsonl"
 
@@ -178,43 +179,55 @@ def coerce_polarity(fields):
     return coerced
 
 
-def process_one_record(record, dry_run, missing_build_info_log, existing_iv_by_path, existing_build_ids):
-    """Returns ("added" | "updated" | "protected" | "would_upsert", block_id).
-    The second value is ALWAYS block_id, whatever the status -- the IV's
-    own identity for review is its source_path, which the caller already has."""
-    fields = coerce_dates(record["fields"])
-    fields = coerce_polarity(fields)
+def row_block_id(record):
+    identity, _ = extract_identity_and_iv_fields(record["fields"])
+    return seed_shared.build_block_id(identity)
+
+
+def process_one_record(record, dry_run, existing_iv_by_path, existing_build_ids, stubbed_ids):
+    """Returns (status, block_id, created_stub) where status is
+    "added" | "updated" | "protected". Dry run reports the same statuses
+    (including would-be stubs) but writes nothing.
+
+    stubbed_ids = block_ids stubbed EARLIER IN THIS BATCH (not yet
+    committed), so several IVs for the same new rev create ONE stub."""
+    fields = coerce_polarity(coerce_dates(record["fields"]))
     identity, iv_fields = extract_identity_and_iv_fields(fields)
 
     block_id = seed_shared.build_block_id(identity)
     iv_file_path = record["source_path"]
 
-    if dry_run:
-        return "would_upsert", block_id
-
     existing = existing_iv_by_path.get(iv_file_path)
-    if existing is not None:
-        existing_iv_id, existing_from_file = existing
-        # Checked BEFORE the missing-Build_Info warning so protected
-        # records don't also add noise to that log.
-        if seed_shared.is_protected(existing_from_file):
-            return "protected", block_id
+    if existing is not None and seed_shared.is_protected(existing[1]):
+        return "protected", block_id, False  # protected IVs never create stubs either
 
-    if block_id not in existing_build_ids:
-        missing_build_info_log.write(json.dumps({
-            "source_path": iv_file_path,
-            "block_id": block_id,
-        }) + "\n")
+    created_stub = False
+    if block_id not in existing_build_ids and block_id not in stubbed_ids:
+        if not dry_run:
+            queries.add_table_entry(
+                db_session,
+                Build_Info,
+                block_id=block_id,
+                from_file=True,
+                last_save_date=seed_shared.compute_last_save_date({}, record.get("source_mtime")),
+                **identity,
+            )
+            db_session.flush()  # make sure the FK target exists before the IV row goes in
+        stubbed_ids.add(block_id)
+        created_stub = True
+
+    if dry_run:
+        return ("updated" if existing is not None else "added"), block_id, created_stub
 
     iv_fields["build_id"] = block_id
     iv_fields["iv_file_path"] = iv_file_path
     iv_fields["from_file"] = True
 
     if existing is not None:
-        queries.update_table_entry(db_session, IV_Info, existing_iv_id, **iv_fields)
-        return "updated", block_id
+        queries.update_table_entry(db_session, IV_Info, existing[0], **iv_fields)
+        return "updated", block_id, created_stub
     queries.add_table_entry(db_session, IV_Info, **iv_fields)
-    return "added", block_id
+    return "added", block_id, created_stub
 
 
 def log_protected(protected_file, source_path, block_id):
@@ -222,72 +235,75 @@ def log_protected(protected_file, source_path, block_id):
     protected_file.flush()
 
 
-def run_batch(batch, dry_run, error_log, missing_build_info_log, checkpoint_file, protected_file):
+def log_stub(stub_file, source_path, block_id):
+    stub_file.write(json.dumps({"block_id": block_id, "first_iv_path": source_path}) + "\n")
+    stub_file.flush()
+
+
+def run_batch(batch, dry_run, error_log, checkpoint_file, protected_file, stub_file):
     """Protected records are LOGGED but never CHECKPOINTED -- see
-    seed_build_info.run_batch for why."""
-    added = updated = errors = protected = 0
-    existing_iv_by_path, existing_build_ids = ({}, set()) if dry_run else bulk_prefetch(batch)
-    # NOTE: prefetched once, at batch start -- if the same iv_file_path
-    # somehow appears twice within one batch, the second occurrence won't
-    # see the first's insert as "existing" until the NEXT batch. Fine in
-    # practice (iv_file_path is per-source-file, so duplicates within a
-    # batch shouldn't occur), just not airtight in that edge case.
+    seed_build_info.run_batch for why. Returns a Counter."""
+    counts = Counter()
+    existing_iv_by_path, existing_build_ids = bulk_prefetch(batch)  # read-only: also used by dry run
+    stubbed_ids = set()
+    # NOTE: prefetched once, at batch start -- see the duplicate-path caveat
+    # in the original docstring; stub dedupe within a batch is handled by
+    # stubbed_ids.
+
+    def finish(record, status, block_id, created_stub):
+        if status == "protected":
+            log_protected(protected_file, record["source_path"], block_id)
+            return
+        if created_stub:
+            log_stub(stub_file, record["source_path"], block_id)
+        append_checkpoint(checkpoint_file, record["source_path"])
 
     try:
         results = []
         for record in batch:
-            status, block_id = process_one_record(
-                record, dry_run, missing_build_info_log, existing_iv_by_path, existing_build_ids
+            status, block_id, created_stub = process_one_record(
+                record, dry_run, existing_iv_by_path, existing_build_ids, stubbed_ids
             )
-            results.append((record, status, block_id))
-            if status in ("added", "would_upsert"):
-                added += 1
-            elif status == "updated":
-                updated += 1
-            elif status == "protected":
-                protected += 1
+            results.append((record, status, block_id, created_stub))
+            counts[status] += 1
+            counts["stubbed"] += created_stub
         if not dry_run:
             queries.commit_db_changes(db_session)
-            # Logging/checkpointing happens only AFTER a successful commit,
-            # so a mid-batch failure doesn't double-log in the fallback below.
-            for record, status, block_id in results:
-                if status == "protected":
-                    log_protected(protected_file, record["source_path"], block_id)
-                else:
-                    append_checkpoint(checkpoint_file, record["source_path"])
-        return added, updated, errors, protected
+            # Logging/checkpointing only AFTER a successful commit.
+            for record, status, block_id, created_stub in results:
+                finish(record, status, block_id, created_stub)
+        return counts
     except Exception:
         if not dry_run:
             queries.roll_back_db_changes(db_session)
-        added = updated = errors = protected = 0
+        counts = Counter()
+        stubbed_ids.clear()  # everything uncommitted was just rolled back
         for record in batch:
+            block_id_for_row = row_block_id(record)
+            already_stubbed = block_id_for_row in stubbed_ids
             try:
-                status, block_id = process_one_record(
-                    record, dry_run, missing_build_info_log, existing_iv_by_path, existing_build_ids
+                status, block_id, created_stub = process_one_record(
+                    record, dry_run, existing_iv_by_path, existing_build_ids, stubbed_ids
                 )
-                if status in ("added", "would_upsert"):
-                    added += 1
-                elif status == "updated":
-                    updated += 1
-                elif status == "protected":
-                    protected += 1
                 if not dry_run:
-                    if status == "protected":
-                        log_protected(protected_file, record["source_path"], block_id)
-                    else:
+                    if status != "protected":
                         queries.commit_db_changes(db_session)
-                        append_checkpoint(checkpoint_file, record["source_path"])
+                    finish(record, status, block_id, created_stub)
+                counts[status] += 1
+                counts["stubbed"] += created_stub
             except Exception as row_error:
                 if not dry_run:
                     queries.roll_back_db_changes(db_session)
-                errors += 1
+                if not already_stubbed:
+                    stubbed_ids.discard(block_id_for_row)  # this row's stub was rolled back
+                counts["error"] += 1
                 error_log.write(json.dumps({
                     "source_path": record["source_path"],
                     "error": str(row_error),
                     "error_type": type(row_error).__name__,
                     "fields": record["fields"],
                 }, default=str) + "\n")
-        return added, updated, errors, protected
+        return counts
 
 
 def main():
@@ -322,29 +338,31 @@ def main():
             print(f"  {p}")
         print()
 
-    total_added = total_updated = total_errors = total_protected = 0
+    totals = Counter()
 
+    # Stub log is APPEND-only and only written after a real commit (never in
+    # a dry run): a stub is created once per block_id, so truncating it on
+    # every run would erase the record of earlier runs.
+    stub_open_mode = "a"
     with open(ERROR_LOG_PATH, "w", encoding="utf-8") as error_log, \
-         open(MISSING_BUILD_INFO_LOG_PATH, "w", encoding="utf-8") as missing_build_info_log, \
+         open(STUBBED_BUILD_INFO_LOG_PATH, stub_open_mode, encoding="utf-8") as stub_file, \
          open(CHECKPOINT_PATH, "a", encoding="utf-8") as checkpoint_file, \
          open(PROTECTED_PATH, "w", encoding="utf-8") as protected_file:  # "w": never checkpointed, so rebuilt fresh each run
 
         for i in range(0, len(clean_records), BATCH_SIZE):
             batch = clean_records[i : i + BATCH_SIZE]
-            added, updated, errors, protected = run_batch(batch, args.dry_run, error_log, missing_build_info_log, checkpoint_file, protected_file)
-            total_added += added
-            total_updated += updated
-            total_errors += errors
-            total_protected += protected
-            print(f"Batch {i // BATCH_SIZE + 1}: +{added} added, {updated} updated, {errors} errors, {protected} protected")
+            counts = run_batch(batch, args.dry_run, error_log, checkpoint_file, protected_file, stub_file)
+            totals.update(counts)
+            print(f"Batch {i // BATCH_SIZE + 1}: +{counts['added']} added, {counts['updated']} updated, "
+                  f"{counts['stubbed']} Build_Info stubs, {counts['error']} errors, {counts['protected']} protected")
 
-    label = "WOULD ADD" if args.dry_run else "ADDED"
+    prefix = "WOULD BE " if args.dry_run else ""
     print()
-    print(f"{label}: {total_added}")
-    print(f"UPDATED (pre-existing iv_file_path): {total_updated}")
-    print(f"ERRORS: {total_errors} -> {ERROR_LOG_PATH}")
-    print(f"PROTECTED ENTRIES: {total_protected} -> {PROTECTED_PATH}")
-    print(f"MISSING BUILD_INFO (inserted anyway, FK target not found): see {MISSING_BUILD_INFO_LOG_PATH}")
+    print(f"{prefix}ADDED: {totals['added']}")
+    print(f"{prefix}UPDATED (pre-existing iv_file_path): {totals['updated']}")
+    print(f"{prefix}BUILD_INFO STUBS CREATED (IV exists before its block/build info): {totals['stubbed']} -> {STUBBED_BUILD_INFO_LOG_PATH}")
+    print(f"ERRORS: {totals['error']} -> {ERROR_LOG_PATH}")
+    print(f"PROTECTED ENTRIES: {totals['protected']} -> {PROTECTED_PATH}")
     if problems:
         print(f"PREFLIGHT PROBLEMS (never attempted): {len(problems)}")
     if args.dry_run:
