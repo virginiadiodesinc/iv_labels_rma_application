@@ -7,3 +7,15 @@
     hx-params="searched-part-type"
     hx-on::config-request="event.detail.parameters['searched-part-name'] = this.value"
 {%- endmacro %}
+
+
+{% macro part_search_datalist_attributes(part_type, input_id) -%}
+    data-part-type="{{ part_type }}"
+    data-source-input="{{ input_id }}"
+    hx-get="{{ url_for('jb2.search_jb2_parts') }}"
+    hx-trigger="input changed delay:500ms from:#{{ input_id }}"
+    hx-target="this"
+    hx-on::config-request="
+        event.detail.parameters['searched-part-name'] = document.getElementById(this.dataset.sourceInput).value;
+        event.detail.parameters['searched-part-type'] = this.dataset.partType;"
+{%- endmacro %}

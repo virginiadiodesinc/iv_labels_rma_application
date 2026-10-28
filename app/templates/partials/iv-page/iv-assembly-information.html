@@ -1,4 +1,5 @@
 {% from "macros/search-suggestions.html" import part_search_attributes %}
+{% from "macros/search-suggestions.html" import part_search_datalist_attributes %}
 
 <form id="iv-assembly-information-form" class="iv-assembly-information-form">
 	<div id="iv-build-info-container" class="iv-build-info-container">
@@ -86,6 +87,7 @@
 							size="40"
 							id="iv-diode-name"
 							value="{{iv_data.diode if iv_data and iv_data.diode else ''}}"
+							list="iv-diode-search-results"
 							hx-get="/search_part_lots/"
 							hx-trigger="{% if suppress_lot_search %}input changed delay:300ms{% else %}revealed, input changed delay:300ms{% endif %}"
 							hx-target="next .lot-container"
@@ -93,6 +95,9 @@
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['diode_lot'] if part else '' }}">
 			</label>
+			<datalist id="iv-diode-search-results" {{ part_search_datalist_attributes('DIODE', 'iv-diode-name') }}>
+				{% include "partials/search/search-suggestion-results.html" %}
+			</datalist>
 			<div class="lot-container">
 				{% set current_lot = iv_data.diode_lot.lower()
 					if iv_data is defined and iv_data.diode_lot
@@ -108,6 +113,7 @@
 							size="40"
 							name="part" 
 							id="iv-circuit-name"
+							list="iv-circuit-search-results"
 							value="{{iv_data.circuit if iv_data and iv_data.circuit else ''}}"
 							hx-get="/search_part_lots/"
 							hx-trigger="{% if suppress_lot_search %}input changed delay:300ms{% else %}revealed, input changed delay:300ms{% endif %}"
@@ -116,6 +122,9 @@
 							oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
 				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ iv_data['circuit_lot'] if part else '' }}">
 			</label>
+			<datalist id="iv-circuit-search-results" {{ part_search_datalist_attributes('CIRCUIT', 'iv-circuit-name') }}>
+				{% include "partials/search/search-suggestion-results.html" %}
+			</datalist>
 			<div class="lot-container">
 				{% set current_lot = iv_data.circuit_lot.lower()
 					if iv_data is defined and iv_data.circuit_lot
