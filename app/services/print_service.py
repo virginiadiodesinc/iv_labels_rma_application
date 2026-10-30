@@ -1,4 +1,6 @@
 from app.services import dymo_printer as printer
+from app.services import validate_red_flags as vrf
+from app.services import field_registry as fr
 
 def print_full_build(full_build_info):
 	"""Prints a full build label
@@ -48,7 +50,13 @@ def print_pb2_label(pb2_info):
 	printer.print_engine("pb2.label", printer.populate_pb2_label_fields, pb2_info)
 
 def print_all_labels(block_build_info):
-	print_block_inspection(block_build_info)
-	print_pb1_label(block_build_info)
-	print_pb2_label(block_build_info)
-	print_full_build(block_build_info)
+	canonical = fr.canonical_from_form(block_build_info)
+
+	if not vrf.validate_block_identification(canonical):
+		print_block_inspection(block_build_info)
+	if not vrf.validate_pb1_info(canonical):
+		print_pb1_label(block_build_info)
+	if not vrf.validate_pb2_info(canonical):
+		print_pb2_label(block_build_info)
+	if not vrf.validate_full_build_info(canonical):
+		print_full_build(block_build_info)

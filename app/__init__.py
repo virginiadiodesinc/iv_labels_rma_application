@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from app.db.models import *
+import uuid
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -21,6 +22,7 @@ def create_app():
 	)
 
 	app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+	app.jinja_env.globals["new_uid"] = lambda: uuid.uuid4().hex[:8]
 
 	from app.routes import build_routes, db_routes, file_handling_routes, iv_routes, jb2_routes, page_loading_routes, printing_routes, save_routes, delete_routes, load_routes
 	

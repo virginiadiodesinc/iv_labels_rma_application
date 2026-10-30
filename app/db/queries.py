@@ -16,24 +16,29 @@ def add_table_entry(db_session, model, **data):
 	return entry
 
 # READ
-def get_table_entries(db_session, model, **filters):
+def get_table_entries(db_session, model, limit=None, **filters):
 	query = select(model)
 	for attribute, value in filters.items():
 		if hasattr(model, attribute):
 			query = query.where(getattr(model, attribute) == value)
 
-	if 'limit' in filters:
-		result_limit = int(filters.get('limit'))
+	if limit != None:
+		result_limit = int(limit)
 		query = query.limit(result_limit)
 		
 	return db_session.execute(query).scalars().all()
 
 # READ (LIKE)
-def get_table_entries_like(db_session, model, **filters):
+def get_table_entries_like(db_session, model, limit=None, **filters):
 	query = select(model)
 	for attribute, value in filters.items():
 		if hasattr(model, attribute):
 			query = query.where(getattr(model, attribute).startswith(value))
+
+	if limit != None:
+			result_limit = int(limit)
+			query = query.limit(result_limit)
+			
 	return db_session.execute(query).scalars().all()
 
 # UPDATE

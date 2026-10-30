@@ -1,10 +1,19 @@
-<div class="part-row" data-has-existing-lot="{{ 'true' if part and part.part_lot else 'false' }}">
+{% set row_uid = new_uid() %}
+<div 
+	class="part-row" 
+	data-has-existing-lot="{{ 'true' if part and part.part_lot else 'false' }}"
+	hx-get="/validate_part_row/"
+	hx-include="this"
+	hx-trigger="input delay:500ms, load delay:500ms, htmx:afterSwap[target.classList.contains('lot-container')]"
+	hx-target="find .part-row-validation-doodad"
+	hx-swap="outerHTML"
+	hx-disinherit="hx-swap hx-target hx-include">
 	<div class="part-row-line-1">
 		<div>
 			<label>
 				Part Type:
 				<select
-				name="part_type">
+				name="part_type" id="part-type-{{ row_uid }}">
 					{% for type in ['CIRCUIT', 'DIODE', 'FILTER MESH', 'MMIC', 'PCB', 'VAC', 
 					'BCMESH', 'CONNECTOR', 'MA PARTS', 'MISC', 'SP OTHER',
 					 'CABLE', 'FILTER', 'INVENTORY', 'PMP'] %}
@@ -30,10 +39,23 @@
 						hx-trigger="revealed, keyup changed delay:300ms"
 						hx-target="next .lot-container"
 						hx-include="closest .part-row"
-						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)">
+						oninput="sanitizeInput(this, ILLEGAL_FILENAME_CHARACTERS, true)"
+						id="part-name-{{ row_uid }}"
+						list="part-results-{{ row_uid }}">
 				<input type="hidden" name="lot" class="part-row-pending-lot" value="{{ part.part_lot if part else '' }}">
+				<datalist 
+							id="part-results-{{ row_uid }}"
+							hx-get="{{ url_for('jb2.search_jb2_parts') }}"
+							hx-trigger="input changed delay:500ms from:#part-name-{{ row_uid }}"
+							hx-target="this"
+							hx-on::config-request="
+								event.detail.parameters['searched-part-name'] = document.getElementById('part-name-{{ row_uid }}').value;
+								event.detail.parameters['searched-part-type'] = document.getElementById('part-type-{{ row_uid }}').value;
+								">
+				</datalist>
 			</label>
 		</div>
+		<div class="part-row-validation-doodad">✓</div>
 		<div class="delete-row-button-container">
 			<button
 				type="button"

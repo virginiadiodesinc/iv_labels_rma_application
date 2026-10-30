@@ -102,7 +102,7 @@ def get_part_info(part_name):
     for row in cursor.fetchall():
         parts_found.append(row)
 
-    return parts_found[0]
+    return parts_found[0] if parts_found else None
 
 def get_BOM(build_name):
     category_pattern = re.compile(r'^([\w, ]*):')

@@ -1,0 +1,19 @@
+{% if issues | length == 0 %}
+    <div class="part-row-validation-doodad">✓</div>
+
+    {% else %}
+    <div class="part-row-validation-doodad">
+        <div class="tooltip-wrapper">
+            <span class="tooltip-trigger"><strong>?</strong></span>
+            <div class="tooltip-box">
+                <ul>
+                    {% for issue in issues %}
+                    <li>
+                        {{issue}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endif %}

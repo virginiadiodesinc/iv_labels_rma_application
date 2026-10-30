@@ -1,5 +1,7 @@
 from flask import Blueprint, request, render_template
 from app.services import parts_service
+from app.db import JB2_queries as jb2
+
 
 build_bp = Blueprint("build", __name__)
 
@@ -199,3 +201,34 @@ def import_iv_identifiers_to_block():
 	}
 
 	return render_template("partials/block-forms/iv-identifier-to-block-side-import.html", block=block)
+
+
+@build_bp.get("/validate_part_row/")
+def validate_part_row():
+	# VALIDATE PART EXISTS IN JB2
+	# VALIDATE PART TYPE IS ACCURATE
+	# VALIDATE LOT CHOSEN
+	part_row = request.args
+	part_name = part_row.get("part")
+	part_lot = part_row.get("custom-lot-input") if part_row.get("lot-select") == "Other" else part_row.get("lot-select")
+	part_type = part_row.get("part_type")
+
+	jb2_part_info = jb2.get_part_info(part_name)
+	part_matches = bool(jb2_part_info)
+	if part_matches:
+		type_matches = (part_type == jb2_part_info[1])
+	lot_selected = part_lot != "Choose" and part_lot.strip() != ""
+	part_name_listed = bool(part_name)
+
+	issues = []
+
+	if not part_name_listed:
+		issues.append("This part does not have a name recorded.")
+	elif not part_matches:
+		issues.append("This part does not match any part names from JB2.")
+	if "type_matches" in locals() and type_matches is False:
+		issues.append(f"This part type is different than the JB2-listed part type which is {jb2_part_info[1]}.")
+	if not lot_selected:
+		issues.append("This part does not have a lot selected.")
+
+	return render_template("partials/build-page/part-row-validation-doodad.html", issues=issues)

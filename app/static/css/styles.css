@@ -822,3 +822,42 @@ summary:has(:is(h1, h2, h3, h4, h5, h6)) {
 	font-weight: bold;
 	font-size: large;
 }
+
+
+.tooltip-wrapper {
+	display: inline-block; /* no position: relative needed anymore */
+}
+
+.tooltip-trigger {
+	cursor: pointer;
+}
+
+.tooltip-box {
+	position: fixed;      /* out of flow, relative to the viewport */
+	/* No top/left/bottom/right on purpose: see note below */
+	margin-top: 6px;      /* small gap below the "?" */
+
+	background-color: #333;
+	color: #fff;
+	padding: 10px 15px;
+	border-radius: 6px;
+	font-size: 14px;
+	width: 200px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.2s ease-in-out, visibility 0.2s;
+	z-index: 1000;
+}
+
+.tooltip-box ul {
+	margin: 0;
+	padding-left: 20px;
+}
+
+.tooltip-wrapper:hover .tooltip-box,
+.tooltip-wrapper:focus-within .tooltip-box {
+	visibility: visible;
+	opacity: 1;
+}
