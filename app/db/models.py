@@ -1,7 +1,7 @@
 import enum
 from numbers import Number
 from datetime import datetime
-from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum, DateTime, CheckConstraint, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum, DateTime, CheckConstraint, ForeignKey, relationship
 from app.db.database import Base
 
 class Build_Info(Base):
@@ -38,6 +38,10 @@ class Build_Info(Base):
 	from_file = Column(Boolean)
 	last_save_date = Column(DateTime)
 	audit_info = Column(String)
+	# RELATIONSHIPS
+	parts = relationship("Build_Parts", back_populates="build")
+	notes = relationship("Notes", back_populates="build")
+	yellow_flags = relationship("Yellow_Flags", back_populates="build", uselist=False)
 
 
 class Build_Parts(Base):
@@ -53,6 +57,8 @@ class Build_Parts(Base):
 	temperature = Column(String)
 	indium = Column(String)
 	modifications = Column(String)
+	# RELATIONSHIP
+	build = relationship("Build_Info", back_populates="parts")
 
 
 class Polarity(enum.Enum):
@@ -110,18 +116,21 @@ class Notes(Base):
 	note_id = Column(Integer, primary_key=True, autoincrement=True)
 	type = Column(Enum(Note_Type), nullable=False)
 	note = Column(String, nullable=False)
+	# RELATIONSHIP
+	build = relationship("Build_Info", back_populates="notes")
 
 
 class Yellow_Flags(Base):
 	__tablename__ = 'yellow_flags'
-	block_id = Column(String, ForeignKey("build_info.block_id"), nullable=False)
-	flag_list_id = Column(Integer, primary_key=True, autoincrement=True)
+	block_id = Column(String, ForeignKey("build_info.block_id"), primary_key=True, nullable=False)
 	mismatched_bom = Column(Boolean)
 	unlisted_block_name = Column(Boolean)
 	unlisted_build_name = Column(Boolean)
 	current_test_note_missing = Column(Boolean)
 	rework_info_note_missing = Column(Boolean)
 	no_parts_listed = Column(Boolean)
+	# RELATIONSHIP
+	build = relationship("Build_Info", back_populates="yellow_flags")
 
 
 class Feedback(Base):
