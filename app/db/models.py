@@ -1,7 +1,8 @@
 import enum
 from numbers import Number
 from datetime import datetime
-from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum, DateTime, CheckConstraint, ForeignKey, relationship
+from sqlalchemy import Column, Integer, Float, String, Boolean, Date, Enum, DateTime, CheckConstraint, ForeignKey
+from sqlalchemy.orm import relationship
 from app.db.database import Base
 
 class Build_Info(Base):
