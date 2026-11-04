@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form id="data-comparison-form"
+        data-filters='{{ filters|tojson }}'
+        hx-get="/data_comparison/search/"
+        hx-trigger="submit"
+        hx-target="#data-comparison-results"
+        hx-swap="innerHTML">
+
+        <h3>Filters</h3>
+        <div id="all-filters-container">
+            {% include "partials/data-comparison/filter.html" %}
+        </div>
+
+        <button type="button"
+                id="add-new-filter-button"
+                hx-get="/add_new_filter/"
+                hx-target="#all-filters-container"
+                hx-swap="beforeend">Add New Filter</button>
+
+        <h3>Sorts (top = highest priority)</h3>
+        <div id="all-sorts-container">
+            {% include "partials/data-comparison/sort.html" %}
+        </div>
+
+        <button type="button"
+                id="add-new-sort-button"
+                hx-get="/add_new_sort/"
+                hx-target="#all-sorts-container"
+                hx-swap="beforeend">Add New Sort</button>
+
+        <div>
+            <button type="submit">Search</button>
+        </div>
+    </form>
+
+    <div id="data-comparison-results"></div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/data_comparison.js') }}"></script>
+{% endblock %}

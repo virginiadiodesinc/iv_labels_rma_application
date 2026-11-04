@@ -10,6 +10,9 @@ from app.db.database import db_session
 from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity, Note_Type, Yellow_Flags
 from app.db import queries
 import datetime
+from sqlalchemy import Integer, case, cast, func, select, or_, and_
+from sqlalchemy.orm import selectinload
+
 
 def get_block_and_build_info(canonical: dict):
     block_id = fr.build_block_id(canonical)
@@ -202,3 +205,85 @@ def commit_db_changes():
 def roll_back_db_changes():
     queries.roll_back_db_changes(db_session)
 
+
+
+# AUDITING
+
+def serial_sort_keys(col):
+	dash = func.instr(col, "-")
+	major = case(
+		(dash == 0, 0),                                   # no hyphen: no major half
+		else_=cast(func.substr(col, 1, dash - 1), Integer),
+	)
+	minor = case(
+		(dash == 0, cast(col, Integer)),                  # no hyphen: whole thing is the minor
+		else_=cast(func.substr(col, dash + 1), Integer),
+	)
+	return [major, minor]
+
+
+FILTER_REGISTRY = {
+    "engraving": {"column": Build_Info.block_engraving, "ops": {"eq", "in", "contains"}, "coerce": str},
+    "serial":    {"column": Build_Info.block_serial_number, "ops": {"eq", "in", "starts_with"}, "coerce": str},
+    "build_name": {
+        "ops": {"eq", "contains"},
+        "builder": lambda op, v: or_(*[queries.translate_filter(c, op, v) for c in
+            (Build_Info.pb1_build_name, Build_Info.pb2_build_name, Build_Info.full_build_name)]),
+    },
+    "full_build_name": {"column": Build_Info.full_build_name, "ops": {"eq", "in", "contains"}, "coerce": str},
+    "pb2_build_name": {"column": Build_Info.pb2_build_name, "ops": {"eq", "in", "contains"}, "coerce": str},
+    "has_part": {
+        "ops": {"eq"},
+        "builder": lambda op, v: Build_Info.parts.any(Build_Parts.part_name == v),
+    },
+    "has_lot": {
+            "ops": {"eq"},
+            "builder": lambda op, v: Build_Info.parts.any(Build_Parts.part_lot == v),
+        },
+    "has_part_and_lot": {
+            "ops": {"eq"},
+            "builder": lambda op, v: Build_Info.parts.any(and_(Build_Parts.part_name == v[0], Build_Parts.part_lot == v[1])),
+    },
+    "yellow_flag_status": {"column": Build_Info.flagged, "ops": {"eq"}},
+    "audit_info": {"column": Build_Info.audit_info, "ops": {"eq"}},
+}
+
+
+SORT_REGISTRY = {
+    "full_build_date": [Build_Info.full_build_date],
+    "save_date": [Build_Info.last_save_date],
+    "serial":    serial_sort_keys(Build_Info.block_serial_number),
+}
+
+
+def search_builds(filters, sorts, page, page_size):
+    conditions = queries.build_filter_conditions(filters, FILTER_REGISTRY)
+    base  = queries.apply_filters(select(Build_Info), conditions)
+
+    total = queries.count_query(db_session, base)                  # count BEFORE sorting
+
+    orderings = queries.build_sort_orderings(sorts, SORT_REGISTRY)
+    paged = queries.paginate(queries.apply_sort(base, Build_Info, orderings), page, page_size)
+    paged = paged.options(selectinload(Build_Info.parts), selectinload(Build_Info.notes),
+                        selectinload(Build_Info.yellow_flags))
+    return total, db_session.execute(paged).scalars().all()
+
+
+def get_filter_menu():
+    return {key: sorted(entry["ops"]) for key, entry in FILTER_REGISTRY.items()}
+
+
+def get_sort_menu():
+    return list(SORT_REGISTRY)
+
+
+def row_to_dict(obj):
+    return {c.name: getattr(obj, c.name) for c in obj.__table__.columns}
+
+
+def build_to_dict(build):
+    data = row_to_dict(build)
+    data["parts"] = [row_to_dict(p) for p in build.parts]
+    data["notes"] = [row_to_dict(n) for n in build.notes]
+    data["yellow_flags"] = row_to_dict(build.yellow_flags) if build.yellow_flags else None
+    return data

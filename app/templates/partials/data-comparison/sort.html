@@ -1,0 +1,12 @@
+<div class="sort-container">
+    <select name="sort-key">
+        {% for key in sorts %}
+            <option value="{{ key }}">{{ key }}</option>
+        {% endfor %}
+    </select>
+    <select name="sort-dir">
+        <option value="ascending">ascending</option>
+        <option value="descending">descending</option>
+    </select>
+    <button type="button" onclick="this.closest('.sort-container').remove();">Remove this sort</button>
+</div>

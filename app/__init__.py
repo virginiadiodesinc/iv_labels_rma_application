@@ -24,7 +24,12 @@ def create_app():
 	app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 	app.jinja_env.globals["new_uid"] = lambda: uuid.uuid4().hex[:8]
 
-	from app.routes import build_routes, db_routes, file_handling_routes, iv_routes, jb2_routes, page_loading_routes, printing_routes, save_routes, delete_routes, load_routes
+	from app.routes import (
+		build_routes, db_routes, file_handling_routes, 
+		iv_routes, jb2_routes, page_loading_routes, 
+		printing_routes, save_routes, delete_routes, 
+		load_routes, data_comparison_routes,
+	)
 	
 	app.register_blueprint(build_routes.build_bp)
 	app.register_blueprint(db_routes.db_bp)
@@ -36,6 +41,7 @@ def create_app():
 	app.register_blueprint(save_routes.save_bp)
 	app.register_blueprint(delete_routes.delete_bp)
 	app.register_blueprint(load_routes.load_bp)
+	app.register_blueprint(data_comparison_routes.data_bp)
 
 	from app.db.database import db_session, engine, Base
 	from sqlalchemy import inspect

@@ -1,0 +1,17 @@
+<div id="filter-input-container-{{ filter_uid }}">
+    {% if input_kind == "list" %}
+        <div id="filter-list-{{ filter_uid }}">
+            {% include "partials/data-comparison/string-input-for-list.html" %}
+        </div>
+        <button type="button"
+                hx-get="/add_filter_string_to_list/"
+                hx-vals='{"filter_uid": "{{ filter_uid }}"}'
+                hx-target="#filter-list-{{ filter_uid }}"
+                hx-swap="beforeend">Add String to List</button>
+    {% elif input_kind == "pair" %}
+        <input type="text" name="filter-value-{{ filter_uid }}" placeholder="Part">
+        <input type="text" name="filter-value-{{ filter_uid }}" placeholder="Lot">
+    {% else %}
+        <input type="text" name="filter-value-{{ filter_uid }}">
+    {% endif %}
+</div>

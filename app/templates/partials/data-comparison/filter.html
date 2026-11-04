@@ -1,0 +1,32 @@
+{% set filter_uid = new_uid() %}
+{% set input_kind = "single" %}
+<div class="filter-container">
+    <input type="hidden" name="filter_uid" value="{{ filter_uid }}">
+
+    <select id="filter-key-{{ filter_uid }}"
+            name="filter-key-{{ filter_uid }}"
+            onchange="updateFilterOperationsSelect(this)">
+        {% for key in filters %}
+            <option value="{{ key }}">{{ key }}</option>
+        {% endfor %}
+    </select>
+
+    <select id="filter-op-{{ filter_uid }}"
+            name="filter-op-{{ filter_uid }}"
+            hx-get="/update_filter_inputs/"
+            hx-trigger="change"
+            hx-include="#filter-key-{{ filter_uid }}, this"
+            hx-vals='{"filter_uid": "{{ filter_uid }}"}'
+            hx-target="#filter-input-container-{{ filter_uid }}"
+            hx-swap="outerHTML">
+        {% for op in filters[filters.keys()|first] %}
+            <option value="{{ op }}">{{ op }}</option>
+        {% endfor %}
+    </select>
+
+    {% include "partials/data-comparison/filter-string-container.html" %}
+
+    <button type="button" onclick="this.closest('.filter-container').remove();">
+        Remove This Filter
+    </button>
+</div>

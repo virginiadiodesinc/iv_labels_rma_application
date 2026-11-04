@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from app import config
-
+from app.services import db_service
 page_bp = Blueprint("page", __name__)
 default_keithley_settings = config.default_keithley_settings
 
@@ -26,6 +26,10 @@ def get_iv_and_build_page():
 @page_bp.get("/feedback")
 def get_feedback_page():
 	return render_template("feedback-page.html")
+
+@page_bp.get("/data_comparison")
+def get_data_comparison_page():
+	return render_template("data-comparison-page.html", filters=db_service.get_filter_menu(), sorts=db_service.get_sort_menu())
 
 @page_bp.post("/clear_iv_assembly_information/")
 def clear_iv_assembly():
