@@ -1,0 +1,15 @@
+<div class="build-data-row">
+    <h1>{{ build.block_id }}</h1>
+    <h1>Parts:</h1>
+    <ul>
+    {% for part in build.parts %}
+        <li>{{ part.part_name }}, {{ part.part_lot }}, {{ part.part_type }}, {{ part.quantity }}</li>
+    {% endfor %}
+    </ul>
+    <h1>Notes:</h1>
+    <ul>
+    {% for note in build.notes %}
+        <li>{{ note.type }}, {{ note.note }}</li>
+    {% endfor %}
+    </ul>
+</div>

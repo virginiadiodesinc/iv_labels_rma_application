@@ -1,1 +1,7 @@
-<p>Hello</p>
+<div
+    id="data-comparison-build-table"
+    name="data-comparison-build-table">
+    {% for build in builds %}
+        {% include "partials/data-comparison/build-data.html" %}
+    {% endfor %}
+</div>
