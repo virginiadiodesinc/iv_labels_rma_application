@@ -1,7 +1,36 @@
-<div
-    id="data-comparison-build-table"
-    name="data-comparison-build-table">
-    {% for build in builds %}
-        {% include "partials/data-comparison/build-data.html" %}
-    {% endfor %}
+{% set current_page = page|default(1) %}
+{% set size = page_size|default(25) %}
+{% set total_pages = (total / size)|round(0, 'ceil')|int %}
+
+<div id="data-comparison-build-table">
+    <p>{{ total }} build{{ "" if total == 1 else "s" }}
+        {% if total_pages > 1 %}&mdash; page {{ current_page }} of {{ total_pages }}{% endif %}
+    </p>
+
+    <div class="build-rows">
+        {% for build in builds %}
+            {% include "partials/data-comparison/build-data.html" %}
+        {% else %}
+            <p>No builds match these filters.</p>
+        {% endfor %}
+    </div>
+
+    {% if total_pages > 1 %}
+        <div class="pagination">
+            <button type="button"
+                    {% if current_page <= 1 %}disabled{% endif %}
+                    hx-get="/data_comparison/search/"
+                    hx-include="#data-comparison-form"
+                    hx-vals='{"page": {{ current_page - 1 }}}'
+                    hx-target="#data-comparison-results"
+                    hx-swap="innerHTML">Previous</button>
+            <button type="button"
+                    {% if current_page >= total_pages %}disabled{% endif %}
+                    hx-get="/data_comparison/search/"
+                    hx-include="#data-comparison-form"
+                    hx-vals='{"page": {{ current_page + 1 }}}'
+                    hx-target="#data-comparison-results"
+                    hx-swap="innerHTML">Next</button>
+        </div>
+    {% endif %}
 </div>

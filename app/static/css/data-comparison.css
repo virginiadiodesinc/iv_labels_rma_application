@@ -1,0 +1,197 @@
+/* ---------- PAGE LAYOUT: sidebar (filters/sorts) + results ---------- */
+
+.data-comparison-layout {
+	display: grid;
+	grid-template-columns: minmax(280px, 1fr) 4fr;
+	column-gap: 15px;
+	align-items: start;
+	padding: 0 10px;
+}
+
+.data-comparison-sidebar {
+	position: sticky;
+	top: 10px;
+	max-height: 90vh;
+	overflow-y: auto;
+	padding-right: 10px;
+	border-right: solid gray;
+}
+
+.data-comparison-main {
+	min-width: 0; /* lets wide tables scroll instead of stretching the grid */
+}
+
+/* ---------- FILTER / SORT ROWS ---------- */
+
+.filter-container,
+.sort-container {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 0;
+	border-bottom: 1px solid #ccc;
+}
+
+.filter-container [id^="filter-input-container-"] {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+}
+
+.data-comparison-filter-string-container {
+	display: flex;
+	gap: 2px;
+}
+
+/* ---------- BUILD ROWS ---------- */
+
+.build-rows .build-data-row {
+	border: 1px solid black;
+	border-radius: 5px;
+	margin-bottom: 6px;
+}
+
+.build-rows .build-data-row:nth-child(odd) {
+	background-color: whitesmoke;
+}
+
+.build-rows .build-data-row:nth-child(even) {
+	background-color: lightblue;
+}
+
+.build-summary {
+	padding: 4px 8px;
+	cursor: pointer;
+}
+
+.build-summary span {
+	margin-right: 20px;
+}
+
+/* fixed widths so the columns line up from row to row */
+.build-summary-id {
+	display: inline-block;
+	min-width: 24ch;
+	font-weight: bold;
+}
+
+.build-summary-name {
+	display: inline-block;
+	min-width: 24ch;
+}
+
+.badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 8px;
+	border: 1px solid black;
+}
+
+.badge-yellow {
+	background-color: gold;
+}
+
+.badge-flagged {
+	background-color: orangered;
+	color: white;
+}
+
+/* ---------- NESTED SECTIONS ---------- */
+
+.build-sections {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start; /* a short section doesn't stretch to match a tall one */
+	gap: 8px 16px;
+	padding: 6px 10px 10px 10px;
+}
+
+.build-section {
+	min-width: 14ch;
+	padding: 3px 6px;
+	background-color: white;
+	border: 1px solid gray;
+	border-radius: 4px;
+}
+
+.build-section[open] {
+	min-width: 28ch;
+}
+
+.build-section > summary {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.build-section-wide {
+	flex: 1 1 100%;
+}
+
+.field-list {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	column-gap: 10px;
+	margin: 4px 0;
+}
+
+.field-list dt {
+	font-weight: bold;
+}
+
+.field-list dd {
+	margin: 0;
+	word-break: break-all; /* file paths */
+}
+
+.flag-list {
+	margin: 4px 0;
+	padding-left: 20px;
+}
+
+/* ---------- PARTS / NOTES TABLES ---------- */
+
+.parts-scroll {
+	max-height: 300px;
+	overflow: auto;
+}
+
+.parts-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.parts-table th {
+	font-size: small;
+	text-align: left;
+	background-color: white;
+	position: sticky;
+	top: 0;
+}
+
+.parts-table td,
+.parts-table th {
+	padding: 2px 8px;
+}
+
+.parts-table tbody tr:nth-child(even) {
+	background-color: lightblue;
+}
+
+.parts-table tbody tr:nth-child(odd) {
+	background-color: whitesmoke;
+}
+
+.note-type-cell {
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+/* ---------- PAGINATION ---------- */
+
+.pagination {
+	display: flex;
+	gap: 10px;
+	margin: 10px 0;
+}

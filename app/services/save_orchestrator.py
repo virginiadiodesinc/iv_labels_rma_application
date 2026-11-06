@@ -188,7 +188,6 @@ def save_inspection_info(canonical: dict) -> SaveResult:
 def save_pb1_info(canonical: dict, parts_list: list[dict], notes_list: list[dict]) -> SaveResult:
     return _save_files_and_info(
         canonical,
-        build_name_key=fr.BUILD_NAME_KEYS[fr.Section.PB1],
         parts_list=parts_list,
         notes_list=notes_list,
     )
@@ -197,7 +196,6 @@ def save_pb1_info(canonical: dict, parts_list: list[dict], notes_list: list[dict
 def save_pb2_info(canonical: dict, parts_list: list[dict], notes_list: list[dict]) -> SaveResult:
     return _save_files_and_info(
         canonical,
-        build_name_key=fr.BUILD_NAME_KEYS[fr.Section.PB2],
         parts_list=parts_list,
         notes_list=notes_list,
     )

@@ -1,0 +1,20 @@
+{# partials/data-comparison/macros.html
+   One place that decides how a value is displayed. Later, an edit mode can
+   be added here and every section picks it up. #}
+
+{% macro field(label, value, fmt='%m/%d/%Y') %}
+    <dt>{{ label }}</dt>
+    <dd>
+        {%- if value is none or value == '' -%}
+            &mdash;
+        {%- elif value is sameas true -%}
+            Yes
+        {%- elif value is sameas false -%}
+            No
+        {%- elif value.strftime is defined -%}
+            {{ value.strftime(fmt) }}
+        {%- else -%}
+            {{ value }}
+        {%- endif -%}
+    </dd>
+{% endmacro %}

@@ -1,15 +1,106 @@
-<div class="build-data-row">
-    <h1>{{ build.block_id }}</h1>
-    <h1>Parts:</h1>
-    <ul>
-    {% for part in build.parts %}
-        <li>{{ part.part_name }}, {{ part.part_lot }}, {{ part.part_type }}, {{ part.quantity }}</li>
+{% from "partials/data-comparison/macros.html" import field %}
+
+{# ---- values used by the summary line ---- #}
+{% set flag_names = ["mismatched_bom", "unlisted_block_name", "unlisted_build_name",
+                     "current_test_note_missing", "rework_info_note_missing", "no_parts_listed"] %}
+{% set active_flags = [] %}
+{% if build.yellow_flags %}
+    {% for name in flag_names %}
+        {% if build.yellow_flags[name] %}{% set _ = active_flags.append(name) %}{% endif %}
     {% endfor %}
-    </ul>
-    <h1>Notes:</h1>
-    <ul>
-    {% for note in build.notes %}
-        <li>{{ note.type }}, {{ note.note }}</li>
-    {% endfor %}
-    </ul>
+{% endif %}
+{% set build_name = build.full_build_name or build.pb2_build_name or build.pb1_build_name or "—" %}
+
+{# build_open / open_section / edit_section / edit_error / form are only set
+   when this row is re-rendered after a save; normally they're undefined. #}
+<div class="build-data-row" data-block-id="{{ build.block_id }}">
+    <details class="build-details" {% if build_open %}open{% endif %}>
+        <summary class="build-summary">
+            <span class="build-summary-id">{{ build.block_id }}</span>
+            <span class="build-summary-name">{{ build_name }}</span>
+            {% if build.flagged %}<span class="badge badge-flagged">Flagged</span>{% endif %}
+            {% if active_flags %}<span class="badge badge-yellow">Yellow flags: {{ active_flags|length }}</span>{% endif %}
+        </summary>
+
+        <div class="build-sections">
+
+            {# the four registry-driven, editable sections #}
+            {% for section_name in ["inspection", "pb1", "pb2", "full_build"] %}
+                {% include "partials/data-comparison/section.html" %}
+            {% endfor %}
+
+            <details class="build-section">
+                <summary>Audit / Meta</summary>
+                <dl class="field-list">
+                    {{ field("Flagged", build.flagged) }}
+                    {{ field("Audit info", build.audit_info) }}
+                    {{ field("From file", build.from_file) }}
+                    {{ field("Last saved", build.last_save_date, '%m/%d/%Y %H:%M') }}
+                    {{ field("Block file", build.block_file_path) }}
+                    {{ field("Build file", build.build_file_path) }}
+                </dl>
+            </details>
+
+            <details class="build-section">
+                <summary>Yellow Flags ({{ active_flags|length }})</summary>
+                {% if active_flags %}
+                    <ul class="flag-list">
+                        {% for name in active_flags %}
+                            <li>{{ name|replace("_", " ")|capitalize }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>None</p>
+                {% endif %}
+            </details>
+
+            <details class="build-section build-section-wide">
+                <summary>Parts ({{ build.parts|length }})</summary>
+                <div class="parts-scroll">
+                    <table class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th><th>Name</th><th>Lot</th><th>Qty</th><th>Tag</th>
+                                <th>Rev. Breakdown V</th><th>Temp</th><th>Indium</th><th>Modifications</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for part in build.parts %}
+                                <tr>
+                                    <td>{{ part.part_type }}</td>
+                                    <td>{{ part.part_name }}</td>
+                                    <td>{{ part.part_lot }}</td>
+                                    <td>{{ part.quantity }}</td>
+                                    <td>{{ part.subassembly_tag or "—" }}</td>
+                                    <td>{{ part.reverse_breakdown_voltage or "—" }}</td>
+                                    <td>{{ part.temperature or "—" }}</td>
+                                    <td>{{ part.indium or "—" }}</td>
+                                    <td>{{ part.modifications or "—" }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="9">No parts listed</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <details class="build-section build-section-wide">
+                <summary>Notes ({{ build.notes|length }})</summary>
+                <table class="parts-table">
+                    <tbody>
+                        {% for note in build.notes %}
+                            <tr>
+                                <td class="note-type-cell">{{ note.type.value|replace("_", " ") }}</td>
+                                <td>{{ note.note }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="2">No notes</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </details>
+
+        </div>
+    </details>
 </div>

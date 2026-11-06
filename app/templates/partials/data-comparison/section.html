@@ -1,0 +1,64 @@
+{# partials/data-comparison/section.html
+   Needs: build, section_name.
+   Optional: edit_section (name of the section currently in edit mode),
+             open_section, edit_error, form (the user's last submission). #}
+{% from "partials/data-comparison/macros.html" import field %}
+{% set section = edit_sections()[section_name] %}
+{% set is_editing = (edit_section == section_name) %}
+
+<details class="build-section" {% if is_editing or open_section == section_name %}open{% endif %}>
+    <summary>{{ section.title }}</summary>
+
+    {% if is_editing %}
+        <form class="section-edit-form"
+              hx-post="/data_comparison/save_section/"
+              hx-target="closest .build-data-row"
+              hx-swap="outerHTML">
+            <input type="hidden" name="block_id" value="{{ build.block_id }}">
+            <input type="hidden" name="section" value="{{ section_name }}">
+            <input type="hidden" name="loaded_save_date"
+                   value="{{ build.last_save_date.isoformat() if build.last_save_date else '' }}">
+
+            {% if edit_error %}<p class="edit-error">{{ edit_error }}</p>{% endif %}
+
+            <dl class="field-list">
+                {% for column, f in section.fields.items() %}
+                    {% set current = build[column] %}
+                    <dt>{{ f.label }}</dt>
+                    <dd>
+                        <input type="{{ f.input }}" name="{{ column }}"
+                               value="{% if form %}{{ form.get(column, '') }}{% elif current is none %}{% elif current.isoformat is defined %}{{ current.isoformat() }}{% else %}{{ current }}{% endif %}">
+                    </dd>
+                {% endfor %}
+                <dt>Your initials</dt>
+                <dd><input type="text" name="editor_initials" class="initials-input" maxlength="3" required
+                           value="{{ form.get('editor_initials', '') if form else '' }}"></dd>
+                <dt>Reason</dt>
+                <dd><input type="text" name="edit_reason"
+                           value="{{ form.get('edit_reason', '') if form else '' }}"></dd>
+            </dl>
+
+            <div class="section-actions">
+                <button type="submit">Save</button>
+                <button type="button"
+                        hx-get="/data_comparison/view_section/"
+                        hx-vals='{{ {"block_id": build.block_id, "section": section_name}|tojson }}'
+                        hx-target="closest .build-section"
+                        hx-swap="outerHTML">Cancel</button>
+            </div>
+        </form>
+    {% else %}
+        <dl class="field-list">
+            {% for column, f in section.fields.items() %}
+                {{ field(f.label, build[column]) }}
+            {% endfor %}
+        </dl>
+        <div class="section-actions">
+            <button type="button"
+                    hx-get="/data_comparison/edit_section/"
+                    hx-vals='{{ {"block_id": build.block_id, "section": section_name}|tojson }}'
+                    hx-target="closest .build-section"
+                    hx-swap="outerHTML">Edit</button>
+        </div>
+    {% endif %}
+</details>

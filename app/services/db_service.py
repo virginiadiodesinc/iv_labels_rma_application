@@ -12,7 +12,8 @@ from app.db import queries
 import datetime
 from sqlalchemy import Integer, case, cast, func, select, or_, and_
 from sqlalchemy.orm import selectinload
-
+from datetime import datetime, date, timedelta
+import logging
 
 def get_block_and_build_info(canonical: dict):
     block_id = fr.build_block_id(canonical)
@@ -70,7 +71,7 @@ def stage_replace_build_parts_and_notes(canonical: dict, parts_list: list, notes
     correct operation here, not a per-row upsert like Build_Info gets.
     Only flushes -- does not commit, same as everything else in here."""
     block_id = fr.build_block_id(canonical)
- 
+
     existing_parts = queries.get_table_entries(db_session, Build_Parts, block_id=block_id)
     for entry in existing_parts:
         queries.delete_table_entry(db_session, Build_Parts, entry.instance_id)
@@ -78,7 +79,7 @@ def stage_replace_build_parts_and_notes(canonical: dict, parts_list: list, notes
     existing_notes = queries.get_table_entries(db_session, Notes, block_id=block_id)
     for entry in existing_notes:
         queries.delete_table_entry(db_session, Notes, entry.note_id)
- 
+
     new_entries = []
     for part in parts_list:
         entry = queries.add_table_entry(db_session, Build_Parts, block_id=block_id, **part)
@@ -210,16 +211,37 @@ def roll_back_db_changes():
 # AUDITING
 
 def serial_sort_keys(col):
-	dash = func.instr(col, "-")
-	major = case(
-		(dash == 0, 0),                                   # no hyphen: no major half
-		else_=cast(func.substr(col, 1, dash - 1), Integer),
-	)
-	minor = case(
-		(dash == 0, cast(col, Integer)),                  # no hyphen: whole thing is the minor
-		else_=cast(func.substr(col, dash + 1), Integer),
-	)
-	return [major, minor]
+    dash = func.instr(col, "-")
+    major = case(
+        (dash == 0, 0),                                   # no hyphen: no major half
+        else_=cast(func.substr(col, 1, dash - 1), Integer),
+    )
+    minor = case(
+        (dash == 0, cast(col, Integer)),                  # no hyphen: whole thing is the minor
+        else_=cast(func.substr(col, dash + 1), Integer),
+    )
+    return [major, minor]
+
+
+def string_to_bool(value):
+    normalized = value.strip().lower()
+    if normalized == "true":
+        return True
+    if normalized == "false":
+        return False
+    raise ValueError(f"expected True or False, got '{value}'")
+
+
+def string_to_datetime(value):
+    return datetime.fromisoformat(value.strip())
+
+
+def string_to_date(value):          # for <input type="date"> and Date columns
+    return date.fromisoformat(value.strip())
+
+
+def string_to_next_day(value):
+      return date.fromisoformat(value.strip()) + timedelta(days=1)
 
 
 FILTER_REGISTRY = {
@@ -244,8 +266,12 @@ FILTER_REGISTRY = {
             "ops": {"eq"},
             "builder": lambda op, v: Build_Info.parts.any(and_(Build_Parts.part_name == v[0], Build_Parts.part_lot == v[1])),
     },
-    "yellow_flag_status": {"column": Build_Info.flagged, "ops": {"eq"}},
+    "yellow_flag_status": {"column": Build_Info.flagged, "ops": {"eq"}, "coerce": string_to_bool},
     "audit_info": {"column": Build_Info.audit_info, "ops": {"eq"}},
+    "last_save_datetime": {"column": Build_Info.last_save_date, "ops": {"gte", "lte", "lt"}, "coerce": string_to_datetime},
+    "full_build_date": {"column": Build_Info.full_build_date, "ops": {"gte", "lte", "lt"}, "coerce": string_to_date},
+    "from_file": {"column": Build_Info.from_file, "ops": {"eq"}, "coerce": string_to_bool},
+    "revision": {"column": Build_Info.block_revision, "ops": {"eq"}},
 }
 
 
@@ -287,3 +313,120 @@ def build_to_dict(build):
     data["notes"] = [row_to_dict(n) for n in build.notes]
     data["yellow_flags"] = row_to_dict(build.yellow_flags) if build.yellow_flags else None
     return data
+
+
+# ---------- EDIT COERCION ----------
+# Different from the filter coercions: for editing, a BLANK means "clear this
+# field" (None), whereas a blank filter is skipped entirely.
+
+
+def edit_text(value):
+    value = (value or "").strip()
+    return value or None
+
+
+def edit_date(value):
+    value = (value or "").strip()
+    return date.fromisoformat(value) if value else None   # ValueError if malformed
+
+
+def _text(label):
+    return {"label": label, "input": "text", "coerce": edit_text}
+
+
+def _date(label):
+    return {"label": label, "input": "date", "coerce": edit_date}
+
+
+# ---------- EDIT REGISTRY ----------
+# section -> title + {column: how to render/parse it}. The template reads
+# label/input; the save function reads coerce, so form and parser can't drift.
+# block_id and last_save_date are deliberately absent (not editable).
+# Not yet covered: Audit/Meta, Yellow Flags, Parts, Notes.
+
+
+EDIT_SECTIONS = {
+    "inspection": {"title": "Inspection", "fields": {
+        "inspection_date":     _date("Inspection date"),
+        "inspection_initials": _text("Inspection initials"),
+        "cleanout_date":       _date("Cleanout date"),
+        "cleanout_initials":   _text("Cleanout initials"),
+    }},
+    "pb1": {"title": "PB1", "fields": {
+        "pb1_build_name": _text("Build name"),
+        "pb1_date":       _date("Date"),
+        "pb1_initials":   _text("Initials"),
+    }},
+    "pb2": {"title": "PB2", "fields": {
+        "pb2_build_name":          _text("Build name"),
+        "pb2_date":                _date("Date"),
+        "pb2_initials":            _text("Initials"),
+        "pb2_inspection_initials": _text("Inspector"),
+    }},
+    "full_build": {"title": "Full Build", "fields": {
+        "full_build_name":     _text("Build name"),
+        "full_build_date":     _date("Date"),
+        "full_build_initials": _text("Initials"),
+    }},
+}
+
+
+def get_build(block_id):
+    return db_session.get(Build_Info, block_id)
+
+
+def record_audit(block_id, section_name, changes, initials, reason):
+    """PLACEHOLDER. Every edit funnels through here. Later: add the audit
+    table and insert one row per change here, in the same transaction.
+    For now it just logs, so there's at least a trail in your log file."""
+    logging.getLogger(__name__).info(
+        "EDIT %s [%s] by %s reason=%r changes=%r",
+        block_id, section_name, initials, reason, changes,
+    )
+
+
+def stage_edit_section(block_id, section_name, form) -> list:
+    """Validates and STAGES one section's edit (flush only -- the caller
+    commits or rolls back, like every other stage_* function). Returns the
+    list of (column, old, new) that actually changed; [] means nothing to do.
+    Raises ValueError with a user-readable message on any problem, BEFORE
+    anything is changed."""
+    section = EDIT_SECTIONS.get(section_name)
+    if section is None:
+        raise ValueError("Unknown section.")
+
+    build = db_session.get(Build_Info, block_id)
+    if build is None:
+        raise ValueError("Build not found.")
+
+    initials = form.get("editor_initials", "").strip().upper()
+    if len(initials) != 3:
+        raise ValueError("Enter your 3-letter initials.")
+
+    # stale-edit check: reject if someone saved this build since the form loaded
+    current = build.last_save_date.isoformat() if build.last_save_date else ""
+    if form.get("loaded_save_date", "") != current:
+        raise ValueError("This build was changed since you opened it. Cancel and reopen to see the latest.")
+
+    # parse everything first, so a bad field means nothing was touched
+    new_values = {}
+    for column, field in section["fields"].items():
+        try:
+            new_values[column] = field["coerce"](form.get(column, ""))
+        except ValueError:
+            raise ValueError(f"{field['label']}: invalid value.")
+
+    # (old or None) so a legacy '' in the DB doesn't show up as a change to None
+    changes = [(column, getattr(build, column), new)
+               for column, new in new_values.items()
+               if (getattr(build, column) or None) != new]
+    if not changes:
+        return []
+
+    updates = dict(new_values)
+    updates["from_file"] = False                          # the app/DB is now the source of truth
+    updates["last_save_date"] = datetime.datetime.now()   # system-set, never user-editable
+    queries.update_table_entry(db_session, Build_Info, block_id, **updates)
+
+    record_audit(block_id, section_name, changes, initials, form.get("edit_reason", "").strip())
+    return changes

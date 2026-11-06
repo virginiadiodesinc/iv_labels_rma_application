@@ -11,6 +11,15 @@
     {% elif input_kind == "pair" %}
         <input type="text" name="filter-value-{{ filter_uid }}" placeholder="Part">
         <input type="text" name="filter-value-{{ filter_uid }}" placeholder="Lot">
+    {% elif input_kind == "bool" %}
+        <select name="filter-value-{{ filter_uid }}">
+            <option value="True">True</option>
+            <option value="False">False</option>
+        </select>
+    {% elif input_kind == "datetime" %}
+        <input type="datetime-local" name="filter-value-{{ filter_uid }}">
+    {% elif input_kind == "date" %}
+        <input type="date" name="filter-value-{{ filter_uid }}">
     {% else %}
         <input type="text" name="filter-value-{{ filter_uid }}">
     {% endif %}
