@@ -1,6 +1,7 @@
 import uuid
 from flask import Blueprint, request, render_template
 from app.services import db_service
+from app.services import save_orchestrator
 from functools import wraps 
 from flask import abort
 
@@ -198,21 +199,32 @@ def view_section():
 def save_section():
     block_id = request.form["block_id"]
     section_name = request.form["section"]
-    try:
-        changes = db_service.stage_edit_section(block_id, section_name, request.form)
-        if changes:
-            # TODO: rewrite the block/build file from the updated row HERE,
-            # before the commit, so a failed file write rolls the DB back.
-            pass
-        db_service.commit_db_changes()
-    except ValueError as e:
-        db_service.roll_back_db_changes()
+
+    def show_error(message):
         # re-show the form with the message and what the user typed
         return _render_row(db_service.get_build(block_id),
-                           edit_section=section_name, edit_error=str(e), form=request.form)
-    except Exception:
-        db_service.roll_back_db_changes()
-        raise
+                           edit_section=section_name, edit_error=message, form=request.form)
+
+    try:
+        new_values, changes, initials, reason = db_service.validate_section_edit(
+            block_id, section_name, request.form)
+    except ValueError as e:
+        return show_error(str(e))
+
+    # TODO (optional): run the stage's red-flag checks on the merged values so
+    # an edit can't produce a state a normal save would reject, e.g.
+    #   canonical = {**fr.canonical_from_db_row(db_service.get_build(block_id), "Build_Info"), **new_values}
+    #   errors = vrf.validate_info(canonical, <this section's red_flag_checks>)
+    #   if errors: return show_error(" ".join(errors))   # adjust to the error shape validate_info returns
+
+    if changes:
+        result = save_orchestrator.save_edited_section(
+            block_id, section_name, new_values, audit=(changes, initials, reason))
+        if not result.success:
+            if isinstance(result.error, ValueError):       # e.g. blank build name -- a real message
+                return show_error(str(result.error))
+            return show_error(f"Save failed ({result.failure_cause}). The database was not changed.")
+        if result.warning:
+            print(result.warning)
 
     return _render_row(db_service.get_build(block_id), open_section=section_name)
-

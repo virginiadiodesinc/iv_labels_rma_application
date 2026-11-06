@@ -43,6 +43,7 @@ from typing import Optional
 
 from app.services import field_registry as fr
 from app.services import file_service
+from app.services import parts_service
 from app.services import db_service
 from app.services import postprocess
 from app.services import string_utilities
@@ -277,3 +278,98 @@ def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list
 
     db_service.commit_db_changes()
     return SaveResult(success=True)
+
+
+def save_edited_section(block_id: str, section_name: str, new_values: dict,
+                        audit: tuple = None, custom_build_suffix: str = None) -> SaveResult:
+    """Saves an edit to ONE section of an existing build, from the
+    data-comparison page. Same shape as _save_files_and_info (DB stage ->
+    files -> single commit -> stale-file cleanup after), but differs on
+    purpose:
+
+      * canonical comes from the DB row + the edited values, not a form
+      * parts/notes are read only to fill the build file's slots -- they are
+        NOT restaged, so a name/initials edit doesn't churn row ids
+      * yellow flags are not touched at all (a regular save re-evaluates
+        them; an edit doesn't)
+
+    audit = (changes, initials, reason), recorded in the same transaction.
+    custom_build_suffix only matters when the full build name is being
+    CHANGED for an engraving that isn't in the suffix list."""
+    section = fr.Section(section_name)
+    build = db_service.get_build(block_id)
+    if build is None:
+        return SaveResult(success=False, failure_cause="build not found",
+                          error=ValueError(f"No build with id {block_id}"))
+
+    # Read everything we need from the OLD state before staging mutates the row.
+    old_block_file_path = build.block_file_path
+    old_build_file_path = build.build_file_path
+    old_full_build_name = build.full_build_name
+
+    canonical = fr.canonical_from_db_row(build, "Build_Info")
+    canonical.update(new_values)
+    if custom_build_suffix:
+        canonical["custom_build_suffix"] = custom_build_suffix
+
+    # Build files exist only for full builds, named after full_build_name.
+    writes_build_file = bool(canonical.get("full_build_name"))
+    if old_build_file_path and not writes_build_file:
+        return SaveResult(
+            success=False, failure_cause="missing build name",
+            error=ValueError("This build already has a build file, so its full build name can't be blank."),
+        )
+
+    # ---- DB: stage only ----
+    try:
+        entry = db_service.stage_upsert_build_info(canonical)   # also sets from_file=False, last_save_date=now
+        if audit:
+            db_service.record_audit(block_id, section_name, *audit)
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    # ---- block file: only inspection/PB1/PB2 live in it ----
+    block_file_path = old_block_file_path
+    if section in (fr.Section.INSPECTION, fr.Section.PB1, fr.Section.PB2):
+        try:
+            block_file_path = file_service.save_block_file_section(canonical, section, config.block_file_directory)
+        except Exception as e:
+            traceback.print_exc()
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="block file", error=e)
+
+    # ---- build file: every section's fields appear in it, so regenerate ----
+    build_file_path = old_build_file_path
+    if writes_build_file:
+        try:
+            parts_list, notes_list = db_service.get_parts_and_notes_as_dicts(block_id)
+            build_canonical = dict(canonical)
+            build_canonical.update(parts_service.assign_parts_and_notes_to_build_slots(parts_list, notes_list))
+
+            name_changed = canonical.get("full_build_name") != old_full_build_name
+            # Unchanged name + existing file -> rewrite that exact path.
+            # Changed name (or first build file) -> compute the new path;
+            # the old one is removed after the commit below.
+            keep_path = old_build_file_path if (old_build_file_path and not name_changed) else None
+            build_file_path = file_service.save_build_file(build_canonical, config.build_file_directory, path=keep_path)
+        except Exception as e:
+            traceback.print_exc()
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="build file", error=e)
+
+    entry.block_file_path = block_file_path
+    entry.build_file_path = build_file_path
+
+    try:
+        db_service.commit_db_changes()
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    return SaveResult(success=True, warning=_clean_up_stale_files(
+        (old_block_file_path, block_file_path),
+        (old_build_file_path, build_file_path),
+    ))

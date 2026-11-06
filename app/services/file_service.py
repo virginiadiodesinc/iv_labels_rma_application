@@ -86,16 +86,23 @@ def truncate_file_lines(lines: list, max_character_counts: list):
 
 
 
-def save_build_file(canonical: dict, build_file_directory: str) -> str:
-    canonical = fr.enrich_with_build_suffix(canonical, string_utilities.get_build_name_with_suffix)
-    path = get_build_file_path(canonical, build_file_directory)
+def save_build_file(canonical: dict, build_file_directory: str, path: str = None) -> str:
+    """path=None  -> compute the file name from the build name (normal saves,
+                     and edits that RENAME the build).
+       path=<str> -> write to exactly this path, no name lookup (edits that
+                     leave the build name alone, so the file can't be
+                     renamed by accident, e.g. by a suffix that can't be
+                     reproduced)."""
+    if path is None:
+        canonical = fr.enrich_with_build_suffix(canonical, string_utilities.get_build_name_with_suffix)
+        path = get_build_file_path(canonical, build_file_directory)
 
     new_lines = [fr.render_new_line(template, canonical) for template in fr.BUILD_FILE_TEMPLATE]
     truncated_file_lines = truncate_file_lines(new_lines, BUILD_FILE_MAX_CHARACTER_COUNTS)
 
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(truncated_file_lines))
-        
+
     return path
 
 

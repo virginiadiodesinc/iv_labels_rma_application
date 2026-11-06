@@ -9,7 +9,6 @@ from app.services import field_registry as fr
 from app.db.database import db_session
 from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity, Note_Type, Yellow_Flags
 from app.db import queries
-import datetime
 from sqlalchemy import Integer, case, cast, func, select, or_, and_
 from sqlalchemy.orm import selectinload
 from datetime import datetime, date, timedelta
@@ -59,7 +58,7 @@ def stage_upsert_build_info(canonical: dict, **extra_columns):
     kwargs["block_id"] = block_id
     kwargs.update(extra_columns)
     kwargs["from_file"] = False
-    kwargs["last_save_date"] = datetime.datetime.now()
+    kwargs["last_save_date"] = datetime.now()
     return queries.upsert_table_entry(db_session, Build_Info, block_id, **kwargs)
 
 
@@ -316,9 +315,8 @@ def build_to_dict(build):
 
 
 # ---------- EDIT COERCION ----------
-# Different from the filter coercions: for editing, a BLANK means "clear this
-# field" (None), whereas a blank filter is skipped entirely.
-
+# For editing, a BLANK means "clear this field" (None), whereas a blank
+# filter is skipped entirely -- hence separate from the filter coercions.
 
 def edit_text(value):
     value = (value or "").strip()
@@ -339,11 +337,10 @@ def _date(label):
 
 
 # ---------- EDIT REGISTRY ----------
-# section -> title + {column: how to render/parse it}. The template reads
-# label/input; the save function reads coerce, so form and parser can't drift.
-# block_id and last_save_date are deliberately absent (not editable).
-# Not yet covered: Audit/Meta, Yellow Flags, Parts, Notes.
-
+# Keys are the section names, which are exactly the fr.Section values
+# ("inspection", "pb1", "pb2", "full_build"), and the field keys are
+# canonical names == Build_Info column names. block_id and last_save_date
+# are deliberately absent.
 
 EDIT_SECTIONS = {
     "inspection": {"title": "Inspection", "fields": {
@@ -376,21 +373,23 @@ def get_build(block_id):
 
 
 def record_audit(block_id, section_name, changes, initials, reason):
-    """PLACEHOLDER. Every edit funnels through here. Later: add the audit
-    table and insert one row per change here, in the same transaction.
-    For now it just logs, so there's at least a trail in your log file."""
+    """PLACEHOLDER. The orchestrator calls this in the same transaction as
+    the edit, right after staging and before any file is written. Later:
+    insert one audit-table row per change here. For now it just logs."""
     logging.getLogger(__name__).info(
         "EDIT %s [%s] by %s reason=%r changes=%r",
         block_id, section_name, initials, reason, changes,
     )
 
 
-def stage_edit_section(block_id, section_name, form) -> list:
-    """Validates and STAGES one section's edit (flush only -- the caller
-    commits or rolls back, like every other stage_* function). Returns the
-    list of (column, old, new) that actually changed; [] means nothing to do.
-    Raises ValueError with a user-readable message on any problem, BEFORE
-    anything is changed."""
+def validate_section_edit(block_id, section_name, form):
+    """PURE validation -- touches nothing. Returns
+    (new_values, changes, initials, reason):
+      new_values  {canonical/column name: coerced value} for every field in the section
+      changes     [(column, old, new)] for fields that actually differ
+      initials    the editor's initials, uppercased
+      reason      free text, may be ''
+    Raises ValueError with a user-readable message on any problem."""
     section = EDIT_SECTIONS.get(section_name)
     if section is None:
         raise ValueError("Unknown section.")
@@ -408,7 +407,6 @@ def stage_edit_section(block_id, section_name, form) -> list:
     if form.get("loaded_save_date", "") != current:
         raise ValueError("This build was changed since you opened it. Cancel and reopen to see the latest.")
 
-    # parse everything first, so a bad field means nothing was touched
     new_values = {}
     for column, field in section["fields"].items():
         try:
@@ -420,13 +418,25 @@ def stage_edit_section(block_id, section_name, form) -> list:
     changes = [(column, getattr(build, column), new)
                for column, new in new_values.items()
                if (getattr(build, column) or None) != new]
-    if not changes:
-        return []
 
-    updates = dict(new_values)
-    updates["from_file"] = False                          # the app/DB is now the source of truth
-    updates["last_save_date"] = datetime.datetime.now()   # system-set, never user-editable
-    queries.update_table_entry(db_session, Build_Info, block_id, **updates)
+    return new_values, changes, initials, form.get("edit_reason", "").strip()
 
-    record_audit(block_id, section_name, changes, initials, form.get("edit_reason", "").strip())
-    return changes
+
+def get_parts_and_notes_as_dicts(block_id):
+    """The same dict shapes parts_from_form / notes_from_form produce (keys
+    are Build_Parts / Notes column names, note type as its lowercase string),
+    so parts_service.assign_parts_and_notes_to_build_slots can consume them
+    unchanged. Sorted by primary key because slot assignment is order
+    dependent ('first DIODE goes to diode1') and relationships have no
+    guaranteed order; the ids preserve the original form order."""
+    build = db_session.get(Build_Info, block_id)
+    parts = [
+        {c.name: getattr(p, c.name) for c in p.__table__.columns
+         if c.name not in ("instance_id", "block_id")}
+        for p in sorted(build.parts, key=lambda p: p.instance_id)
+    ]
+    notes = [
+        {"type": n.type.value, "note": n.note}
+        for n in sorted(build.notes, key=lambda n: n.note_id)
+    ]
+    return parts, notes

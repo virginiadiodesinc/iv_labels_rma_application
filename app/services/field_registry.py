@@ -327,6 +327,19 @@ def canonical_to_db_kwargs(canonical: dict, db_model: str) -> dict:
     return kwargs
 
 
+def canonical_from_db_row(row, db_model: str) -> dict:
+    """Builds a canonical dict from a loaded ORM row, using the same registry
+    that maps canonical -> columns the other way. Only fields whose db_model
+    matches are included, so form-only fields (custom_build_suffix) and
+    Yellow_Flags columns are NOT produced."""
+    canonical = {}
+    for spec in FIELDS:
+        if spec.db_model != db_model:
+            continue
+        canonical[spec.canonical] = getattr(row, spec.db_column or spec.canonical)
+    return canonical
+
+
 def build_block_id(canonical: dict) -> str:
     """The composite primary key Build_Info actually uses. Lives here, not in
     queries.py, because it's domain logic about what identifies a block --
