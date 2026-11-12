@@ -285,9 +285,9 @@ def canonical_from_form(form) -> dict:
 
     return result
 
-def yellow_flag(canonical: dict) -> dict:
+def yellow_flag(canonical: dict, yellow_flagged: bool) -> dict:
     canonical = dict(canonical)
-    canonical["flagged"] = True
+    canonical["flagged"] = yellow_flagged
     return canonical
 
 def merge_yellow_flags(canonical: dict, yellow_flag_dict: dict) -> dict:

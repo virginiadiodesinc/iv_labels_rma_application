@@ -1,0 +1,84 @@
+{# partials/data-comparison/yellow-flags-section.html
+   Needs: build. Optional: edit_section, open_section, edit_error, form.
+   Only flags that are currently raised get a checkbox; unchecking clears it.
+   Flags can't be raised here -- the next regular save re-evaluates them. #}
+{% set is_editing = (edit_section == "yellow_flags") %}
+{% set active = [] %}
+{% if build.yellow_flags %}
+    {% for name in yellow_flag_columns() %}
+        {% if build.yellow_flags[name] %}{% set _ = active.append(name) %}{% endif %}
+    {% endfor %}
+{% endif %}
+
+<details class="build-section" {% if is_editing or open_section == "yellow_flags" %}open{% endif %}>
+    <summary>Yellow Flags ({{ active|length }})</summary>
+
+    {% if is_editing %}
+        <form class="section-edit-form"
+              hx-post="/data_comparison/save_section/"
+              hx-target="closest .build-data-row"
+              hx-swap="outerHTML">
+            <input type="hidden" name="block_id" value="{{ build.block_id }}">
+            <input type="hidden" name="section" value="yellow_flags">
+            <input type="hidden" name="loaded_save_date"
+                   value="{{ build.last_save_date.isoformat() if build.last_save_date else '' }}">
+
+            {% if edit_error %}<p class="edit-error">{{ edit_error }}</p>{% endif %}
+
+            {% if active %}
+                <p>Uncheck a flag to clear it.</p>
+                <ul class="flag-list flag-checkboxes">
+                    {% for name in active %}
+                        <li>
+                            <label>
+                                <input type="checkbox" name="{{ name }}" value="1"
+                                       {% if not form or name in form %}checked{% endif %}>
+                                {{ name|replace("_", " ")|capitalize }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No individual flags are recorded, but this build is marked flagged.
+                   Saving will clear the flagged status.</p>
+            {% endif %}
+
+            <dl class="field-list">
+                <dt>Your initials</dt>
+                <dd><input type="text" name="editor_initials" class="initials-input" maxlength="3" required
+                           value="{{ form.get('editor_initials', '') if form else '' }}"></dd>
+                <dt>Reason</dt>
+                <dd><input type="text" name="edit_reason"
+                           value="{{ form.get('edit_reason', '') if form else '' }}"></dd>
+            </dl>
+
+            <div class="section-actions">
+                <button type="submit">Save</button>
+                <button type="button"
+                        hx-get="/data_comparison/view_section/"
+                        hx-vals='{{ {"block_id": build.block_id, "section": "yellow_flags"}|tojson }}'
+                        hx-target="closest .build-section"
+                        hx-swap="outerHTML">Cancel</button>
+            </div>
+        </form>
+    {% else %}
+        {% if active %}
+            <ul class="flag-list">
+                {% for name in active %}
+                    <li>{{ name|replace("_", " ")|capitalize }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>None</p>
+        {% endif %}
+        {% if active or build.flagged %}
+            <div class="section-actions">
+                <button type="button"
+                        hx-get="/data_comparison/edit_section/"
+                        hx-vals='{{ {"block_id": build.block_id, "section": "yellow_flags"}|tojson }}'
+                        hx-target="closest .build-section"
+                        hx-swap="outerHTML">Edit</button>
+            </div>
+        {% endif %}
+    {% endif %}
+</details>

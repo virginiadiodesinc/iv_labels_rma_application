@@ -30,6 +30,9 @@
                                value="{% if form %}{{ form.get(column, '') }}{% elif current is none %}{% elif current.isoformat is defined %}{{ current.isoformat() }}{% else %}{{ current }}{% endif %}">
                     </dd>
                 {% endfor %}
+                {% for r in section.readonly or [] %}
+                    {{ field(r.label, build[r.column], r.fmt or '%m/%d/%Y') }}
+                {% endfor %}
                 <dt>Your initials</dt>
                 <dd><input type="text" name="editor_initials" class="initials-input" maxlength="3" required
                            value="{{ form.get('editor_initials', '') if form else '' }}"></dd>
@@ -51,6 +54,9 @@
         <dl class="field-list">
             {% for column, f in section.fields.items() %}
                 {{ field(f.label, build[column]) }}
+            {% endfor %}
+            {% for r in section.readonly or [] %}
+                {{ field(r.label, build[r.column], r.fmt or '%m/%d/%Y') }}
             {% endfor %}
         </dl>
         <div class="section-actions">

@@ -165,14 +165,22 @@ def edit_sections():
     return db_service.EDIT_SECTIONS
 
 
+@data_bp.app_template_global()
+def yellow_flag_columns():
+    return db_service.YELLOW_FLAG_COLUMNS
+
+
 def _render_section(block_id, section_name, edit_section):
     build = db_service.get_build(block_id)
-    if build is None or section_name not in db_service.EDIT_SECTIONS:
+    if build is None:
         abort(404)
-    return render_template(
-        "partials/data-comparison/section.html",
-        build=build, section_name=section_name, edit_section=edit_section,
-    )
+    if section_name == "yellow_flags":
+        template = "partials/data-comparison/yellow-flags-section.html"
+    elif section_name in db_service.EDIT_SECTIONS:
+        template = "partials/data-comparison/section.html"
+    else:
+        abort(404)
+    return render_template(template, build=build, section_name=section_name, edit_section=edit_section)
 
 
 def _render_row(build, **context):
@@ -205,23 +213,36 @@ def save_section():
         return _render_row(db_service.get_build(block_id),
                            edit_section=section_name, edit_error=message, form=request.form)
 
-    try:
-        new_values, changes, initials, reason = db_service.validate_section_edit(
-            block_id, section_name, request.form)
-    except ValueError as e:
-        return show_error(str(e))
+    # Three kinds of section, same skeleton: validate (pure) -> one orchestrator call.
+    if section_name == "yellow_flags":
+        try:
+            flags_to_clear, changes, initials, reason = db_service.validate_yellow_flags_edit(
+                block_id, request.form)
+        except ValueError as e:
+            return show_error(str(e))
+        save = lambda: save_orchestrator.save_edited_yellow_flags(
+            block_id, flags_to_clear, audit=(changes, initials, reason))
+    else:
+        try:
+            new_values, changes, initials, reason = db_service.validate_section_edit(
+                block_id, section_name, request.form)
+        except ValueError as e:
+            return show_error(str(e))
+        audit = (changes, initials, reason)
+        if section_name in db_service.FILE_SECTIONS:
+            save = lambda: save_orchestrator.save_edited_section(
+                block_id, section_name, new_values, audit=audit)
+        else:   # "meta": DB only
+            save = lambda: save_orchestrator.save_edited_meta(
+                block_id, section_name, new_values, audit=audit)
 
-    # TODO (optional): run the stage's red-flag checks on the merged values so
-    # an edit can't produce a state a normal save would reject, e.g.
-    #   canonical = {**fr.canonical_from_db_row(db_service.get_build(block_id), "Build_Info"), **new_values}
-    #   errors = vrf.validate_info(canonical, <this section's red_flag_checks>)
-    #   if errors: return show_error(" ".join(errors))   # adjust to the error shape validate_info returns
+    # (optional red-flag validation hook for the file sections goes here,
+    #  as described in the earlier version)
 
     if changes:
-        result = save_orchestrator.save_edited_section(
-            block_id, section_name, new_values, audit=(changes, initials, reason))
+        result = save()
         if not result.success:
-            if isinstance(result.error, ValueError):       # e.g. blank build name -- a real message
+            if isinstance(result.error, ValueError):
                 return show_error(str(result.error))
             return show_error(f"Save failed ({result.failure_cause}). The database was not changed.")
         if result.warning:

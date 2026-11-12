@@ -336,6 +336,11 @@ def _date(label):
     return {"label": label, "input": "date", "coerce": edit_date}
 
 
+# Which sections write files (go through save_edited_section). Everything
+# else in EDIT_SECTIONS is DB-only.
+FILE_SECTIONS = {"inspection", "pb1", "pb2", "full_build"}
+
+
 # ---------- EDIT REGISTRY ----------
 # Keys are the section names, which are exactly the fr.Section values
 # ("inspection", "pb1", "pb2", "full_build"), and the field keys are
@@ -365,7 +370,93 @@ EDIT_SECTIONS = {
         "full_build_date":     _date("Date"),
         "full_build_initials": _text("Initials"),
     }},
+    "meta": {
+        "title": "Audit / Meta",
+        "fields": {
+            "audit_info": _text("Audit info"),
+        },
+        "readonly": [
+            {"column": "flagged",         "label": "Flagged"},
+            {"column": "from_file",       "label": "From file"},
+            {"column": "last_save_date",  "label": "Last saved", "fmt": "%m/%d/%Y %H:%M"},
+            {"column": "block_file_path", "label": "Block file"},
+            {"column": "build_file_path", "label": "Build file"},
+        ],
+    }
 }
+
+# Read off the model, so a flag added to Yellow_Flags later shows up here
+# (and in the template, via the yellow_flag_columns() global) automatically.
+YELLOW_FLAG_COLUMNS = [c.name for c in Yellow_Flags.__table__.columns if c.name != "block_id"]
+
+
+def active_yellow_flags(build):
+    row = build.yellow_flags
+    return [c for c in YELLOW_FLAG_COLUMNS if row is not None and getattr(row, c)]
+
+
+def _check_editor_and_freshness(build, form):
+    """Same two checks validate_section_edit does inline (you can swap those
+    for a call to this). Returns the editor's initials."""
+    initials = form.get("editor_initials", "").strip().upper()
+    if len(initials) != 3:
+        raise ValueError("Enter your 3-letter initials.")
+    current = build.last_save_date.isoformat() if build.last_save_date else ""
+    if form.get("loaded_save_date", "") != current:
+        raise ValueError("This build was changed since you opened it. Cancel and reopen to see the latest.")
+    return initials
+
+
+def validate_yellow_flags_edit(block_id, form):
+    """PURE validation. The form only contains a checkbox for each flag that
+    is currently active, so an unchecked (absent) box means 'clear it'.
+    Flags can only be cleared here, never raised: raising is the regular
+    save's job. Returns (flags_to_clear, changes, initials, reason)."""
+    build = db_session.get(Build_Info, block_id)
+    if build is None:
+        raise ValueError("Build not found.")
+    initials = _check_editor_and_freshness(build, form)
+
+    before = active_yellow_flags(build)
+    keep = [c for c in before if c in form]
+    flags_to_clear = [c for c in before if c not in keep]
+
+    changes = [(c, True, False) for c in flags_to_clear]
+    still_flagged = bool(keep)
+    if bool(build.flagged) != still_flagged:      # also repairs 'flagged' with no flag rows
+        changes.append(("flagged", bool(build.flagged), still_flagged))
+
+    return flags_to_clear, changes, initials, form.get("edit_reason", "").strip()
+
+
+def stage_update_build_info_columns(block_id, **updates):
+    """Direct column update for DB-only edits (no canonical involved, so it
+    works for columns that aren't in the field registry, like audit_info).
+    Same bookkeeping as every other edit: from_file False, save date now."""
+    updates["from_file"] = False
+    updates["last_save_date"] = datetime.now()
+    entry = queries.update_table_entry(db_session, Build_Info, block_id, **updates)
+    if entry is False:
+        raise ValueError("Build not found.")
+    return entry
+
+
+def stage_clear_yellow_flags(block_id, flags_to_clear):
+    """Clears the given flags, then keeps the two representations in sync in
+    the SAME transaction: if nothing is left raised, the Yellow_Flags row is
+    deleted (no row == no flags) and Build_Info.flagged becomes False;
+    otherwise flagged stays True. Only flushes -- the orchestrator commits."""
+    row = db_session.get(Yellow_Flags, block_id)     # block_id is the PK now
+    still_active = False
+    if row is not None:
+        for name in flags_to_clear:
+            if name in YELLOW_FLAG_COLUMNS:
+                setattr(row, name, False)
+        db_session.flush()
+        still_active = any(getattr(row, c) for c in YELLOW_FLAG_COLUMNS)
+        if not still_active:
+            queries.delete_table_entry(db_session, Yellow_Flags, block_id)
+    return stage_update_build_info_columns(block_id, flagged=still_active)
 
 
 def get_build(block_id):

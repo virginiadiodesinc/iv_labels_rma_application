@@ -76,7 +76,6 @@ def save_block_file(canonical: dict, block_file_directory: str) -> str:
     return path
 
 def truncate_file_lines(lines: list, max_character_counts: list):
-    print(len(lines), len(max_character_counts))
     for index, line in enumerate(lines):
         max_character_count = max_character_counts[index]
         if len(line) > max_character_count:
@@ -255,3 +254,46 @@ def delete_stale_file(old_path: str, new_path: str) -> str:
         return None
     os.remove(old_path)
     return old_path
+
+
+BLOCK_SECTION_LINE_COUNT = len(fr.BLOCK_FILE_TEMPLATE)  # the first 6 lines
+
+
+def update_build_file_block_section(canonical: dict, build_file_path: str, section: fr.Section = None):
+    """Rewrites ONLY the block-info lines (the first 6) of an existing build
+    file, leaving the parts/notes lines exactly as they are on disk.
+
+    section=None    -> those lines are rendered fresh from canonical (PB1/PB2
+                       saves, where canonical carries the whole block panel).
+    section=Section -> piecemeal, same rules as save_block_file_section
+                       (inspection-only saves).
+
+    Returns the path written, or None if there's no build file on disk to
+    update (nothing is created -- a block save must never invent a build file).
+    """
+    if not build_file_path or not os.path.isfile(build_file_path):
+        return None
+
+    with open(build_file_path, "r", encoding="utf-8") as f:
+        # split("\n"), NOT splitlines(): the build file can legitimately end
+        # in blank lines (empty notes/filter2), and splitlines() would eat them.
+        lines = f.read().split("\n")
+
+    while len(lines) < BLOCK_SECTION_LINE_COUNT:
+        lines.append("")
+
+    block_lines = []
+    for template in fr.BLOCK_FILE_TEMPLATE:
+        if section is None:
+            block_lines.append(fr.render_new_line(template, canonical))
+        else:
+            block_lines.append(fr.update_existing_line(template, lines[template.line_index], canonical, section))
+
+    # Build files truncate by per-line limits; the block file doesn't.
+    block_lines = truncate_file_lines(block_lines, BUILD_FILE_MAX_CHARACTER_COUNTS[:BLOCK_SECTION_LINE_COUNT])
+    lines[:BLOCK_SECTION_LINE_COUNT] = block_lines
+
+    with open(build_file_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+    return build_file_path

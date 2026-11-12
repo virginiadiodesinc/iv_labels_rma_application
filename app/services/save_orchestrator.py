@@ -91,10 +91,15 @@ def _save_files_and_info(
             error=ValueError(f"{build_name_key} is blank -- cannot name the build file"),
         )
 
+   # Parts/notes are staged whenever the caller supplied them (PB1, PB2, full
+    # build) -- independent of whether this save also rewrites the build file.
+    # Inspection passes None for both, so it never touches them.
+    saves_parts = parts_list is not None
+
     try:
         entry = db_service.stage_upsert_build_info(canonical)
-        if writes_build_file:
-            db_service.stage_replace_build_parts_and_notes(canonical, parts_list or [], notes_list or [])
+        if saves_parts:
+            db_service.stage_replace_build_parts_and_notes(canonical, parts_list, notes_list or [])
     except Exception as e:
         traceback.print_exc()
         db_service.roll_back_db_changes()
@@ -115,17 +120,27 @@ def _save_files_and_info(
         return SaveResult(success=False, failure_cause="block file", error=e)
 
     build_file_path = old_build_file_path
+    build_sync_warning = None
     if writes_build_file:
         try:
-            # Substituted canonical is scoped to this call ONLY -- it must
-            # not reach stage_upsert_build_info above, or a PB1 save would
-            # write the PB1 name into Build_Info.full_build_name.
             build_canonical = fr.with_build_name_from(canonical, build_name_key)
             build_file_path = file_service.save_build_file(build_canonical, config.build_file_directory)
         except Exception as e:
             traceback.print_exc()
             db_service.roll_back_db_changes()
             return SaveResult(success=False, failure_cause="build file", error=e)
+    elif old_build_file_path:
+        # Block-only save (inspection/PB1/PB2) on a block that already has a
+        # build file: keep that file's block section in sync. No build file
+        # in the DB -> nothing to do.
+        try:
+            synced = file_service.update_build_file_block_section(canonical, old_build_file_path, section)
+        except Exception as e:
+            traceback.print_exc()
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="build file", error=e)
+        if synced is None:
+            build_sync_warning = f"Build file not found at {old_build_file_path}; its block info was not updated."
 
     entry.block_file_path = block_file_path
     entry.build_file_path = build_file_path
@@ -153,10 +168,12 @@ def _save_files_and_info(
         db_service.roll_back_db_changes()
         return SaveResult(success=False, failure_cause="db", error=e)
 
-    return SaveResult(success=True, warning=_clean_up_stale_files(
+    cleanup_warning = _clean_up_stale_files(
         (old_block_file_path, block_file_path),
         (old_build_file_path, build_file_path),
-    ))
+    )
+    warnings = [w for w in (build_sync_warning, cleanup_warning) if w]
+    return SaveResult(success=True, warning=" ".join(warnings) or None)
 
 
 def _clean_up_stale_files(*path_pairs) -> Optional[str]:
@@ -312,13 +329,19 @@ def save_edited_section(block_id: str, section_name: str, new_values: dict,
     if custom_build_suffix:
         canonical["custom_build_suffix"] = custom_build_suffix
 
-    # Build files exist only for full builds, named after full_build_name.
-    writes_build_file = bool(canonical.get("full_build_name"))
-    if old_build_file_path and not writes_build_file:
+    # Inspection/PB1/PB2 live in the block file AND in the first 6 lines of the
+    # build file. Edits to those sections sync just those lines; every other
+    # section (full build, parts, notes, ...) regenerates the whole build file.
+    is_block_section = section in (fr.Section.INSPECTION, fr.Section.PB1, fr.Section.PB2)
+    has_full_build_name = bool(canonical.get("full_build_name"))
+
+    # Only a full regeneration needs a build name to name the file after.
+    if old_build_file_path and not is_block_section and not has_full_build_name:
         return SaveResult(
             success=False, failure_cause="missing build name",
             error=ValueError("This build already has a build file, so its full build name can't be blank."),
         )
+    rewrites_build_file = (not is_block_section) and has_full_build_name
 
     # ---- DB: stage only ----
     try:
@@ -332,7 +355,7 @@ def save_edited_section(block_id: str, section_name: str, new_values: dict,
 
     # ---- block file: only inspection/PB1/PB2 live in it ----
     block_file_path = old_block_file_path
-    if section in (fr.Section.INSPECTION, fr.Section.PB1, fr.Section.PB2):
+    if is_block_section:
         try:
             block_file_path = file_service.save_block_file_section(canonical, section, config.block_file_directory)
         except Exception as e:
@@ -342,22 +365,32 @@ def save_edited_section(block_id: str, section_name: str, new_values: dict,
 
     # ---- build file: every section's fields appear in it, so regenerate ----
     build_file_path = old_build_file_path
-    if writes_build_file:
+    build_sync_warning = None
+    if rewrites_build_file:
         try:
             parts_list, notes_list = db_service.get_parts_and_notes_as_dicts(block_id)
             build_canonical = dict(canonical)
             build_canonical.update(parts_service.assign_parts_and_notes_to_build_slots(parts_list, notes_list))
 
             name_changed = canonical.get("full_build_name") != old_full_build_name
-            # Unchanged name + existing file -> rewrite that exact path.
-            # Changed name (or first build file) -> compute the new path;
-            # the old one is removed after the commit below.
             keep_path = old_build_file_path if (old_build_file_path and not name_changed) else None
             build_file_path = file_service.save_build_file(build_canonical, config.build_file_directory, path=keep_path)
         except Exception as e:
             traceback.print_exc()
             db_service.roll_back_db_changes()
             return SaveResult(success=False, failure_cause="build file", error=e)
+    elif is_block_section and old_build_file_path:
+        try:
+            # section=None on purpose: canonical here is the complete DB row
+            # plus the edit, so rendering all 6 lines fresh makes the build
+            # file match the DB even if it had already drifted.
+            synced = file_service.update_build_file_block_section(canonical, old_build_file_path, None)
+        except Exception as e:
+            traceback.print_exc()
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="build file", error=e)
+        if synced is None:
+            build_sync_warning = f"Build file not found at {old_build_file_path}; its block info was not updated."
 
     entry.block_file_path = block_file_path
     entry.build_file_path = build_file_path
@@ -369,7 +402,43 @@ def save_edited_section(block_id: str, section_name: str, new_values: dict,
         db_service.roll_back_db_changes()
         return SaveResult(success=False, failure_cause="db", error=e)
 
-    return SaveResult(success=True, warning=_clean_up_stale_files(
+    cleanup_warning = _clean_up_stale_files(
         (old_block_file_path, block_file_path),
         (old_build_file_path, build_file_path),
-    ))
+    )
+    warnings = [w for w in (build_sync_warning, cleanup_warning) if w]
+    return SaveResult(success=True, warning=" ".join(warnings) or None)
+
+
+def _save_db_only(block_id: str, section_name: str, stage_fn, audit: tuple = None) -> SaveResult:
+    """For edits that touch no files: stage -> audit (same transaction) ->
+    single commit, rolling back on any failure."""
+    try:
+        stage_fn()
+        if audit:
+            db_service.record_audit(block_id, section_name, *audit)
+        db_service.commit_db_changes()
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+    return SaveResult(success=True)
+
+
+def save_edited_meta(block_id: str, section_name: str, new_values: dict, audit: tuple = None) -> SaveResult:
+    """Audit / Meta edits (audit_info). No block or build file contains these."""
+    return _save_db_only(
+        block_id, section_name,
+        lambda: db_service.stage_update_build_info_columns(block_id, **new_values),
+        audit,
+    )
+
+
+def save_edited_yellow_flags(block_id: str, flags_to_clear: list, audit: tuple = None) -> SaveResult:
+    """Clears yellow flags and keeps Yellow_Flags + Build_Info.flagged in
+    sync. Never re-evaluates flags and never touches files."""
+    return _save_db_only(
+        block_id, "yellow_flags",
+        lambda: db_service.stage_clear_yellow_flags(block_id, flags_to_clear),
+        audit,
+    )

@@ -50,6 +50,7 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
     )
     yellow_flags = vyf.check_yellow_flags(flag_ctx, yellow_flag_checks)
     yellow_flags_found = vyf.any_flag_raised(yellow_flags)
+
     if not confirmed:
         return render_template(
             "partials/generic/save-confirmation-dialog.html",
@@ -59,8 +60,10 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
             print_label=print_label
         ), 200
 
+    
+    canonical = fr.yellow_flag(canonical, yellow_flags_found)
+
     if yellow_flags_found:
-        canonical = fr.yellow_flag(canonical)
         canonical = fr.merge_yellow_flags(canonical, yellow_flags)
 
     if collects_parts:
@@ -83,6 +86,7 @@ def _handle_save(route_name, red_flag_checks, yellow_flag_checks, orchestrator_f
     # printed on every save regardless of the checkbox, and ignored print_fn.
     if print_label and print_fn:
         print_fn(request.form)
+
 
     return render_template("partials/generic/save-success.html"), 200
 
