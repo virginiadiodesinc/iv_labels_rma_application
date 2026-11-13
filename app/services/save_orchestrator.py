@@ -248,6 +248,14 @@ def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list
         output_key="iv_full_build_name_with_suffix",
     )
 
+    try:
+        global current_iv_file_directory
+        iv_file_path, current_iv_file_directory = file_service.choose_iv_file_path(canonical, current_iv_file_directory)
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="file dialog", error=e)
+
     block_identity = fr.iv_identity_as_block_identity(canonical)
     try:
         db_service.stage_upsert_build_info(block_identity)
@@ -256,8 +264,6 @@ def save_iv_info(canonical: dict, vup_list: list, vdown_list: list, isource_list
         db_service.roll_back_db_changes()
         return SaveResult(success=False, failure_cause="db build info", error=e)
 
-    global current_iv_file_directory
-    iv_file_path, current_iv_file_directory = file_service.choose_iv_file_path(canonical, current_iv_file_directory)
 
     try:
         iv_entry = db_service.stage_upsert_iv_info(canonical, iv_file_path)
@@ -442,3 +448,70 @@ def save_edited_yellow_flags(block_id: str, flags_to_clear: list, audit: tuple =
         lambda: db_service.stage_clear_yellow_flags(block_id, flags_to_clear),
         audit,
     )
+
+
+def save_edited_parts_or_notes(block_id: str, section_name: str, new_rows: list,
+                               audit: tuple = None) -> SaveResult:
+    """Replaces a build's whole Parts list or whole Notes list from the
+    data-comparison page.
+
+      * DB: restage the one list, bump last_save_date / from_file, audit,
+        all in one transaction.
+      * Build file: regenerated only if the build has a full build name
+        (PB1/PB2 saves don't write one either). Written to the EXISTING path,
+        since the name isn't changing; no stale-file cleanup needed.
+      * Yellow flags and Build_Info.flagged are not touched.
+
+    The slots are filled from the new list plus the OTHER list as it is in
+    the DB, both read before anything is staged."""
+    if section_name not in ("parts", "notes"):
+        return SaveResult(success=False, failure_cause="unknown section",
+                          error=ValueError(f"Unknown section {section_name}"))
+
+    build = db_service.get_build(block_id)
+    if build is None:
+        return SaveResult(success=False, failure_cause="build not found",
+                          error=ValueError(f"No build with id {block_id}"))
+
+    old_build_file_path = build.build_file_path
+    canonical = fr.canonical_from_db_row(build, "Build_Info")
+    parts_list, notes_list = db_service.get_parts_and_notes_as_dicts(block_id)
+
+    if section_name == "parts":
+        parts_list = new_rows
+        stage_list = lambda: db_service.stage_replace_build_parts(block_id, new_rows)
+    else:
+        notes_list = new_rows
+        stage_list = lambda: db_service.stage_replace_notes(block_id, new_rows)
+
+    # ---- DB: stage only ----
+    try:
+        stage_list()
+        entry = db_service.stage_update_build_info_columns(block_id)   # from_file=False, last_save_date=now
+        if audit:
+            db_service.record_audit(block_id, section_name, *audit)
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    # ---- build file: full builds only ----
+    if canonical.get("full_build_name"):
+        try:
+            build_canonical = dict(canonical)
+            build_canonical.update(parts_service.assign_parts_and_notes_to_build_slots(parts_list, notes_list))
+            entry.build_file_path = file_service.save_build_file(
+                build_canonical, config.build_file_directory, path=old_build_file_path or None)
+        except Exception as e:
+            traceback.print_exc()
+            db_service.roll_back_db_changes()
+            return SaveResult(success=False, failure_cause="build file", error=e)
+
+    try:
+        db_service.commit_db_changes()
+    except Exception as e:
+        traceback.print_exc()
+        db_service.roll_back_db_changes()
+        return SaveResult(success=False, failure_cause="db", error=e)
+
+    return SaveResult(success=True)

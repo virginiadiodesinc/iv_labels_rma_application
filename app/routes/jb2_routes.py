@@ -61,7 +61,7 @@ def get_jb2_bom_from_build_name():
 	parts = jb2.get_BOM(build_name)
 	sub_parts = []
 
-	for part in parts:
+	for part in parts[:]:
 		if part["part_type"] == "COMPONENT":
 			parts.remove(part)
 			sub_part = {
@@ -72,7 +72,7 @@ def get_jb2_bom_from_build_name():
 		if part["part_type"] == "BLOCK":
 			parts.remove(part)
 
-	for sub_part_entry in sub_parts:
+	for sub_part_entry in sub_parts[:]:
 		for sub_part in sub_part_entry["sub_parts"]:
 			if sub_part["part_type"] == "BLOCK":
 				sub_part_entry["sub_parts"].remove(sub_part)

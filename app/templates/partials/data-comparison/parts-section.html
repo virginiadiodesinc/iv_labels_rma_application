@@ -1,0 +1,98 @@
+{# partials/data-comparison/parts-section.html
+   Needs: build. Optional: edit_section, open_section, edit_error, form.
+   Whole-list edit: add / remove / reorder rows, then one Save. #}
+{% set is_editing = (edit_section == "parts") %}
+
+<details class="build-section build-section-wide" {% if is_editing or open_section == "parts" %}open{% endif %}>
+    <summary>Parts ({{ build.parts|length }})</summary>
+
+    {% if is_editing %}
+        <form class="section-edit-form"
+              hx-post="/data_comparison/save_section/"
+              hx-target="closest .build-data-row"
+              hx-swap="outerHTML">
+            <input type="hidden" name="block_id" value="{{ build.block_id }}">
+            <input type="hidden" name="section" value="parts">
+            <input type="hidden" name="loaded_save_date"
+                   value="{{ build.last_save_date.isoformat() if build.last_save_date else '' }}">
+
+            {% if edit_error %}<p class="edit-error">{{ edit_error }}</p>{% endif %}
+
+            <div class="parts-scroll">
+                <table class="parts-table edit-table">
+                    <thead>
+                        <tr>
+                            <th>Order</th><th>Type</th><th>Name</th><th>Lot</th><th>Qty</th><th>Tag</th>
+                            <th>Rev. Breakdown V</th><th>Temp</th><th>Indium</th><th>Modifications</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody class="edit-rows">
+                        {% for row in edit_part_rows(build, form) %}
+                            {% include "partials/data-comparison/edit-part-row.html" %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="button"
+                    hx-get="/data_comparison/new_part_row/"
+                    hx-target="previous .edit-rows"
+                    hx-swap="beforeend">Add part</button>
+
+            <p class="edit-hint">Order matters: the first diode fills diode1, the first circuit circuit1, and so on.
+                {% if build.full_build_name %}Saving rewrites the build file.{% endif %}</p>
+
+            <dl class="field-list">
+                <dt>Your initials</dt>
+                <dd><input type="text" name="editor_initials" class="initials-input" maxlength="3" required
+                           value="{{ form.get('editor_initials', '') if form else '' }}"></dd>
+                <dt>Reason</dt>
+                <dd><input type="text" name="edit_reason"
+                           value="{{ form.get('edit_reason', '') if form else '' }}"></dd>
+            </dl>
+
+            <div class="section-actions">
+                <button type="submit">Save</button>
+                <button type="button"
+                        hx-get="/data_comparison/view_section/"
+                        hx-vals='{{ {"block_id": build.block_id, "section": "parts"}|tojson }}'
+                        hx-target="closest .build-section"
+                        hx-swap="outerHTML">Cancel</button>
+            </div>
+        </form>
+    {% else %}
+        <div class="parts-scroll">
+            <table class="parts-table">
+                <thead>
+                    <tr>
+                        <th>Type</th><th>Name</th><th>Lot</th><th>Qty</th><th>Tag</th>
+                        <th>Rev. Breakdown V</th><th>Temp</th><th>Indium</th><th>Modifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for part in build.parts|sort(attribute="instance_id") %}
+                        <tr>
+                            <td>{{ part.part_type }}</td>
+                            <td>{{ part.part_name }}</td>
+                            <td>{{ part.part_lot }}</td>
+                            <td>{{ part.quantity }}</td>
+                            <td>{{ part.subassembly_tag or "—" }}</td>
+                            <td>{{ part.reverse_breakdown_voltage or "—" }}</td>
+                            <td>{{ part.temperature or "—" }}</td>
+                            <td>{{ part.indium or "—" }}</td>
+                            <td>{{ part.modifications or "—" }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="9">No parts listed</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="section-actions">
+            <button type="button"
+                    hx-get="/data_comparison/edit_section/"
+                    hx-vals='{{ {"block_id": build.block_id, "section": "parts"}|tojson }}'
+                    hx-target="closest .build-section"
+                    hx-swap="outerHTML">Edit</button>
+        </div>
+    {% endif %}
+</details>

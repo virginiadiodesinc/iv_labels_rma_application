@@ -1,8 +1,7 @@
 {% from "partials/data-comparison/macros.html" import field %}
 
 {# ---- values used by the summary line ---- #}
-{% set flag_names = ["mismatched_bom", "unlisted_block_name", "unlisted_build_name",
-                     "current_test_note_missing", "rework_info_note_missing", "no_parts_listed"] %}
+{% set flag_names = yellow_flag_columns() %}
 {% set active_flags = [] %}
 {% if build.yellow_flags %}
     {% for name in flag_names %}
@@ -31,52 +30,9 @@
 
             {% include "partials/data-comparison/yellow-flags-section.html" %}
 
-            <details class="build-section build-section-wide">
-                <summary>Parts ({{ build.parts|length }})</summary>
-                <div class="parts-scroll">
-                    <table class="parts-table">
-                        <thead>
-                            <tr>
-                                <th>Type</th><th>Name</th><th>Lot</th><th>Qty</th><th>Tag</th>
-                                <th>Rev. Breakdown V</th><th>Temp</th><th>Indium</th><th>Modifications</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for part in build.parts %}
-                                <tr>
-                                    <td>{{ part.part_type }}</td>
-                                    <td>{{ part.part_name }}</td>
-                                    <td>{{ part.part_lot }}</td>
-                                    <td>{{ part.quantity }}</td>
-                                    <td>{{ part.subassembly_tag or "—" }}</td>
-                                    <td>{{ part.reverse_breakdown_voltage or "—" }}</td>
-                                    <td>{{ part.temperature or "—" }}</td>
-                                    <td>{{ part.indium or "—" }}</td>
-                                    <td>{{ part.modifications or "—" }}</td>
-                                </tr>
-                            {% else %}
-                                <tr><td colspan="9">No parts listed</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </details>
+            {% include "partials/data-comparison/parts-section.html" %}
 
-            <details class="build-section build-section-wide">
-                <summary>Notes ({{ build.notes|length }})</summary>
-                <table class="parts-table">
-                    <tbody>
-                        {% for note in build.notes %}
-                            <tr>
-                                <td class="note-type-cell">{{ note.type.value|replace("_", " ") }}</td>
-                                <td>{{ note.note }}</td>
-                            </tr>
-                        {% else %}
-                            <tr><td colspan="2">No notes</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </details>
+            {% include "partials/data-comparison/notes-section.html" %}
 
         </div>
     </details>

@@ -1,0 +1,24 @@
+{# partials/data-comparison/filter-group.html
+   Needs: filters (the filter menu). One OR group: every filter inside it
+   must match; a build matches if ANY group matches. filter.html picks up
+   group_uid from this template's context. #}
+{% set group_uid = new_uid() %}
+<div class="filter-group">
+    <input type="hidden" name="filter_group" value="{{ group_uid }}">
+    <p class="filter-group-label">Match all of:</p>
+
+    <div class="filter-group-filters">
+        {% include "partials/data-comparison/filter.html" %}
+    </div>
+
+    <div class="filter-group-actions">
+        <button type="button"
+                hx-get="/add_new_filter/"
+                hx-vals='{"group_uid": "{{ group_uid }}"}'
+                hx-target="previous .filter-group-filters"
+                hx-swap="beforeend">Add Filter</button>
+        <button type="button" onclick="this.closest('.filter-group').remove();">
+            Remove Group
+        </button>
+    </div>
+</div>

@@ -231,3 +231,126 @@ def assign_parts_and_notes_to_build_slots(parts: list, notes: list) -> dict:
             break
 
     return slots
+
+
+"""
+Parsing for the data-comparison page's Parts / Notes edit forms. Kept
+separate from parts_from_form on purpose: that parser fills diode/PCB fields
+by position and relies on the main page's JS, and here every field is
+editable on every part type.
+
+Edit rows are named by a per-row uid (same trick as the filters):
+    part_uid                      one hidden input per row, DOM order = row order
+    part_type-<uid>, part_name-<uid>, ... one input per column
+    note_uid, note_type-<uid>, note-<uid>
+so a row's fields can never pair with another row's, whatever is deleted,
+added or reordered.
+
+These lists mirror part-row.html / note-row.html. If you like, point those
+templates at the part_types() / subassembly_tags() / note_types() globals so
+there's one copy.
+"""
+
+PART_TYPES = ['CIRCUIT', 'DIODE', 'FILTER MESH', 'MMIC', 'PCB', 'VAC',
+              'BCMESH', 'CONNECTOR', 'MA PARTS', 'MISC', 'SP OTHER',
+              'CABLE', 'FILTER', 'INVENTORY', 'PMP']
+
+SUBASSEMBLY_TAGS = ['NA', '1', '2', '3', 'A', 'B', 'A1', 'A2', 'G1', 'G2', 'G3', 'G4', 'W']
+
+# Note_Type member NAMES, in note-row.html's order.
+NOTE_TYPES = ["GENERIC", "CURRENT_TEST", "REWORK_SUMMARY", "FAST_CART_NUMBER", "CAPA_NUMBER", "JOB_NUMBER"]
+
+# Build_Parts columns, in the edit table's column order.
+PART_EDIT_COLUMNS = [
+    "part_type", "part_name", "part_lot", "quantity", "subassembly_tag",
+    "reverse_breakdown_voltage", "temperature", "indium", "modifications",
+]
+
+# Blank -> 'NA', same default the main page's inputs carry.
+NA_DEFAULT_COLUMNS = {"subassembly_tag", "reverse_breakdown_voltage", "temperature", "indium", "modifications"}
+
+
+def _clean(value) -> str:
+    return "" if value is None else str(value).strip()
+
+
+# ---------- parts ----------
+
+def part_row_for_display(part: dict) -> dict:
+    """Any part dict (DB-sourced or raw form) -> all-string row for the edit
+    table, with the NA defaults applied. Also used by db_service to normalize
+    rows before diffing, so an untouched legacy row (None where the form
+    shows 'NA') doesn't count as a change."""
+    row = {col: _clean(part.get(col)) for col in PART_EDIT_COLUMNS}
+    for col in NA_DEFAULT_COLUMNS:
+        row[col] = row[col] or "NA"
+    return row
+
+
+def blank_part_row() -> dict:
+    return part_row_for_display({"part_type": PART_TYPES[0], "quantity": 1})
+
+
+def raw_part_rows(form) -> list:
+    """Exactly what the user typed, row by row, no coercion. Used to re-show
+    the form after an error."""
+    return [
+        {col: _clean(form.get(f"{col}-{uid}")) for col in PART_EDIT_COLUMNS}
+        for uid in form.getlist("part_uid")
+    ]
+
+
+def parts_from_edit_form(form) -> list:
+    """Rows ready for Build_Parts inserts, in DOM order. Only checks what the
+    database itself needs (a name, a lot, a whole-number quantity); no red or
+    yellow flag rules, so wrong data can always be corrected or removed.
+    Raises ValueError listing every problem at once."""
+    parts, errors = [], []
+    for n, raw in enumerate(raw_part_rows(form), start=1):
+        part = part_row_for_display(raw)
+        if not part["part_type"]:
+            errors.append(f"Part {n}: type is blank.")
+        if not part["part_name"]:
+            errors.append(f"Part {n}: name is blank.")
+        if not part["part_lot"]:
+            errors.append(f"Part {n}: lot is blank (use NA or Unknown if it isn't known).")
+        try:
+            part["quantity"] = int(part["quantity"])
+        except ValueError:
+            errors.append(f"Part {n}: quantity must be a whole number.")
+        parts.append(part)
+    if errors:
+        raise ValueError(" ".join(errors))
+    return parts
+
+
+# ---------- notes ----------
+
+def note_row_for_display(note: dict) -> dict:
+    """type as the Note_Type NAME (uppercase), matching the select's values."""
+    text = note.get("note")
+    return {"type": _clean(note.get("type")).upper(), "note": "" if text is None else str(text)}
+
+
+def raw_note_rows(form) -> list:
+    return [
+        {"type": _clean(form.get(f"note_type-{uid}")).upper(), "note": form.get(f"note-{uid}") or ""}
+        for uid in form.getlist("note_uid")
+    ]
+
+
+def notes_from_edit_form(form) -> list:
+    """Same dict shape as notes_from_form ({"type": lowercase, "note": text}),
+    so stage_replace_notes and assign_parts_and_notes_to_build_slots take it
+    unchanged."""
+    notes, errors = [], []
+    for n, raw in enumerate(raw_note_rows(form), start=1):
+        text = raw["note"].strip()
+        if raw["type"] not in NOTE_TYPES:
+            errors.append(f"Note {n}: unknown type.")
+        if not text:
+            errors.append(f"Note {n}: text is blank.")
+        notes.append({"type": raw["type"].lower(), "note": text})
+    if errors:
+        raise ValueError(" ".join(errors))
+    return notes

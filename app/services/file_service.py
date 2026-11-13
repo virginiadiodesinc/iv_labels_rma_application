@@ -131,7 +131,7 @@ def choose_iv_file_path(canonical: dict, iv_file_directory: str) -> str:
         directory=iv_file_directory
         )
     selected_path = str(Path(selected_path[0]))
-    current_iv_file_directory = str(Path(selected_path[0]).parent)
+    current_iv_file_directory = str(Path(selected_path).parent)
     return selected_path, current_iv_file_directory
 
 

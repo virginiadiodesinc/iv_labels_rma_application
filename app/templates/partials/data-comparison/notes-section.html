@@ -1,0 +1,77 @@
+{# partials/data-comparison/notes-section.html
+   Needs: build. Optional: edit_section, open_section, edit_error, form. #}
+{% set is_editing = (edit_section == "notes") %}
+
+<details class="build-section build-section-wide" {% if is_editing or open_section == "notes" %}open{% endif %}>
+    <summary>Notes ({{ build.notes|length }})</summary>
+
+    {% if is_editing %}
+        <form class="section-edit-form"
+              hx-post="/data_comparison/save_section/"
+              hx-target="closest .build-data-row"
+              hx-swap="outerHTML">
+            <input type="hidden" name="block_id" value="{{ build.block_id }}">
+            <input type="hidden" name="section" value="notes">
+            <input type="hidden" name="loaded_save_date"
+                   value="{{ build.last_save_date.isoformat() if build.last_save_date else '' }}">
+
+            {% if edit_error %}<p class="edit-error">{{ edit_error }}</p>{% endif %}
+
+            <table class="parts-table edit-table">
+                <thead>
+                    <tr><th>Order</th><th>Type</th><th>Note</th><th></th></tr>
+                </thead>
+                <tbody class="edit-rows">
+                    {% for row in edit_note_rows(build, form) %}
+                        {% include "partials/data-comparison/edit-note-row.html" %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="button"
+                    hx-get="/data_comparison/new_note_row/"
+                    hx-target="previous .edit-rows"
+                    hx-swap="beforeend">Add note</button>
+
+            <p class="edit-hint">Notes fill the build file's note lines in this order, ahead of PCB mods and extra parts.
+                {% if build.full_build_name %}Saving rewrites the build file.{% endif %}</p>
+
+            <dl class="field-list">
+                <dt>Your initials</dt>
+                <dd><input type="text" name="editor_initials" class="initials-input" maxlength="3" required
+                           value="{{ form.get('editor_initials', '') if form else '' }}"></dd>
+                <dt>Reason</dt>
+                <dd><input type="text" name="edit_reason"
+                           value="{{ form.get('edit_reason', '') if form else '' }}"></dd>
+            </dl>
+
+            <div class="section-actions">
+                <button type="submit">Save</button>
+                <button type="button"
+                        hx-get="/data_comparison/view_section/"
+                        hx-vals='{{ {"block_id": build.block_id, "section": "notes"}|tojson }}'
+                        hx-target="closest .build-section"
+                        hx-swap="outerHTML">Cancel</button>
+            </div>
+        </form>
+    {% else %}
+        <table class="parts-table">
+            <tbody>
+                {% for note in build.notes|sort(attribute="note_id") %}
+                    <tr>
+                        <td class="note-type-cell">{{ note.type.value|replace("_", " ") }}</td>
+                        <td>{{ note.note }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="2">No notes</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="section-actions">
+            <button type="button"
+                    hx-get="/data_comparison/edit_section/"
+                    hx-vals='{{ {"block_id": build.block_id, "section": "notes"}|tojson }}'
+                    hx-target="closest .build-section"
+                    hx-swap="outerHTML">Edit</button>
+        </div>
+    {% endif %}
+</details>

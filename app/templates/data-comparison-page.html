@@ -18,14 +18,14 @@
 
                 <h3>Filters</h3>
                 <div id="all-filters-container">
-                    {% include "partials/data-comparison/filter.html" %}
+                    {% include "partials/data-comparison/filter-group.html" %}
                 </div>
 
                 <button type="button"
                         id="add-new-filter-button"
-                        hx-get="/add_new_filter/"
+                        hx-get="/add_filter_group/"
                         hx-target="#all-filters-container"
-                        hx-swap="beforeend">Add New Filter</button>
+                        hx-swap="beforeend">Add OR Group</button>
 
                 <h3>Sorts (top = highest priority)</h3>
                 <div id="all-sorts-container">

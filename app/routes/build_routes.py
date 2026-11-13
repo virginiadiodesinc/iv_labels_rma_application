@@ -120,6 +120,14 @@ def clear_part_search():
 	return render_template("partials/search/searched-part-list.html")
 
 
+def is_number(string_input) -> bool:
+	try:
+		float(string_input)
+		return True
+	except (ValueError, TypeError):
+		return False
+
+
 @build_bp.post("/import_diode_info_from_iv/")
 def import_diode_info_from_iv():
 	iv_parts_list = parts_service.parts_from_form(request.form)
@@ -133,10 +141,9 @@ def import_diode_info_from_iv():
 
 	for iv_field, part_field in iv_form_fields.items():
 		diode_info[part_field] = request.form.get(iv_field)
-		if diode_info[part_field] and diode_info[part_field].isnumeric() and diode_info[part_field] != "0.0":
+		# CONVERTING NUMBERS AND FLOATS TO
+		if diode_info[part_field] and diode_info[part_field].is_number() and diode_info[part_field] != "0.0":
 			diode_info[part_field] = round(float(diode_info[part_field]), 2)
-
-
 
 	return render_template("partials/build-page/diode-row.html", part=diode_info)
 

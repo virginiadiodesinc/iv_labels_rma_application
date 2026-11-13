@@ -1,0 +1,25 @@
+{# partials/data-comparison/edit-note-row.html
+   Needs: row = {"type": Note_Type NAME, "note": text}. #}
+{% set uid = new_uid() %}
+<tr class="edit-row">
+    <td class="edit-row-move">
+        <input type="hidden" name="note_uid" value="{{ uid }}">
+        <button type="button" title="Move up"
+                onclick="const r = this.closest('tr'); if (r.previousElementSibling) r.previousElementSibling.before(r)">▲</button>
+        <button type="button" title="Move down"
+                onclick="const r = this.closest('tr'); if (r.nextElementSibling) r.nextElementSibling.after(r)">▼</button>
+    </td>
+    <td>
+        <select name="note_type-{{ uid }}">
+            {% for t in note_types() %}
+                <option value="{{ t }}" {% if t == row.type %}selected{% endif %}>
+                    {{ t.replace("_", " ").replace("SUMMARY", "INFO") }}</option>
+            {% endfor %}
+        </select>
+    </td>
+    <td><textarea name="note-{{ uid }}" cols="50" rows="2">{{ row.note }}</textarea></td>
+    <td>
+        <button type="button" class="delete-row-button" title="Remove row"
+                onclick="this.closest('tr').remove()">X</button>
+    </td>
+</tr>

@@ -1,0 +1,66 @@
+{# partials/data-comparison/edit-part-row.html
+   Needs: row (all-string dict keyed by Build_Parts column).
+   Every input name carries this row's uid; the hidden part_uid gives the
+   row order. Explicit hx-swap on the datalists is required: the edit form's
+   hx-swap="outerHTML" would otherwise be inherited and replace them. #}
+{% set uid = new_uid() %}
+<tr class="edit-row">
+    <td class="edit-row-move">
+        <input type="hidden" name="part_uid" value="{{ uid }}">
+        <button type="button" title="Move up"
+                onclick="const r = this.closest('tr'); if (r.previousElementSibling) r.previousElementSibling.before(r)">▲</button>
+        <button type="button" title="Move down"
+                onclick="const r = this.closest('tr'); if (r.nextElementSibling) r.nextElementSibling.after(r)">▼</button>
+    </td>
+    <td>
+        {# a legacy type that isn't in the list stays selectable, so an untouched row can't change #}
+        {% set types = part_types() if (not row.part_type or row.part_type in part_types()) else [row.part_type] + part_types() %}
+        <select name="part_type-{{ uid }}" id="part-type-{{ uid }}">
+            {% for t in types %}
+                <option {% if t == row.part_type %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </td>
+    <td>
+        <input type="text" name="part_name-{{ uid }}" id="part-name-{{ uid }}"
+               value="{{ row.part_name }}" size="14" autocomplete="off"
+               list="part-results-{{ uid }}">
+        <datalist id="part-results-{{ uid }}"
+                  hx-get="{{ url_for('jb2.search_jb2_parts') }}"
+                  hx-trigger="input changed delay:500ms from:#part-name-{{ uid }}"
+                  hx-target="this"
+                  hx-swap="innerHTML"
+                  hx-on::config-request="
+                      event.detail.parameters['searched-part-name'] = document.getElementById('part-name-{{ uid }}').value;
+                      event.detail.parameters['searched-part-type'] = document.getElementById('part-type-{{ uid }}').value;
+                  "></datalist>
+    </td>
+    <td>
+        <input type="text" name="part_lot-{{ uid }}" id="part-lot-{{ uid }}"
+               value="{{ row.part_lot }}" size="10" autocomplete="off"
+               list="lot-options-{{ uid }}">
+        <datalist id="lot-options-{{ uid }}"
+                  hx-get="/data_comparison/lot_options/"
+                  hx-trigger="focus from:#part-lot-{{ uid }}"
+                  hx-vals='js:{"part_name": document.getElementById("part-name-{{ uid }}").value}'
+                  hx-target="this"
+                  hx-swap="innerHTML"></datalist>
+    </td>
+    <td><input type="number" name="quantity-{{ uid }}" value="{{ row.quantity }}" min="0" class="edit-qty"></td>
+    <td>
+        {% set tags = subassembly_tags() if row.subassembly_tag in subassembly_tags() else [row.subassembly_tag] + subassembly_tags() %}
+        <select name="subassembly_tag-{{ uid }}">
+            {% for t in tags %}
+                <option {% if t == row.subassembly_tag %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </td>
+    <td><input type="text" name="reverse_breakdown_voltage-{{ uid }}" value="{{ row.reverse_breakdown_voltage }}" size="5"></td>
+    <td><input type="text" name="temperature-{{ uid }}" value="{{ row.temperature }}" size="5"></td>
+    <td><input type="text" name="indium-{{ uid }}" value="{{ row.indium }}" size="5"></td>
+    <td><input type="text" name="modifications-{{ uid }}" value="{{ row.modifications }}" size="14"></td>
+    <td>
+        <button type="button" class="delete-row-button" title="Remove row"
+                onclick="this.closest('tr').remove()">X</button>
+    </td>
+</tr>

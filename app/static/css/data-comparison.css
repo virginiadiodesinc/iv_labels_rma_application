@@ -195,3 +195,17 @@
 	gap: 10px;
 	margin: 10px 0;
 }
+
+
+.filter-group { 
+	border: 1px solid #ccc; 
+	padding: 0.5em; 
+	margin-bottom: 0.5em; 
+}
+
+.filter-group + .filter-group::before { 
+	content: "OR"; 
+	display: block; 
+	font-weight: bold; 
+	margin-bottom: 0.4em; 
+}

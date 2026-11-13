@@ -2,6 +2,7 @@
 {% set input_kind = "single" %}
 <div class="filter-container">
     <input type="hidden" name="filter_uid" value="{{ filter_uid }}">
+    <input type="hidden" name="filter-group-{{ filter_uid }}" value="{{ group_uid }}">
 
     <select id="filter-key-{{ filter_uid }}"
             name="filter-key-{{ filter_uid }}"

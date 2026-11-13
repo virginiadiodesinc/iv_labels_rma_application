@@ -6,12 +6,14 @@ for the field-name mapping instead of hand-listing columns per route.
 """
 
 from app.services import field_registry as fr
+from app.services import parts_service
 from app.db.database import db_session
 from app.db.models import Build_Info, Build_Parts, Notes, IV_Info, Polarity, Note_Type, Yellow_Flags
 from app.db import queries
 from sqlalchemy import Integer, case, cast, func, select, or_, and_
 from sqlalchemy.orm import selectinload
 from datetime import datetime, date, timedelta
+from collections import Counter
 import logging
 
 def get_block_and_build_info(canonical: dict):
@@ -62,46 +64,38 @@ def stage_upsert_build_info(canonical: dict, **extra_columns):
     return queries.upsert_table_entry(db_session, Build_Info, block_id, **kwargs)
 
 
-def stage_replace_build_parts_and_notes(canonical: dict, parts_list: list, notes_list: list) -> list:
-    """Full-build saves replace ALL parts for this block wholesale --
-    Build_Parts has no meaningful single row to upsert (its real PK,
-    instance_id, is an unrelated autoincrement int; block_id is just a
-    repeated FK column on every row), so delete-then-reinsert is the
-    correct operation here, not a per-row upsert like Build_Info gets.
-    Only flushes -- does not commit, same as everything else in here."""
-    block_id = fr.build_block_id(canonical)
+def _note_type(value: str) -> Note_Type:
+    try:
+        return Note_Type[value.upper()]
+    except (KeyError, AttributeError):
+        raise ValueError(f"Unknown note type '{value}'")
 
-    existing_parts = queries.get_table_entries(db_session, Build_Parts, block_id=block_id)
-    for entry in existing_parts:
+
+# ---------- STAGING ----------
+
+def stage_replace_build_parts(block_id: str, parts_list: list) -> list:
+    """Delete-then-reinsert every Build_Parts row for this block. Insert order
+    = list order, so instance_id preserves the order slot assignment uses.
+    Only flushes."""
+    for entry in queries.get_table_entries(db_session, Build_Parts, block_id=block_id):
         queries.delete_table_entry(db_session, Build_Parts, entry.instance_id)
+    return [queries.add_table_entry(db_session, Build_Parts, block_id=block_id, **part)
+            for part in parts_list]
 
-    existing_notes = queries.get_table_entries(db_session, Notes, block_id=block_id)
-    for entry in existing_notes:
+
+def stage_replace_notes(block_id: str, notes_list: list) -> list:
+    """Same as above for Notes. Only flushes."""
+    for entry in queries.get_table_entries(db_session, Notes, block_id=block_id):
         queries.delete_table_entry(db_session, Notes, entry.note_id)
+    return [queries.add_table_entry(db_session, Notes, block_id=block_id,
+                                    type=_note_type(note["type"]), note=note["note"])
+            for note in notes_list]
 
-    new_entries = []
-    for part in parts_list:
-        entry = queries.add_table_entry(db_session, Build_Parts, block_id=block_id, **part)
-        new_entries.append(entry)
-    for index, note in enumerate(notes_list):
-        note_type = None
-        if 	note["type"].lower() ==  "generic":
-            note_type = Note_Type.GENERIC
-        elif note["type"].lower() ==  "current_test":
-            note_type = Note_Type.CURRENT_TEST
-        elif note["type"].lower() ==  "rework_summary":
-            note_type = Note_Type.REWORK_SUMMARY
-        elif note["type"].lower() ==  "fast_cart_number":
-            note_type = Note_Type.FAST_CART_NUMBER
-        elif note["type"].lower() ==  "capa_number":
-            note_type = Note_Type.CAPA_NUMBER
-        elif note["type"].lower() ==  "job_number":
-            note_type = Note_Type.JOB_NUMBER
-        note_with_proper_type = note.copy()
-        note_with_proper_type["type"] = note_type
-        entry = queries.add_table_entry(db_session, Notes, block_id=block_id, **note_with_proper_type)
-        new_entries.append(entry)
-    return new_entries
+
+def stage_replace_build_parts_and_notes(canonical: dict, parts_list: list, notes_list: list) -> list:
+    """Regular saves: replace both lists at once. Unchanged signature."""
+    block_id = fr.build_block_id(canonical)
+    return stage_replace_build_parts(block_id, parts_list) + stage_replace_notes(block_id, notes_list)
 
 
 def stage_add_iv_info(canonical: dict) -> object:
@@ -281,9 +275,9 @@ SORT_REGISTRY = {
 }
 
 
-def search_builds(filters, sorts, page, page_size):
-    conditions = queries.build_filter_conditions(filters, FILTER_REGISTRY)
-    base  = queries.apply_filters(select(Build_Info), conditions)
+def search_builds(filter_groups, sorts, page, page_size):
+    conditions = queries.build_grouped_filter_conditions(filter_groups, FILTER_REGISTRY)
+    base = queries.apply_filters(select(Build_Info), conditions)
 
     total = queries.count_query(db_session, base)                  # count BEFORE sorting
 
@@ -531,3 +525,63 @@ def get_parts_and_notes_as_dicts(block_id):
         for n in sorted(build.notes, key=lambda n: n.note_id)
     ]
     return parts, notes
+
+
+# ---------- VALIDATION ----------
+
+LIST_SECTIONS = {"parts", "notes"}
+
+
+def _part_key(row: dict) -> tuple:
+    display = parts_service.part_row_for_display(row)
+    return tuple(display[c] for c in parts_service.PART_EDIT_COLUMNS)
+
+
+def _note_key(row: dict) -> tuple:
+    display = parts_service.note_row_for_display(row)
+    return (display["type"], display["note"].strip())
+
+
+def _diff_rows(label, old_rows, new_rows, key_fn, columns) -> list:
+    """Rows have no stable identity (they're deleted and reinserted), so this
+    compares the lists as multisets: each row only in the old list is
+    'removed', each row only in the new one is 'added', and an edited row
+    shows up as one of each. Change tuples keep the (column, old, new) shape
+    record_audit already gets:
+        ("part", {row}, None)   removed
+        ("part", None, {row})   added
+    If nothing was added or removed but the order changed (which matters for
+    build-file slots), one ("part_order", old_keys, new_keys) entry is
+    recorded instead."""
+    old_keys = [key_fn(r) for r in old_rows]
+    new_keys = [key_fn(r) for r in new_rows]
+    removed = Counter(old_keys) - Counter(new_keys)
+    added = Counter(new_keys) - Counter(old_keys)
+
+    changes = [(label, dict(zip(columns, k)), None) for k in removed.elements()]
+    changes += [(label, None, dict(zip(columns, k))) for k in added.elements()]
+    if not changes and old_keys != new_keys:
+        changes.append((f"{label}_order", old_keys, new_keys))
+    return changes
+
+
+def validate_parts_or_notes_edit(block_id: str, section_name: str, form):
+    """PURE validation for the whole-list Parts / Notes edits.
+    Returns (new_rows, changes, initials, reason); raises ValueError with a
+    user-readable message."""
+    if section_name not in LIST_SECTIONS:
+        raise ValueError("Unknown section.")
+    build = db_session.get(Build_Info, block_id)
+    if build is None:
+        raise ValueError("Build not found.")
+    initials = _check_editor_and_freshness(build, form)
+
+    old_parts, old_notes = get_parts_and_notes_as_dicts(block_id)
+    if section_name == "parts":
+        new_rows = parts_service.parts_from_edit_form(form)
+        changes = _diff_rows("part", old_parts, new_rows, _part_key, parts_service.PART_EDIT_COLUMNS)
+    else:
+        new_rows = parts_service.notes_from_edit_form(form)
+        changes = _diff_rows("note", old_notes, new_rows, _note_key, ("type", "note"))
+
+    return new_rows, changes, initials, form.get("edit_reason", "").strip()

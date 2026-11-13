@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete, func, cast, Integer, inspect
+from sqlalchemy import select, delete, func, cast, Integer, inspect, and_, or_
 
 # All of CREATE/UPDATE/DESTROY/UPSERT below STAGE a change (add/setattr +
 # flush) but never commit and never catch/rollback on their own. Committing
@@ -134,6 +134,19 @@ def build_filter_conditions(filters, registry):
 		else:
 			conditions.append(translate_filter(entry["column"], operation, value))
 	return conditions
+
+
+def build_grouped_filter_conditions(groups, registry):
+    """groups: [[(key, operation, value), ...], ...] -- one inner list per OR
+    group. Returns a list for apply_filters: [] (no filtering) or one OR of
+    ANDs. Groups with no usable filters are skipped rather than treated as
+    'match everything', which an empty AND would otherwise mean."""
+    clauses = []
+    for group in groups:
+        conditions = build_filter_conditions(group, registry)
+        if conditions:
+            clauses.append(and_(*conditions))
+    return [or_(*clauses)] if clauses else []
 
 
 def apply_filters(query, conditions):
